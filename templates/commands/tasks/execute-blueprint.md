@@ -16,6 +16,10 @@ If the plan does not exist, or the plan does not have an execution blueprint sec
 
 ## Execution Process
 
+### Phase Pre-Execution
+
+If the current branch is `main`, ask the user if you should create a new branch for this execution. Generate a branch name compatible with conventional commits.
+
 ### Phase Execution Workflow
 
 1. **Phase Initialization**

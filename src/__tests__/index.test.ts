@@ -34,6 +34,25 @@ describe('index.ts', () => {
     mockUtils.getTemplatePath.mockImplementation((file: string) => `/workspace/templates/${file}`);
     mockUtils.getCreatedDirectories.mockReturnValue(['.ai/task-manager', '.claude']);
     mockUtils.exists.mockResolvedValue(true);
+    mockUtils.getTemplateFormat.mockImplementation((assistant) => assistant === 'claude' ? 'md' : 'toml');
+    mockUtils.resolvePath.mockImplementation((baseDir, ...segments) => {
+      const base = baseDir || '.';
+      const resolved = base === '.' ? '/workspace' : base;
+      return `${resolved}/${segments.join('/')}`;
+    });
+  });
+
+  afterEach(() => {
+    // Clear all mocks and reset to clean state
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+  });
+
+  afterAll(() => {
+    // Final cleanup
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+    jest.restoreAllMocks();
   });
 
   describe('init', () => {
@@ -47,7 +66,7 @@ describe('index.ts', () => {
       expect(result.success).toBe(true);
       expect(result.message).toBe('AI Task Manager initialized successfully!');
       expect(result.data).toEqual({ assistants: ['claude'] });
-      expect(mockLogger.info).toHaveBeenCalledWith('Initializing AI Task Manager...');
+      expect(mockLogger.info).toHaveBeenCalledWith('Initializing AI Task Manager in: /workspace/...');
       expect(mockLogger.success).toHaveBeenCalledWith('AI Task Manager initialized successfully!');
     });
 
@@ -69,13 +88,13 @@ describe('index.ts', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual({ assistants: ['claude', 'gemini'] });
-      expect(mockUtils.ensureDir).toHaveBeenCalledWith('.ai/task-manager/plans');
+      expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.ai/task-manager/plans');
     });
 
     it('should create directory structure correctly', async () => {
       await init(defaultOptions);
 
-      expect(mockUtils.ensureDir).toHaveBeenCalledWith('.ai/task-manager/plans');
+      expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.ai/task-manager/plans');
     });
 
     it('should copy common templates', async () => {
@@ -83,11 +102,11 @@ describe('index.ts', () => {
 
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/ai-task-manager/TASK_MANAGER_INFO.md',
-        '.ai/task-manager/TASK_MANAGER_INFO.md'
+        '/workspace/.ai/task-manager/TASK_MANAGER_INFO.md'
       );
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/ai-task-manager/VALIDATION_GATES.md',
-        '.ai/task-manager/VALIDATION_GATES.md'
+        '/workspace/.ai/task-manager/VALIDATION_GATES.md'
       );
     });
 
@@ -96,15 +115,15 @@ describe('index.ts', () => {
 
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/create-plan.md',
-        '.claude/commands/tasks/create-plan.md'
+        '/workspace/.claude/commands/tasks/create-plan.md'
       );
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/execute-blueprint.md',
-        '.claude/commands/tasks/execute-blueprint.md'
+        '/workspace/.claude/commands/tasks/execute-blueprint.md'
       );
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/generate-tasks.md',
-        '.claude/commands/tasks/generate-tasks.md'
+        '/workspace/.claude/commands/tasks/generate-tasks.md'
       );
     });
 
@@ -226,13 +245,13 @@ describe('index.ts', () => {
       expect(mockLogger.info).toHaveBeenCalledWith('  ✓ .claude/commands/tasks');
 
       expect(mockLogger.info).toHaveBeenCalledWith('Template files copied:');
-      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ .ai/task-manager/TASK_MANAGER_INFO.md');
-      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ .ai/task-manager/VALIDATION_GATES.md');
-      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ .claude/commands/tasks/create-plan.md');
+      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ /workspace/.ai/task-manager/TASK_MANAGER_INFO.md');
+      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ /workspace/.ai/task-manager/VALIDATION_GATES.md');
+      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ /workspace/.claude/commands/tasks/create-plan.md');
       expect(mockLogger.info).toHaveBeenCalledWith(
-        '  ✓ .claude/commands/tasks/execute-blueprint.md'
+        '  ✓ /workspace/.claude/commands/tasks/execute-blueprint.md'
       );
-      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ .claude/commands/tasks/generate-tasks.md');
+      expect(mockLogger.info).toHaveBeenCalledWith('  ✓ /workspace/.claude/commands/tasks/generate-tasks.md');
 
       expect(mockLogger.success).toHaveBeenCalledWith(
         'Project is ready for AI-powered task management!'
@@ -256,17 +275,17 @@ describe('index.ts', () => {
       await init(options);
 
       // Verify that ensureDir is called for both assistants
-      expect(mockUtils.ensureDir).toHaveBeenCalledWith('.claude/commands/tasks');
-      expect(mockUtils.ensureDir).toHaveBeenCalledWith('.gemini/commands/tasks');
+      expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.claude/commands/tasks');
+      expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.gemini/commands/tasks');
 
       // Verify that templates are copied for both assistants
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/create-plan.md',
-        '.claude/commands/tasks/create-plan.md'
+        '/workspace/.claude/commands/tasks/create-plan.md'
       );
       expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
-        '/workspace/templates/commands/tasks/create-plan.md',
-        '.gemini/commands/tasks/create-plan.md'
+        '/workspace/templates/commands/tasks/create-plan.toml',
+        '/workspace/.gemini/commands/tasks/create-plan.toml'
       );
     });
   });
@@ -278,7 +297,7 @@ describe('index.ts', () => {
       const result = await isInitialized();
 
       expect(result).toBe(true);
-      expect(mockUtils.exists).toHaveBeenCalledWith('.ai/task-manager');
+      expect(mockUtils.exists).toHaveBeenCalledWith('/workspace/.ai/task-manager');
     });
 
     it('should return false when .ai/task-manager does not exist', async () => {
@@ -287,7 +306,7 @@ describe('index.ts', () => {
       const result = await isInitialized();
 
       expect(result).toBe(false);
-      expect(mockUtils.exists).toHaveBeenCalledWith('.ai/task-manager');
+      expect(mockUtils.exists).toHaveBeenCalledWith('/workspace/.ai/task-manager');
     });
   });
 
@@ -374,9 +393,9 @@ describe('index.ts', () => {
 
       await getInitInfo();
 
-      expect(mockUtils.exists).toHaveBeenCalledWith('.ai/task-manager');
-      expect(mockUtils.exists).toHaveBeenCalledWith('.claude/commands/tasks');
-      expect(mockUtils.exists).toHaveBeenCalledWith('.gemini/commands/tasks');
+      expect(mockUtils.exists).toHaveBeenCalledWith('/workspace/.ai/task-manager');
+      expect(mockUtils.exists).toHaveBeenCalledWith('/workspace/.claude/commands/tasks');
+      expect(mockUtils.exists).toHaveBeenCalledWith('/workspace/.gemini/commands/tasks');
       expect(mockUtils.exists).toHaveBeenCalledTimes(3);
     });
   });
@@ -401,7 +420,7 @@ describe('index.ts', () => {
       expect(result.success).toBe(true);
       expect(mockUtils.parseAssistants).toHaveBeenCalledWith('claude,gemini');
       expect(mockUtils.validateAssistants).toHaveBeenCalledWith(['claude', 'gemini']);
-      expect(mockUtils.ensureDir).toHaveBeenCalledWith('.ai/task-manager/plans');
+      expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.ai/task-manager/plans');
       expect(mockLogger.success).toHaveBeenCalledWith('AI Task Manager initialized successfully!');
       expect(mockLogger.success).toHaveBeenCalledWith(
         'Project is ready for AI-powered task management!'

@@ -11,6 +11,11 @@
 export type Assistant = 'claude' | 'gemini';
 
 /**
+ * Template format types for different assistants
+ */
+export type TemplateFormat = 'md' | 'toml';
+
+/**
  * Options for the init command
  */
 export interface InitOptions {

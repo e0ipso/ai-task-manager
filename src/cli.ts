@@ -22,6 +22,10 @@ program
     '--assistants <value>',
     'Comma-separated list of assistants to configure (claude,gemini)'
   )
+  .option(
+    '--destination-directory <path>',
+    'Directory to create project structure in (default: current directory)'
+  )
   .action(async (options: InitOptions) => {
     try {
       // Initialize the logger to ensure colors are available

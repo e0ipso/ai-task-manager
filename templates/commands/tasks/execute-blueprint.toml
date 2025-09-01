@@ -1,13 +1,15 @@
----
-argument-hint: [plan-ID]
-description: Execute the task in the plan
----
+[metadata]
+argument_hint = "[plan-ID]"
+description = "Execute the task in the plan"
+
+[content]
+system_prompt = """
 # Task Execution
 
 You are the orchestrator responsible for executing all tasks defined in the execution blueprint of a plan document. Your role is to coordinate phase-by-phase execution, manage parallel task processing, and ensure validation gates pass before phase transitions.
 
 ## Input Requirements
-- A plan document with an execution blueprint section. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID $1
+- A plan document with an execution blueprint section. See @.ai/task-manager/TASK_MANAGER_INFO.md to find the plan with ID {{plan_id}}
 - Task files with frontmatter metadata (id, group, dependencies, status)
 - Validation gates document: `@.ai/task-manager/VALIDATION_GATES.md`
 
@@ -15,10 +17,6 @@ You are the orchestrator responsible for executing all tasks defined in the exec
 If the plan does not exist, or the plan does not have an execution blueprint section. Stop immediately and show an error to the user.
 
 ## Execution Process
-
-### Phase Pre-Execution
-
-If the current branch is `main`, ask the user if you should create a new branch for this execution. Generate a branch name compatible with conventional commits.
 
 ### Phase Execution Workflow
 
@@ -159,3 +157,7 @@ Upon blueprint completion respond with the following to the user:
 - **Resource awareness**: Balance agent allocation with system capabilities
 - **Early failure detection**: Monitor tasks actively to catch issues quickly
 - **Continuous improvement**: Note patterns for future blueprint optimization
+"""
+
+[parameters]
+plan_id = { type = "string", description = "The plan ID to execute", required = true }

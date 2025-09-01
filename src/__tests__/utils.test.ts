@@ -30,6 +30,7 @@ import {
   getHomeDirectory,
   remove,
   move,
+  getTemplateFormat,
 } from '../utils';
 import { FileSystemError, Assistant } from '../types';
 
@@ -41,18 +42,38 @@ const mockFs = fs as jest.Mocked<any>;
 jest.mock('os');
 const mockOs = os as jest.Mocked<typeof os>;
 
-// Mock path - but keep real implementations for path helper tests
-jest.mock('path', () => ({
-  ...jest.requireActual('path'),
-  resolve: jest.fn().mockImplementation((...args: string[]) => 
-    jest.requireActual('path').resolve(...args)
-  )
-}));
-const mockPath = path as jest.Mocked<any>;
+// Mock path module - keep real implementations for most functions but mock resolve
+jest.mock('path', () => {
+  const actualPath = jest.requireActual('path');
+  return {
+    ...actualPath,
+    resolve: jest.fn().mockImplementation((...args: string[]) => 
+      actualPath.resolve(...args)
+    )
+  };
+});
+const mockPath = path as jest.Mocked<typeof path> & { resolve: jest.MockedFunction<typeof path.resolve> };
 
 describe('utils.ts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset path.resolve to default behavior
+    mockPath.resolve.mockImplementation((...args: string[]) => 
+      jest.requireActual('path').resolve(...args)
+    );
+  });
+
+  afterEach(() => {
+    // Clear all mocks and timers
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+  });
+
+  afterAll(() => {
+    // Final cleanup
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+    jest.restoreAllMocks();
   });
 
   describe('ensureDir', () => {
@@ -432,31 +453,43 @@ describe('utils.ts', () => {
     it('should return directories for single assistant', () => {
       const result = getCreatedDirectories(['claude']);
       expect(result).toEqual([
-        '.ai/task-manager',
-        '.ai/task-manager/plans',
-        '.claude',
-        '.claude/commands',
-        '.claude/commands/tasks',
+        '/workspace/.ai/task-manager',
+        '/workspace/.ai/task-manager/plans',
+        '/workspace/.claude',
+        '/workspace/.claude/commands',
+        '/workspace/.claude/commands/tasks',
       ]);
     });
 
     it('should return directories for multiple assistants', () => {
       const result = getCreatedDirectories(['claude', 'gemini']);
       expect(result).toEqual([
-        '.ai/task-manager',
-        '.ai/task-manager/plans',
-        '.claude',
-        '.claude/commands',
-        '.claude/commands/tasks',
-        '.gemini',
-        '.gemini/commands',
-        '.gemini/commands/tasks',
+        '/workspace/.ai/task-manager',
+        '/workspace/.ai/task-manager/plans',
+        '/workspace/.claude',
+        '/workspace/.claude/commands',
+        '/workspace/.claude/commands/tasks',
+        '/workspace/.gemini',
+        '/workspace/.gemini/commands',
+        '/workspace/.gemini/commands/tasks',
       ]);
     });
 
     it('should handle empty assistant array', () => {
       const result = getCreatedDirectories([]);
-      expect(result).toEqual(['.ai/task-manager', '.ai/task-manager/plans']);
+      expect(result).toEqual(['/workspace/.ai/task-manager', '/workspace/.ai/task-manager/plans']);
+    });
+  });
+
+  describe('getTemplateFormat', () => {
+    it('should return md format for Claude', () => {
+      const result = getTemplateFormat('claude');
+      expect(result).toBe('md');
+    });
+
+    it('should return toml format for Gemini', () => {
+      const result = getTemplateFormat('gemini');
+      expect(result).toBe('toml');
     });
   });
 
