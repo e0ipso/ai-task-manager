@@ -20,9 +20,22 @@ describe('logger.ts (simplified)', () => {
     logger.setDebugMode(false);
   });
 
+  afterEach(() => {
+    // Ensure debug mode is reset after each test
+    logger.setDebugMode(false);
+    // Clear any pending async operations
+    jest.clearAllTimers();
+  });
+
   afterAll(() => {
+    // Restore console spies
     consoleSpy.log.mockRestore();
     consoleSpy.error.mockRestore();
+    
+    // Final cleanup
+    logger.setDebugMode(false);
+    jest.clearAllTimers();
+    jest.clearAllMocks();
   });
 
   describe('debug mode', () => {

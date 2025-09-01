@@ -1,8 +1,9 @@
----
-argument-hint: [plan-ID]
-description: Generate tasks to implement the plan with the provided ID.
----
-# Comprehensive Task List Creation
+[metadata]
+argument-hint = "{{plan_id}}"
+description = "Generate tasks to implement the plan with the provided ID."
+
+[prompt]
+content = """# Comprehensive Task List Creation
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
 Include @.ai/task-manager/TASK_MANAGER_INFO.md for the directory structure of tasks.
@@ -12,7 +13,7 @@ Include @.ai/task-manager/TASK_MANAGER_INFO.md for the directory structure of ta
 You will think hard to analyze the provided plan document and decompose it into atomic, actionable tasks with clear dependencies and groupings.
 
 ### Input
-- A plan document. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID $1
+- A plan document. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID {{plan_id}}
 - The plan contains high-level objectives and implementation steps
 
 ### Input Error Handling
@@ -182,7 +183,7 @@ The schema for this frontmatter is:
     },
     "created": {
       "type": "string",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}$",
       "description": "Creation date in YYYY-MM-DD format"
     }
   },
@@ -212,90 +213,6 @@ The schema for this frontmatter is:
 ## Implementation Notes
 [Any helpful context or suggestions]
 ```
-
-### Task ID Generation
-
-When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
-
-#### Command
-```bash
-PLAN_ID=$1; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id:" {} \; 2>/dev/null | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
-```
-
-#### How It Works
-1. **Finds task files** using the pattern `*.md` in the specific plan's tasks directory
-2. **Extracts front-matter IDs** using grep to find `id:` lines from all task files
-3. **Strips the `id:` prefix** using sed to get numeric values only
-4. **Sorts numerically** to find the highest existing task ID
-5. **Handles empty results** by defaulting to 0 if no tasks exist
-6. **Adds 1** to get the next available task ID
-
-This command reads the actual `id:` values from task front-matter, making it the definitive source of truth.
-
-#### Parameter Usage
-- `$1` is the plan ID parameter passed to this template
-- The command accepts the raw plan ID (e.g., `6` for plan `06`)
-- It automatically handles zero-padding for directory lookup
-
-#### Front-matter vs Filename Format
-**IMPORTANT:** There is a distinction between numeric and zero-padded formats:
-
-- **Front-matter ID**: Use numeric values: `id: 3` (not `id: "03"`)
-- **Filename**: Use zero-padded format: `03--task-name.md`
-
-#### Usage Examples
-
-**Example 1: Plan 6 with existing tasks**
-```bash
-# Command execution (plan ID = 6)
-PLAN_ID=6; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id:" {} \; 2>/dev/null | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
-# Output: 5 (if highest task front-matter has id: 4)
-
-# Front-matter usage:
----
-id: 4
-group: "implementation"
-dependencies: [1, 2]
-status: "pending"
-created: "2024-01-15"
----
-```
-
-**Example 2: Plan 1 with no existing tasks**
-```bash
-# Command execution (plan ID = 1)
-PLAN_ID=1; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id:" {} \; 2>/dev/null | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
-# Output: 1 (empty tasks directory, no front-matter to read)
-
-# Front-matter usage:
----
-id: 1
-group: "setup"
-dependencies: []
-status: "pending"
-created: "2024-01-15"
----
-```
-
-#### Edge Case Handling
-The command handles several edge cases automatically:
-- **Empty tasks directory**: Returns `1` as the first task ID
-- **Non-sequential task IDs**: Returns the maximum existing ID + 1
-- **Missing plan directory**: Returns `1` (graceful fallback)
-- **Mixed numbering**: Correctly finds the highest numeric ID regardless of gaps
-
-#### Command Execution Context
-- Run this command from the repository root directory
-- The command works with the current file system state
-- It searches within the plan directory structure: `.ai/task-manager/plans/##--plan-name/tasks/`
-
-#### Manual Fallback
-If the command fails or returns unexpected results:
-1. Navigate to `.ai/task-manager/plans/##--plan-name/tasks/`
-2. List existing task files: `ls -1 *.md 2>/dev/null | sort`
-3. Identify the highest numbered task file
-4. Add 1 to get the next ID
-5. Use numeric format in front-matter, zero-padded format for filename
 
 ### Validation Checklist
 Before finalizing, ensure:
@@ -406,7 +323,6 @@ Before finalizing, ensure:
 - Phases execute in strict numerical order
 - Phase N+1 cannot begin until Phase N is fully complete and validated
 - This ensures dependency integrity and systematic progress
-- 
 
 #### Validation Gates
 - Each phase has associated validation criteria defined externally
@@ -418,4 +334,4 @@ Before finalizing, ensure:
 If dependency analysis reveals issues:
 - **Circular dependencies**: Document the cycle and mark affected tasks for review
 - **Orphaned tasks**: Tasks that cannot be scheduled due to missing dependencies
-- **Ambiguous dependencies**: Note assumptions made and flag for clarification
+- **Ambiguous dependencies**: Note assumptions made and flag for clarification"""

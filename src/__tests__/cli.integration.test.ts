@@ -15,6 +15,28 @@ describe('CLI Integration Tests', () => {
   let testDir: string;
   let originalCwd: string;
   const cliPath = path.resolve(__dirname, '../../dist/cli.js');
+  let activeProcesses: Set<any> = new Set();
+  let activeTimers: Set<NodeJS.Timeout> = new Set();
+
+  // Helper function to track timers
+  const trackTimer = (timer: NodeJS.Timeout): NodeJS.Timeout => {
+    activeTimers.add(timer);
+    return timer;
+  };
+
+  // Helper function to clear tracked timer
+  const clearTrackedTimer = (timer: NodeJS.Timeout | null) => {
+    if (timer) {
+      clearTimeout(timer);
+      activeTimers.delete(timer);
+    }
+  };
+
+  // Helper function to track processes
+  const trackProcess = (process: any) => {
+    activeProcesses.add(process);
+    return process;
+  };
   
   beforeEach(async () => {
     // Store original working directory
@@ -25,14 +47,47 @@ describe('CLI Integration Tests', () => {
     
     // Change to test directory
     process.chdir(testDir);
+    
+    // Clear tracking sets
+    activeProcesses.clear();
+    activeTimers.clear();
   });
   
   afterEach(async () => {
+    // Kill any remaining active processes
+    for (const process of activeProcesses) {
+      if (!process.killed) {
+        process.kill('SIGKILL');
+      }
+    }
+    activeProcesses.clear();
+    
+    // Clear any remaining timers
+    for (const timer of activeTimers) {
+      clearTimeout(timer);
+    }
+    activeTimers.clear();
+    
     // Restore original working directory
     process.chdir(originalCwd);
     
     // Clean up test directory
     await fs.remove(testDir);
+  });
+  
+  afterAll(async () => {
+    // Final cleanup - ensure all resources are released
+    for (const process of activeProcesses) {
+      if (!process.killed) {
+        process.kill('SIGKILL');
+      }
+    }
+    activeProcesses.clear();
+    
+    for (const timer of activeTimers) {
+      clearTimeout(timer);
+    }
+    activeTimers.clear();
   });
 
   describe('CLI Basic Functionality', () => {
@@ -147,10 +202,10 @@ describe('CLI Integration Tests', () => {
       expect(await fs.pathExists(path.join(testDir, '.gemini/commands'))).toBe(true);
       expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks'))).toBe(true);
 
-      // Verify gemini-specific template files were copied
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/execute-blueprint.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/generate-tasks.md'))).toBe(true);
+      // Verify gemini-specific template files were copied (TOML format)
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/generate-tasks.toml'))).toBe(true);
     });
 
     it('should successfully initialize with multiple assistants', async () => {
@@ -165,9 +220,9 @@ describe('CLI Integration Tests', () => {
       expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
       expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks'))).toBe(true);
 
-      // Verify template files for both assistants
+      // Verify template files for both assistants (different formats)
       expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
     });
 
     it('should handle assistants with extra whitespace', async () => {
@@ -370,9 +425,9 @@ describe('CLI Integration Tests', () => {
         '.claude/commands/tasks/execute-blueprint.md', 
         '.claude/commands/tasks/generate-tasks.md',
         // Gemini files
-        '.gemini/commands/tasks/create-plan.md',
-        '.gemini/commands/tasks/execute-blueprint.md',
-        '.gemini/commands/tasks/generate-tasks.md'
+        '.gemini/commands/tasks/create-plan.toml',
+        '.gemini/commands/tasks/execute-blueprint.toml',
+        '.gemini/commands/tasks/generate-tasks.toml'
       ];
 
       for (const file of expectedFiles) {
@@ -472,37 +527,58 @@ describe('CLI Integration Tests', () => {
 
     it('should handle process termination gracefully', (done) => {
       // This test verifies that the CLI can be terminated
-      const child = spawn('node', [cliPath, 'init', '--assistants', 'claude'], {
+      const child = trackProcess(spawn('node', [cliPath, 'init', '--assistants', 'claude'], {
         cwd: testDir,
         stdio: ['pipe', 'pipe', 'pipe']
-      });
+      }));
 
       let processExited = false;
+      let killTimer: NodeJS.Timeout | null = null;
+      let safetyTimer: NodeJS.Timeout | null = null;
+
+      // Cleanup function to clear timers and kill child process
+      const cleanup = () => {
+        clearTrackedTimer(killTimer);
+        clearTrackedTimer(safetyTimer);
+        killTimer = null;
+        safetyTimer = null;
+        
+        if (!processExited && !child.killed) {
+          child.kill('SIGKILL');
+        }
+        activeProcesses.delete(child);
+      };
 
       // Kill the process after a short delay
-      setTimeout(() => {
+      killTimer = trackTimer(setTimeout(() => {
         child.kill('SIGTERM');
-      }, 200);
+        clearTrackedTimer(killTimer);
+        killTimer = null;
+      }, 200));
 
-      child.on('close', (code, signal) => {
+      child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
         processExited = true;
+        cleanup();
         // Process should either exit normally or be terminated
         expect(processExited).toBe(true);
         done();
       });
 
-      child.on('error', (error) => {
+      child.on('error', (error: Error) => {
         processExited = true;
+        cleanup();
         done(error);
       });
 
       // Safety timeout
-      setTimeout(() => {
+      safetyTimer = trackTimer(setTimeout(() => {
         if (!processExited) {
           child.kill('SIGKILL');
+          processExited = true;
+          cleanup();
           done();
         }
-      }, 5000);
+      }, 5000));
     }, 8000);
   });
 
@@ -580,6 +656,201 @@ describe('CLI Integration Tests', () => {
       
       const content = await fs.readFile(taskFile, 'utf8');
       expect(content.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Destination Directory Flag', () => {
+    it('should create directories in specified destination with relative path', async () => {
+      const customDir = 'custom-project';
+      const customDirPath = path.join(testDir, customDir);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory ${customDir}`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      // Check that command completed successfully
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in custom location
+      expect(await fs.pathExists(path.join(customDirPath, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.ai/task-manager/plans'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks'))).toBe(true);
+
+      // Verify template files were copied to custom location
+      expect(await fs.pathExists(path.join(customDirPath, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.ai/task-manager/VALIDATION_GATES.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks/execute-blueprint.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks/generate-tasks.md'))).toBe(true);
+      
+      // Verify files are not created in the current directory
+      expect(await fs.pathExists(path.join(testDir, '.ai'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.claude'))).toBe(false);
+    });
+
+    it('should create directories in specified destination with absolute path', async () => {
+      const customDir = path.join(testDir, 'absolute-custom-project');
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory "${customDir}"`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in absolute path location
+      expect(await fs.pathExists(path.join(customDir, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDir, '.ai/task-manager/plans'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDir, '.claude/commands/tasks'))).toBe(true);
+
+      // Verify template files were copied to absolute path location
+      expect(await fs.pathExists(path.join(customDir, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+    });
+
+    it('should work with multiple assistants and destination directory', async () => {
+      const customDir = 'multi-assistant-project';
+      const customDirPath = path.join(testDir, customDir);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude,gemini --destination-directory ${customDir}`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify both assistant directory structures exist in custom location
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.gemini/commands/tasks'))).toBe(true);
+
+      // Verify template files for both assistants in custom location
+      expect(await fs.pathExists(path.join(customDirPath, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(customDirPath, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+    });
+
+    it('should verify default behavior still works when no destination directory specified', async () => {
+      // This test ensures that when no --destination-directory is provided,
+      // the initialization still occurs in the current directory
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in current directory (testDir)
+      expect(await fs.pathExists(path.join(testDir, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
+
+      // Verify template files were copied to current directory
+      expect(await fs.pathExists(path.join(testDir, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+    });
+
+    it('should handle nested directory paths', async () => {
+      const nestedDir = 'level1/level2/nested-project';
+      const nestedDirPath = path.join(testDir, nestedDir);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory ${nestedDir}`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in nested location
+      expect(await fs.pathExists(path.join(nestedDirPath, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(nestedDirPath, '.claude/commands/tasks'))).toBe(true);
+
+      // Verify template files were copied to nested location
+      expect(await fs.pathExists(path.join(nestedDirPath, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(nestedDirPath, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+    });
+
+    it('should handle destination directory paths with spaces', async () => {
+      const spacedDir = 'project with spaces';
+      const spacedDirPath = path.join(testDir, spacedDir);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory "${spacedDir}"`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in path with spaces
+      expect(await fs.pathExists(path.join(spacedDirPath, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(spacedDirPath, '.claude/commands/tasks'))).toBe(true);
+
+      // Verify template files were copied to path with spaces
+      expect(await fs.pathExists(path.join(spacedDirPath, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+      expect(await fs.pathExists(path.join(spacedDirPath, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+    });
+
+    it('should create parent directories if they do not exist', async () => {
+      const nonExistentParentDir = 'does-not-exist/child-dir';
+      const nonExistentParentDirPath = path.join(testDir, nonExistentParentDir);
+      
+      // Ensure parent directory doesn't exist before test
+      expect(await fs.pathExists(path.join(testDir, 'does-not-exist'))).toBe(false);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory ${nonExistentParentDir}`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify parent directories were created
+      expect(await fs.pathExists(path.join(testDir, 'does-not-exist'))).toBe(true);
+      expect(await fs.pathExists(nonExistentParentDirPath)).toBe(true);
+      
+      // Verify directory structure was created in the new location
+      expect(await fs.pathExists(path.join(nonExistentParentDirPath, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(nonExistentParentDirPath, '.claude/commands/tasks'))).toBe(true);
+    });
+
+    it('should handle current directory reference (.) as destination', async () => {
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory .`, { 
+        encoding: 'utf8',
+        cwd: testDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in current directory
+      expect(await fs.pathExists(path.join(testDir, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
+    });
+
+    it('should handle parent directory reference (..) as destination', async () => {
+      // Create a subdirectory to run from
+      const subDir = path.join(testDir, 'subdir');
+      await fs.ensureDir(subDir);
+      
+      const result = execSync(`node "${cliPath}" init --assistants claude --destination-directory ..`, { 
+        encoding: 'utf8',
+        cwd: subDir,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      expect(result).toContain('AI Task Manager initialized successfully!');
+      
+      // Verify directory structure was created in parent directory (testDir)
+      expect(await fs.pathExists(path.join(testDir, '.ai/task-manager'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
     });
   });
 });

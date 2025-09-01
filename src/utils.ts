@@ -7,7 +7,7 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { FileSystemError, Assistant } from './types';
+import { FileSystemError, Assistant, TemplateFormat } from './types';
 
 /**
  * Create a directory recursively if it doesn't exist
@@ -241,6 +241,23 @@ export function getExtension(filePath: string): string {
 }
 
 /**
+ * Get the template format for a specific assistant
+ * @param assistant - The assistant type
+ * @returns The template format to use ('md' for Claude, 'toml' for Gemini)
+ */
+export function getTemplateFormat(assistant: Assistant): TemplateFormat {
+  switch (assistant) {
+    case 'claude':
+      return 'md';
+    case 'gemini':
+      return 'toml';
+    default:
+      // This should never happen due to type safety, but adding for completeness
+      throw new Error(`Unknown assistant type: ${assistant}`);
+  }
+}
+
+/**
  * Get the absolute path to a template file
  * @param templateFile - The template filename
  * @returns The absolute path to the template
@@ -252,15 +269,20 @@ export function getTemplatePath(templateFile: string): string {
 /**
  * Get list of directories that will be created for given assistants
  * @param assistants - Array of assistants
+ * @param baseDir - Base directory to resolve paths against (defaults to current directory)
  * @returns Array of directory paths to create
  */
-export function getCreatedDirectories(assistants: Assistant[]): string[] {
-  const dirs: string[] = ['.ai/task-manager', '.ai/task-manager/plans'];
+export function getCreatedDirectories(assistants: Assistant[], baseDir?: string): string[] {
+  const base = baseDir || '.';
+  const dirs: string[] = [
+    resolvePath(base, '.ai/task-manager'),
+    resolvePath(base, '.ai/task-manager/plans'),
+  ];
 
   for (const assistant of assistants) {
-    dirs.push(`.${assistant}`);
-    dirs.push(`.${assistant}/commands`);
-    dirs.push(`.${assistant}/commands/tasks`);
+    dirs.push(resolvePath(base, `.${assistant}`));
+    dirs.push(resolvePath(base, `.${assistant}/commands`));
+    dirs.push(resolvePath(base, `.${assistant}/commands/tasks`));
   }
 
   return dirs;
@@ -342,11 +364,11 @@ export async function move(src: string, dest: string): Promise<void> {
 export function resolvePath(baseDir: string | undefined, ...segments: string[]): string {
   // Handle edge cases: null, undefined, or empty strings
   const base = baseDir || '.';
-  
+
   // Filter out any null, undefined, or empty string segments
-  const validSegments = segments.filter(segment => 
-    segment !== null && segment !== undefined && segment !== ''
+  const validSegments = segments.filter(
+    segment => segment !== null && segment !== undefined && segment !== ''
   );
-  
+
   return path.resolve(base, ...validSegments);
 }
