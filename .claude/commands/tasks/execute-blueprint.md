@@ -18,7 +18,7 @@ If the plan does not exist, or the plan does not have an execution blueprint sec
 
 ### Phase Pre-Execution
 
-If the current branch is `main`, ask the user if you should create a new branch for this execution. Generate a branch name compatible with conventional commits.
+Before starting execution check if you are in the `main` branch. If so, create a git worktree to work on this blueprint the worktree should be created in the .ai/task-manager/worktrees folder.
 
 ### Phase Execution Workflow
 
