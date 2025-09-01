@@ -3,7 +3,7 @@
  * Provides hierarchical progress tracking, estimated time completion, and detailed metrics
  */
 
-import { EnhancedLogger, LogLevel } from './logger';
+import { EnhancedLogger } from './logger';
 
 export interface ProgressStep {
   id: string;
@@ -93,7 +93,11 @@ export class ProgressTracker {
     if (this.logger) {
       this.logger.info('Progress tracking started', 'PROGRESS', {
         totalSteps: this.stepOrder.length,
-        steps: Array.from(this.steps.values()).map(s => ({ id: s.id, name: s.name, weight: s.weight })),
+        steps: Array.from(this.steps.values()).map(s => ({
+          id: s.id,
+          name: s.name,
+          weight: s.weight,
+        })),
       });
     }
   }
@@ -144,11 +148,15 @@ export class ProgressTracker {
 
     if (Math.abs(step.progress - oldProgress) >= this.config.progressUpdateThreshold) {
       if (this.logger && this.config.enableDetailedLogging) {
-        this.logger.debug(`Step progress: ${step.name} - ${step.progress}%${message ? ` (${message})` : ''}`, 'PROGRESS', {
-          stepId,
-          progress: step.progress,
-          message,
-        });
+        this.logger.debug(
+          `Step progress: ${step.name} - ${step.progress}%${message ? ` (${message})` : ''}`,
+          'PROGRESS',
+          {
+            stepId,
+            progress: step.progress,
+            message,
+          }
+        );
       }
 
       this.updateProgress();
@@ -180,8 +188,8 @@ export class ProgressTracker {
       this.currentStepId = null;
     }
 
-    const level = success ? LogLevel.DEBUG : LogLevel.WARN;
-    const message = success 
+    // const level = success ? LogLevel.DEBUG : LogLevel.WARN;
+    const message = success
       ? `Completed step: ${step.name}${step.duration ? ` (${step.duration}ms)` : ''}`
       : `Failed step: ${step.name}${error ? ` - ${error}` : ''}`;
 
@@ -218,7 +226,7 @@ export class ProgressTracker {
     }
 
     const metrics = this.getMetrics();
-    
+
     if (this.logger) {
       this.logger.info(`Progress tracking finished`, 'PROGRESS', {
         success,
@@ -257,7 +265,7 @@ export class ProgressTracker {
     const overallProgress = totalWeight > 0 ? (completedWeight / totalWeight) * 100 : 0;
     const elapsedTime = this.startTime ? Date.now() - this.startTime.getTime() : 0;
     const completedSteps = Array.from(this.steps.values()).filter(s => s.completed).length;
-    
+
     return {
       totalSteps: this.stepOrder.length,
       completedSteps,
@@ -277,7 +285,7 @@ export class ProgressTracker {
   private updateProgress(): void {
     const metrics = this.getMetrics();
     const now = new Date();
-    
+
     this.progressHistory.push({
       timestamp: now,
       progress: metrics.overallProgress,
@@ -302,10 +310,10 @@ export class ProgressTracker {
       const recentHistory = this.progressHistory.slice(-this.config.estimationWindowSize);
       const firstPoint = recentHistory[0];
       const lastPoint = recentHistory[recentHistory.length - 1];
-      
+
       const timeSpan = lastPoint!.timestamp.getTime() - firstPoint!.timestamp.getTime();
       const progressDelta = lastPoint!.progress - firstPoint!.progress;
-      
+
       if (progressDelta > 0 && timeSpan > 0) {
         const remainingProgress = 100 - currentProgress;
         const rate = progressDelta / timeSpan; // progress per millisecond
@@ -316,7 +324,7 @@ export class ProgressTracker {
     // Fallback to simple linear estimation
     const remainingProgress = 100 - currentProgress;
     const rate = currentProgress / elapsedTime; // progress per millisecond
-    
+
     return rate > 0 ? Math.round(remainingProgress / rate) : 0;
   }
 
@@ -325,7 +333,7 @@ export class ProgressTracker {
    */
   private calculateAverageStepTime(): number {
     const completedSteps = Array.from(this.steps.values()).filter(s => s.completed && s.duration);
-    
+
     if (completedSteps.length === 0) {
       return 0;
     }

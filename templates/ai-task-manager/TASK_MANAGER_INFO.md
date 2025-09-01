@@ -30,8 +30,8 @@ Plans are organized as follows:
 .ai/
   task-manager/
     plans/
-      001--authentication-provider/
-        plan--authentication-provider.md
+      01--authentication-provider/
+        plan-01--authentication-provider.md
         tasks/
           01--create-project-structure.md
           02--implement-authorization.md
@@ -42,8 +42,8 @@ Plans are organized as follows:
 
 Note how in the `.ai/task-manager/plans/` folder we have a sub-folder per plan.
 Each sub-folder will contain the plan document and has a name following a naming 
-pattern `[incremental-ID]--[plan-short-name]`. The plan document has a name
-following the pattern `plan--[plan-short-name].md`. Finally, all tasks are under
-a `tasks` sub-folder. Each task has a name according to the pattern
-`[incremental-ID]--[task-short-name].md`. IDs for tasks are auto-incremental 
-within a plan. Each plan starts their tasks' IDs from 01.
+pattern `[ID]--[plan-short-name]`. Where the ID is auto-incremental. The plan 
+document has a name following the pattern `plan-[ID]--[plan-short-name].md`. 
+Finally, all tasks are under a `tasks` sub-folder. Each task has a name 
+according to the pattern `[incremental-ID]--[task-short-name].md`. IDs for tasks
+are auto-incremental within a plan. Each plan starts their tasks' IDs from 01.
