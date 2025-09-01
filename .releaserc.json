@@ -178,13 +178,13 @@
           }
         ],
         "successComment": "🎉 This ${issue.pull_request ? 'PR is included' : 'issue has been resolved'} in version ${nextRelease.version} :tada:",
-        "failComment": "❌ The release from branch ${branch.name} had failed due to the following errors:\n- ${errors.map(err => err.message).join('\\n- ')}",
+        "failComment": "❌ The release from branch ${branch.name} had failed due to the following errors:\\n- ${errors.map(err => err.message).join('\\n- ')}",
         "failTitle": "🚨 The automated release is failing",
         "labels": [
           "released"
         ],
         "releasedLabels": [
-          "released<%= nextRelease.channel ? ` on @\${nextRelease.channel}` : \"\" %> from <%= branch.name %>"
+          "released<%= nextRelease.channel ? ` on @${nextRelease.channel}` : '' %> from <%= branch.name %>"
         ]
       }
     ]

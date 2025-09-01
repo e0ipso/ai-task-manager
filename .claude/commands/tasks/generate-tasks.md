@@ -63,14 +63,52 @@ Organize tasks into logical groups based on feature areas (e.g., "user-authentic
 #### Step 4: Output Generation
 
 ##### Frontmatter Structure
+
+Example:
 ```yaml
 ---
-id: 001
+id: 1
 group: "user-authentication"
-dependencies: []  # List of task IDs, e.g., [002, 003]
+dependencies: []  # List of task IDs, e.g., [2, 3]
 status: "pending"  # pending | in-progress | completed | needs-clarification
-created_at: "2024-01-15T10:00:00Z"
+created: "2024-01-15"
 ---
+```
+
+The schema for this frontmatter is:
+```json
+{
+  "type": "object",
+  "required": ["id", "group", "dependencies", "status", "created"],
+  "properties": {
+    "id": {
+      "type": ["number"],
+      "description": "Unique identifier for the task. An integer."
+    },
+    "group": {
+      "type": "string",
+      "description": "Group or category the task belongs to"
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "List of task IDs this task depends on",
+      "items": {
+        "type": ["number"]
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in-progress", "completed", "needs-clarification"],
+      "description": "Current status of the task"
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Creation date in YYYY-MM-DD format"
+    }
+  },
+  "additionalProperties": false
+}
 ```
 
 ##### Task Body Structure

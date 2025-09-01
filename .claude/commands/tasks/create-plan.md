@@ -57,12 +57,38 @@ Structure your response as follows:
 - If context is sufficient: Provide the comprehensive plan using the structure above. Use the information in @TASK_MANAGER_INFO.md for the directory structure and additional information about plans.
 
 #### Frontmatter Structure
+
+Example:
 ```yaml
 ---
-id: 01
+id: 1
 summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing"
 created: 2025-09-01
 ---
+```
+
+The schema for this frontmatter is:
+```json
+{
+  "type": "object",
+  "required": ["id", "summary", "created"],
+  "properties": {
+    "id": {
+      "type": ["number"],
+      "description": "Unique identifier for the task. An integer."
+    },
+    "summary": {
+      "type": "string",
+      "description": "A summary of the plan"
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Creation date in YYYY-MM-DD format"
+    }
+  },
+  "additionalProperties": false
+}
 ```
 
 ### Important Notes
