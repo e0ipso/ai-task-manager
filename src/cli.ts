@@ -6,6 +6,7 @@ import path from 'path';
 import { TaskManager } from './task-manager';
 import { UserInterface, UIOptions } from './ui';
 import { FileSystemManager, createDefaultInstallationConfig } from './filesystem';
+import { InitOrchestrator, InitOptions } from './init-orchestrator';
 
 const program = new Command();
 
@@ -37,10 +38,10 @@ Examples:
 
 For more information, visit: https://github.com/e0ipso/ai-task-manager`);
 
-// Enhanced init command with new UI system
+// Enhanced init command with integrated orchestrator
 program
   .command('init')
-  .description('Initialize a new task management workspace with interactive setup')
+  .description('Initialize a new task management workspace with comprehensive integration')
   .option('-p, --project <name>', 'Project name')
   .option('-d, --description <desc>', 'Project description')
   .option('--template <template>', 'Project template (basic, development, research, custom)', 'basic')
@@ -48,75 +49,77 @@ program
   .option('--non-interactive', 'Skip interactive prompts and use defaults')
   .option('--force', 'Overwrite existing workspace if it exists')
   .option('--no-color', 'Disable colored output')
+  .option('--dry-run', 'Preview initialization without making changes')
+  .option('--verbose', 'Enable detailed logging output')
   .addHelpText('after', `
 Examples:
   $ ai-task-manager init
   $ ai-task-manager init --project "My App" --description "A web application"
   $ ai-task-manager init --non-interactive
-  $ ai-task-manager init --project "API Server" --force`)
+  $ ai-task-manager init --project "API Server" --force
+  $ ai-task-manager init --dry-run --verbose`)
   .action(async (options) => {
     try {
-      // Check if workspace already exists
-      const configPath = path.join(process.cwd(), '.ai-tasks', 'config.json');
-      const workspaceExists = await fs.access(configPath).then(() => true).catch(() => false);
+      // Create initialization options
+      const initOptions: InitOptions = {
+        project: options.project,
+        description: options.description,
+        template: options.template || 'basic',
+        includeExamples: !options.noExamples,
+        nonInteractive: options.nonInteractive,
+        force: options.force,
+        noColor: options.noColor,
+        dryRun: options.dryRun,
+        verbose: options.verbose,
+      };
 
-      if (workspaceExists && !options.force) {
-        console.error('❌ Error: Workspace already exists in this directory.');
-        console.log('💡 Use --force flag to overwrite existing workspace.');
+      // Create and run orchestrator
+      const orchestrator = new InitOrchestrator(options.verbose);
+      const result = await orchestrator.orchestrateInit(initOptions);
+
+      if (result.success) {
+        if (options.verbose) {
+          console.log('\n📊 Operation Summary:');
+          console.log(`  • Project: ${result.projectName}`);
+          console.log(`  • Files Created: ${result.operationsSummary.filesCreated}`);
+          console.log(`  • Directories Created: ${result.operationsSummary.directoriesCreated}`);
+          console.log(`  • Templates Installed: ${result.operationsSummary.templatesInstalled}`);
+          console.log(`  • Commands Installed: ${result.operationsSummary.commandsInstalled}`);
+          console.log(`  • Tasks Created: ${result.operationsSummary.tasksCreated}`);
+          console.log(`  • Duration: ${(result.operationsSummary.duration / 1000).toFixed(2)}s`);
+
+          if (orchestrator.getLogs().length > 0) {
+            console.log('\n📝 Detailed Logs:');
+            orchestrator.getLogs().forEach(log => {
+              const timestamp = log.timestamp.toISOString().substring(11, 23);
+              console.log(`  [${timestamp}] ${log.level.toUpperCase()}: ${log.message}`);
+            });
+          }
+        }
+
+        if (result.warnings.length > 0) {
+          console.log('\n⚠️  Warnings:');
+          result.warnings.forEach(warning => console.log(`  • ${warning}`));
+        }
+
+        if (options.dryRun) {
+          console.log('\n🧪 Dry run completed - no changes were made');
+          console.log('Remove --dry-run flag to perform actual initialization');
+        }
+      } else {
+        // Error handling is done by the orchestrator
         process.exit(1);
       }
 
-      // Create UI instance with options
-      const uiOptions: UIOptions = {
-        nonInteractive: options.nonInteractive,
-        colors: !options.noColor,
-        defaults: {
-          projectName: options.project || path.basename(process.cwd()),
-          description: options.description || 'A new project managed by AI Task Manager',
-          template: options.template || 'basic',
-          includeExamples: !options.noExamples
-        }
-      };
-
-      const ui = new UserInterface(uiOptions);
-      
-      // Run initialization flow
-      const config = await ui.runInitializationFlow();
-      const taskManager = new TaskManager();
-      
-      // Initialize workspace with progress tracking
-      await ui.withProgress(
-        async () => {
-          await taskManager.initialize(config.projectName, config.description);
-          
-          // Add example tasks if requested
-          if (config.includeExamples) {
-            await taskManager.createTask(
-              'Welcome to AI Task Manager',
-              'This is your first example task. You can edit or delete it anytime.'
-            );
-            await taskManager.createTask(
-              'Explore the CLI features',
-              'Try running list, status, and create commands to get familiar with the tool.'
-            );
-          }
-        },
-        'Setting up workspace',
-        'Workspace initialization completed successfully'
-      );
-      
-      ui.showInitializationSuccess(config.projectName, process.cwd());
-      
     } catch (error) {
       const ui = new UserInterface({ colors: !options.noColor });
-      ui.showInitializationError(
-        error instanceof Error ? error.message : String(error),
-        [
-          'Check that you have write permissions in the current directory',
-          'Ensure you have enough disk space available',
-          'Try running with elevated permissions if necessary'
-        ]
-      );
+      ui.showError('Initialization failed', [
+        error instanceof Error ? error.message : String(error)
+      ], [
+        'Use --verbose flag for detailed error information',
+        'Check that you have proper permissions',
+        'Ensure the target directory is accessible'
+      ]);
       process.exit(1);
     }
   });
