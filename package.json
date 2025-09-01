@@ -18,7 +18,11 @@
     "commitlint": "commitlint --edit",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "security:audit": "npm audit",
+    "security:audit-json": "npm audit --json",
+    "security:fix": "npm audit fix",
+    "security:fix-force": "npm audit fix --force"
   },
   "keywords": [
     "cli",
