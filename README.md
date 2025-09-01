@@ -27,6 +27,8 @@ npx @e0ipso/ai-task-manager --help
 
 The `--assistants` flag is **required** when initializing a workspace. You must specify which coding assistant(s) you want to configure support for.
 
+The `--destination-directory` flag allows you to specify an alternative directory for the workspace. By default, the workspace is initialized in the current working directory.
+
 ```bash
 # Quick start with Claude
 npx @e0ipso/ai-task-manager init --assistants claude
