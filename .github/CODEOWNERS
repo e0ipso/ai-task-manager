@@ -1,0 +1,23 @@
+# Global code owners - all files require review from repository maintainers
+* @repository-maintainers
+
+# Specific ownership for critical files
+package.json @repository-maintainers
+package-lock.json @repository-maintainers
+tsconfig.json @repository-maintainers
+
+# GitHub Actions workflows
+.github/workflows/ @repository-maintainers
+
+# Security and configuration files
+.github/dependabot.yml @repository-maintainers
+.github/CODEOWNERS @repository-maintainers
+
+# Source code - development team
+src/ @development-team
+tests/ @development-team
+
+# Documentation
+README.md @documentation-team
+docs/ @documentation-team
+*.md @documentation-team
