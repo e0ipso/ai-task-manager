@@ -16,8 +16,20 @@ export function validateAssistants(input: string): AssistantValidationResult {
   };
 
   // Handle empty or undefined input
-  if (!input || typeof input !== 'string' || input.trim() === '') {
-    result.errors.push('Assistant input cannot be empty');
+  if (!input || typeof input !== 'string') {
+    result.errors.push('Assistant input cannot be empty or undefined');
+    return result;
+  }
+
+  // Handle whitespace-only input
+  if (input.trim() === '') {
+    result.errors.push('Assistant input cannot be empty or contain only whitespace');
+    return result;
+  }
+
+  // Handle inputs that are just separators
+  if (input.trim() === ',' || /^,+$/.test(input.trim())) {
+    result.errors.push('Assistant input cannot contain only commas');
     return result;
   }
 
@@ -29,7 +41,7 @@ export function validateAssistants(input: string): AssistantValidationResult {
 
   // Handle case where all entries were empty after trimming
   if (rawAssistants.length === 0) {
-    result.errors.push('No valid assistant names found in input');
+    result.errors.push('No valid assistant names found in input (only commas and whitespace detected)');
     return result;
   }
 
@@ -55,14 +67,29 @@ export function validateAssistants(input: string): AssistantValidationResult {
     }
   }
 
-  // Add errors for invalid names
+  // Add errors for invalid names with specific suggestions
   if (invalidNames.length > 0) {
     const invalidNamesStr = invalidNames.join(', ');
     const supportedNamesStr = SUPPORTED_ASSISTANTS.join(', ');
-    result.errors.push(
-      `Invalid assistant name${invalidNames.length > 1 ? 's' : ''}: ${invalidNamesStr}. ` +
-        `Supported assistants: ${supportedNamesStr}`
-    );
+    
+    // Check for common misspellings and provide suggestions
+    const suggestions: string[] = [];
+    for (const invalidName of invalidNames) {
+      if (['claud', 'claude-ai', 'anthropic'].includes(invalidName)) {
+        suggestions.push(`Did you mean "claude" instead of "${invalidName}"?`);
+      } else if (['gemeni', 'google', 'bard'].includes(invalidName)) {
+        suggestions.push(`Did you mean "gemini" instead of "${invalidName}"?`);
+      }
+    }
+    
+    let errorMessage = `Invalid assistant name${invalidNames.length > 1 ? 's' : ''}: ${invalidNamesStr}. ` +
+      `Supported assistants: ${supportedNamesStr}`;
+    
+    if (suggestions.length > 0) {
+      errorMessage += '. ' + suggestions.join('. ');
+    }
+    
+    result.errors.push(errorMessage);
   }
 
   // Set result

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 import fs from 'fs/promises';
 import path from 'path';
 import { TaskManager } from './task-manager';
@@ -55,7 +55,11 @@ program
   .requiredOption('--assistants <assistants>', 'Select coding assistants (claude,gemini)', (value) => {
     const result = validateAssistants(value);
     if (!result.valid) {
-      throw new Error(`Invalid assistants: ${result.errors.join(', ')}`);
+      // Format error with helpful suggestions
+      const errorMsg = result.errors.join(', ');
+      throw new InvalidArgumentError(
+        `${errorMsg}. Valid options: claude, gemini. Examples: --assistants claude or --assistants claude,gemini`
+      );
     }
     return result.assistants;
   })
@@ -68,6 +72,20 @@ Examples:
   $ ai-task-manager init --assistants claude --dry-run --verbose`)
   .action(async (options) => {
     try {
+      // Additional validation for assistants (redundant safety check)
+      if (!options.assistants || options.assistants.length === 0) {
+        const ui = new UserInterface({ colors: !options.noColor });
+        ui.showError('Assistant Selection Error', [
+          'No assistants were specified or validation failed'
+        ], [
+          'Valid assistants: claude, gemini',
+          'Use --assistants claude for Claude only',
+          'Use --assistants gemini for Gemini only',
+          'Use --assistants claude,gemini for both assistants'
+        ]);
+        process.exit(1);
+      }
+
       // Create initialization options
       const initOptions: InitOptions = {
         project: options.project,
@@ -122,13 +140,33 @@ Examples:
 
     } catch (error) {
       const ui = new UserInterface({ colors: !options.noColor });
-      ui.showError('Initialization failed', [
-        error instanceof Error ? error.message : String(error)
-      ], [
-        'Use --verbose flag for detailed error information',
-        'Check that you have proper permissions',
-        'Ensure the target directory is accessible'
-      ]);
+      
+      // Handle different types of errors with specific messages
+      if (error instanceof Error && error.message.includes('Invalid assistant')) {
+        ui.showError('Assistant Selection Error', [error.message], [
+          'Valid assistants: claude, gemini',
+          'Use --assistants claude for Claude only',
+          'Use --assistants gemini for Gemini only',
+          'Use --assistants claude,gemini for both assistants'
+        ]);
+      } else if (error instanceof Error && error.message.includes('Assistant input cannot be empty')) {
+        ui.showError('Missing Required Assistants', [
+          'The --assistants flag is required but no valid assistants were provided'
+        ], [
+          'Valid assistants: claude, gemini',
+          'Example: --assistants claude',
+          'Example: --assistants claude,gemini'
+        ]);
+      } else {
+        ui.showError('Initialization Failed', [
+          error instanceof Error ? error.message : String(error)
+        ], [
+          'Use --verbose flag for detailed error information',
+          'Check that you have proper permissions',
+          'Ensure the target directory is accessible',
+          'Verify assistant selection is correct: --assistants claude,gemini'
+        ]);
+      }
       process.exit(1);
     }
   });
@@ -679,38 +717,105 @@ Examples:
 
 // Add global error handler
 process.on('uncaughtException', (error) => {
-  console.error('❌ Fatal error:', error.message);
+  // Try to use UserInterface for better error formatting if possible
+  try {
+    const ui = new UserInterface({ colors: true });
+    ui.showError('Fatal Error', [error.message], [
+      'This is an unexpected error',
+      'Please report this issue with the full error details',
+      'Try running the command again'
+    ]);
+  } catch {
+    // Fallback to basic console error if UserInterface fails
+    console.error('❌ Fatal error:', error.message);
+  }
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
-  console.error('❌ Unhandled rejection:', reason);
+  // Try to use UserInterface for better error formatting if possible
+  try {
+    const ui = new UserInterface({ colors: true });
+    const message = reason instanceof Error ? reason.message : String(reason);
+    ui.showError('Unhandled Promise Rejection', [message], [
+      'This indicates an uncaught async error',
+      'Please report this issue with the full error details',
+      'Try running the command again'
+    ]);
+  } catch {
+    // Fallback to basic console error if UserInterface fails
+    console.error('❌ Unhandled rejection:', reason);
+  }
   process.exit(1);
 });
 
-// Handle unknown commands
+// Handle unknown commands with enhanced error formatting
 program.on('command:*', (operands) => {
   const unknownCommand = operands[0];
-  console.error(`❌ Unknown command: ${unknownCommand}`);
-  console.log('');
-  console.log('Available commands:');
-  console.log('  install    Install AI Task Manager with templates and commands');
-  console.log('  verify     Verify installation integrity and optionally repair');
-  console.log('  uninstall  Remove AI Task Manager from current directory');
-  console.log('  init       Initialize a new task workspace');
-  console.log('  create     Create a new task');
-  console.log('  list       List tasks with filtering options');
-  console.log('  status     Show workspace status');
-  console.log('');
-  console.log('Use "ai-task-manager --help" for general help');
+  try {
+    const ui = new UserInterface({ colors: true });
+    ui.showError(`Unknown Command: ${unknownCommand}`, [
+      'The specified command does not exist'
+    ], [
+      'Available commands: install, verify, uninstall, init, create, list, status',
+      'Use "ai-task-manager --help" for detailed help',
+      'Use "ai-task-manager <command> --help" for command-specific help'
+    ]);
+  } catch {
+    // Fallback to basic console output
+    console.error(`❌ Unknown command: ${unknownCommand}`);
+    console.log('');
+    console.log('Available commands:');
+    console.log('  install    Install AI Task Manager with templates and commands');
+    console.log('  verify     Verify installation integrity and optionally repair');
+    console.log('  uninstall  Remove AI Task Manager from current directory');
+    console.log('  init       Initialize a new task workspace');
+    console.log('  create     Create a new task');
+    console.log('  list       List tasks with filtering options');
+    console.log('  status     Show workspace status');
+    console.log('');
+    console.log('Use "ai-task-manager --help" for general help');
+  }
   process.exit(1);
 });
 
-// Parse command line arguments
+// Parse command line arguments with enhanced error handling
 try {
   program.parse(process.argv);
 } catch (error) {
-  console.error('❌ Command parsing error:', error instanceof Error ? error.message : error);
+  try {
+    const ui = new UserInterface({ colors: true });
+    
+    // Handle specific Commander.js errors
+    if (error instanceof InvalidArgumentError) {
+      ui.showError('Invalid Argument', [error.message], [
+        'Check the command syntax and try again',
+        'Use --help flag to see correct usage'
+      ]);
+    } else if (error instanceof Error && error.message.includes('required option')) {
+      ui.showError('Missing Required Option', [error.message], [
+        'All required options must be provided',
+        'Use --help flag to see required options',
+        'Example: ai-task-manager init --assistants claude'
+      ]);
+    } else if (error instanceof Error && error.message.includes('unknown option')) {
+      ui.showError('Unknown Option', [error.message], [
+        'Check the command syntax for valid options',
+        'Use --help flag to see available options'
+      ]);
+    } else {
+      ui.showError('Command Error', [
+        error instanceof Error ? error.message : String(error)
+      ], [
+        'Check the command syntax',
+        'Use --help flag for usage information',
+        'Try running the command again'
+      ]);
+    }
+  } catch {
+    // Fallback to basic console error
+    console.error('❌ Command parsing error:', error instanceof Error ? error.message : error);
+  }
   process.exit(1);
 }
 
