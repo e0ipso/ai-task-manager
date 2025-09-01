@@ -2,35 +2,11 @@
 
 AI-powered task management CLI tool built with TypeScript and Node.js.
 
-## Installation
-
-### NPX (Recommended)
-```bash
-npx @e0ipso/ai-task-manager --help
-```
-
-### Global Installation
-```bash
-npm install -g @e0ipso/ai-task-manager
-ai-task-manager --help
-```
-
 ## Usage
 
 ### Initialize a workspace
 ```bash
-ai-task-manager init
-```
-
-### List tasks
-```bash
-ai-task-manager list
-ai-task-manager list --status pending
-```
-
-### View workspace status
-```bash
-ai-task-manager status
+npx @e0ipso/ai-task-manager init --no-user-interaction
 ```
 
 ## Development
