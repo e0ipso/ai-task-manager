@@ -21,6 +21,11 @@ task cannot be worked on (or completed) before some other task(s) are completed.
 
 ## Directory Structure
 
+To find a plan document from its ID use the following command (replace {planId} with the ID, like 06):
+```shell
+find . -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?{planId}$" {} \;
+```
+
 Plans, and tasks are stored as MarkDown files with a YAML front-matter. They are
 all filed under the `.ai/task-manager/` folder at the root of the repository.
 
@@ -47,8 +52,3 @@ document has a name following the pattern `plan-[ID]--[plan-short-name].md`.
 Finally, all tasks are under a `tasks` sub-folder. Each task has a name 
 according to the pattern `[incremental-ID]--[task-short-name].md`. IDs for tasks
 are auto-incremental within a plan. Each plan starts their tasks' IDs from 01.
-
-To find a plan document from its ID use the following command (replace {planId} with the ID, like 06):
-```shell
-find . -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?{planId}$" {} \;
-```
