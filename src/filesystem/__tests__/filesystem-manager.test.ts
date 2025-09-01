@@ -7,6 +7,8 @@ import * as os from 'os';
 import { FileSystemManager } from '../filesystem-manager';
 import { TemplateManager } from '../../templates/template-manager';
 import { CommandManager } from '../../command-manager';
+import { AssistantConfig } from '../../types/assistant-config';
+import { SupportedAssistant } from '../../utils/assistant-validator';
 
 // Mock the modules that might not have all files available in test environment
 jest.mock('../../templates/template-manager');
@@ -231,6 +233,150 @@ describe('FileSystemManager', () => {
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Command planning failed'));
       
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('multi-assistant support', () => {
+    let assistantConfig: AssistantConfig;
+
+    beforeEach(() => {
+      // Mock assistant configuration
+      assistantConfig = {
+        assistants: ['claude', 'gemini'] as SupportedAssistant[],
+        directories: {
+          claude: path.join(tempDir, '.ai/claude'),
+          gemini: path.join(tempDir, '.ai/gemini'),
+        } as Record<SupportedAssistant, string>,
+        installationTargets: [
+          {
+            assistant: 'claude' as 'claude',
+            baseDirectory: path.join(tempDir, '.ai/claude'),
+            commandsDirectory: path.join(tempDir, '.ai/claude/commands'),
+            tasksDirectory: path.join(tempDir, '.ai/claude/tasks'),
+          },
+          {
+            assistant: 'gemini' as 'gemini',
+            baseDirectory: path.join(tempDir, '.ai/gemini'),
+            commandsDirectory: path.join(tempDir, '.ai/gemini/commands'),
+            tasksDirectory: path.join(tempDir, '.ai/gemini/tasks'),
+          },
+        ],
+      };
+
+      // Mock the sourceCommandsPath property access
+      Object.defineProperty(mockCommandManager, 'sourceCommandsPath', {
+        get: () => path.join(__dirname, '../../../templates/commands'),
+        configurable: true,
+      });
+    });
+
+    it('should create assistant directories', async () => {
+      await fsManager.createAssistantDirectories(tempDir, assistantConfig);
+
+      // Check that all directories were created
+      for (const target of assistantConfig.installationTargets) {
+        expect(await fs.access(target.baseDirectory).then(() => true).catch(() => false)).toBe(true);
+        expect(await fs.access(target.commandsDirectory).then(() => true).catch(() => false)).toBe(true);
+        expect(await fs.access(target.tasksDirectory).then(() => true).catch(() => false)).toBe(true);
+      }
+    });
+
+    it('should install for multiple assistants', async () => {
+      // Mock template files existence
+      const templateDir = path.join(__dirname, '../../../templates/test-template');
+      const commandsDir = path.join(__dirname, '../../../templates/commands');
+      await fs.mkdir(templateDir, { recursive: true });
+      await fs.mkdir(commandsDir, { recursive: true });
+      await fs.writeFile(path.join(templateDir, 'test.md'), '# Test Template');
+      await fs.writeFile(path.join(commandsDir, 'test-command.md'), '---\ndescription: Test command\n---\n\n# Test Command');
+
+      try {
+        const config = {
+          targetDirectory: tempDir,
+          overwriteMode: 'overwrite' as const,
+          backupMode: 'auto' as const,
+          verifyIntegrity: false,
+          createBackup: false,
+          permissions: {
+            files: 0o644,
+            directories: 0o755,
+          },
+          dryRun: false,
+        };
+
+        const result = await fsManager.installForAssistants(tempDir, config, assistantConfig);
+
+        expect(result.success).toBe(true);
+        
+        // Check that assistant directories were created
+        for (const target of assistantConfig.installationTargets) {
+          expect(await fs.access(target.baseDirectory).then(() => true).catch(() => false)).toBe(true);
+          expect(await fs.access(target.commandsDirectory).then(() => true).catch(() => false)).toBe(true);
+          expect(await fs.access(target.tasksDirectory).then(() => true).catch(() => false)).toBe(true);
+        }
+      } finally {
+        // Cleanup
+        await fs.rm(templateDir, { recursive: true, force: true });
+        await fs.rm(commandsDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should uninstall multiple assistants', async () => {
+      // First create some directories
+      await fsManager.createAssistantDirectories(tempDir, assistantConfig);
+      
+      // Create .ai directory with some content
+      const aiDir = path.join(tempDir, '.ai');
+      await fs.mkdir(aiDir, { recursive: true });
+      await fs.writeFile(path.join(aiDir, 'test.txt'), 'test content');
+
+      const success = await fsManager.uninstallForAssistants(tempDir, assistantConfig);
+
+      expect(success).toBe(true);
+      
+      // Check that assistant directories were removed
+      for (const target of assistantConfig.installationTargets) {
+        expect(await fs.access(target.baseDirectory).then(() => true).catch(() => false)).toBe(false);
+      }
+      
+      // Check that .ai directory was removed
+      expect(await fs.access(aiDir).then(() => true).catch(() => false)).toBe(false);
+    });
+
+    it('should handle directory creation errors gracefully', async () => {
+      // Create a bad assistant config with invalid paths
+      const badAssistantConfig: AssistantConfig = {
+        assistants: ['claude'] as SupportedAssistant[],
+        directories: {
+          claude: '/invalid/path/that/cannot/be/created',
+        } as Record<SupportedAssistant, string>,
+        installationTargets: [
+          {
+            assistant: 'claude' as 'claude',
+            baseDirectory: '/invalid/path/that/cannot/be/created',
+            commandsDirectory: '/invalid/path/that/cannot/be/created/commands',
+            tasksDirectory: '/invalid/path/that/cannot/be/created/tasks',
+          },
+        ],
+      };
+
+      await expect(
+        fsManager.createAssistantDirectories(tempDir, badAssistantConfig)
+      ).rejects.toThrow(/Failed to create assistant directories/);
+    });
+
+    it('should plan command installation for multiple assistants', async () => {
+      const operations = await fsManager['planCommandInstallationForAssistants'](tempDir, assistantConfig);
+
+      expect(operations.length).toBeGreaterThan(0);
+      
+      // Should have create directory operations for each assistant
+      const createDirOps = operations.filter(op => op.type === 'create_directory');
+      expect(createDirOps.length).toBe(4); // 2 assistants × 2 directories (commands + tasks)
+      
+      // Should have file copy operations for each assistant
+      const copyFileOps = operations.filter(op => op.type === 'copy_file');
+      expect(copyFileOps.length).toBe(2); // 2 assistants × 1 command file
     });
   });
 });
