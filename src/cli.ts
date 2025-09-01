@@ -7,6 +7,7 @@ import { TaskManager } from './task-manager';
 import { UserInterface, UIOptions } from './ui';
 import { FileSystemManager, createDefaultInstallationConfig } from './filesystem';
 import { InitOrchestrator, InitOptions } from './init-orchestrator';
+import { validateAssistants } from './utils/assistant-validator';
 
 const program = new Command();
 
@@ -30,7 +31,7 @@ program
   .addHelpText('after', `
 Examples:
   $ npx @e0ipso/ai-task-manager install
-  $ npx @e0ipso/ai-task-manager init --project "My Project" --non-interactive
+  $ npx @e0ipso/ai-task-manager init --assistants claude --project "My Project" --non-interactive
   $ npx @e0ipso/ai-task-manager create --title "Fix bug" --description "Fix login issue"
   $ npx @e0ipso/ai-task-manager list --status pending
   $ npx @e0ipso/ai-task-manager status
@@ -51,13 +52,20 @@ program
   .option('--no-color', 'Disable colored output')
   .option('--dry-run', 'Preview initialization without making changes')
   .option('--verbose', 'Enable detailed logging output')
+  .requiredOption('--assistants <assistants>', 'Select coding assistants (claude,gemini)', (value) => {
+    const result = validateAssistants(value);
+    if (!result.valid) {
+      throw new Error(`Invalid assistants: ${result.errors.join(', ')}`);
+    }
+    return result.assistants;
+  })
   .addHelpText('after', `
 Examples:
-  $ ai-task-manager init
-  $ ai-task-manager init --project "My App" --description "A web application"
-  $ ai-task-manager init --non-interactive
-  $ ai-task-manager init --project "API Server" --force
-  $ ai-task-manager init --dry-run --verbose`)
+  $ ai-task-manager init --assistants claude
+  $ ai-task-manager init --assistants claude,gemini --project "My App" --description "A web application"
+  $ ai-task-manager init --assistants claude --non-interactive
+  $ ai-task-manager init --assistants gemini --project "API Server" --force
+  $ ai-task-manager init --assistants claude --dry-run --verbose`)
   .action(async (options) => {
     try {
       // Create initialization options
@@ -71,6 +79,7 @@ Examples:
         noColor: options.noColor,
         dryRun: options.dryRun,
         verbose: options.verbose,
+        assistants: options.assistants,
       };
 
       // Create and run orchestrator

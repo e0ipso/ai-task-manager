@@ -12,17 +12,32 @@ import { TaskManager } from './task-manager';
 import { TemplateManager } from './templates';
 import { CommandManager } from './command-manager';
 import { EnhancedLogger, createVerboseLogger, ProgressTracker } from './logging';
+import { SupportedAssistant } from './utils/assistant-validator';
 
+/**
+ * Configuration options for initializing a new AI Task Manager project
+ */
 export interface InitOptions {
+  /** Project name override */
   project?: string;
+  /** Project description */
   description?: string;
+  /** Template to use for initialization */
   template?: string;
+  /** Whether to include example tasks and configurations */
   includeExamples?: boolean;
+  /** Run in non-interactive mode using defaults */
   nonInteractive?: boolean;
+  /** Force overwrite existing files and directories */
   force?: boolean;
+  /** Disable colored output */
   noColor?: boolean;
+  /** Perform dry run without making actual changes */
   dryRun?: boolean;
+  /** Enable verbose logging output */
   verbose?: boolean;
+  /** List of AI assistants to configure support for */
+  assistants?: SupportedAssistant[];
 }
 
 export interface InitContext {

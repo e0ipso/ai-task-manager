@@ -119,6 +119,18 @@ export class FileSystemUtils {
   }
 
   /**
+   * Ensure directory exists, creating it if necessary
+   */
+  static async ensureDirectory(
+    dirPath: string,
+    options: { recursive?: boolean; mode?: number } = {}
+  ): Promise<void> {
+    if (!(await this.pathExists(dirPath))) {
+      await this.createDirectory(dirPath, options);
+    }
+  }
+
+  /**
    * Copy file with integrity verification
    */
   static async copyFileWithVerification(
