@@ -1,21 +1,68 @@
-MIT License
+PROPRIETARY SOFTWARE LICENSE WITH REVOCATION RIGHTS
 
-Copyright (c) 2025 e0ipso
+Copyright (c) 2025 Mateu Aguiló Bosch
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+NOTICE: This is proprietary software with revocable usage rights.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. GRANT OF LICENSE
+   Subject to the terms and conditions of this License, the copyright holder
+   hereby grants you a free, non-exclusive, non-transferable, revocable right
+   to use, run, and operate this software ("Software") for any lawful purpose.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. REVOCATION RIGHTS
+   The copyright holder reserves the absolute right to revoke this license at
+   any time, for any reason or no reason, with or without cause, by providing
+   written notice to you. Such notice may be provided through:
+   - Direct communication to known users
+   - Public announcement on the project repository
+   - Update to this LICENSE file
+
+3. NOTICE PERIOD
+   Upon issuance of a revocation notice, you will have thirty (30) days
+   ("Notice Period") to cease all use of the Software and remove all copies
+   from your systems.
+
+4. CONDITIONS FOR REVOCATION
+   While the copyright holder may revoke this license at their sole discretion,
+   revocation may particularly occur in cases of:
+   - Violation of applicable laws or regulations
+   - Use of the Software in a manner harmful to others
+   - Commercial use without separate commercial license
+   - Any use deemed inappropriate by the copyright holder
+
+5. POST-REVOCATION OBLIGATIONS
+   After the Notice Period expires, you must:
+   - Immediately cease all use of the Software
+   - Delete all copies of the Software from all systems under your control
+   - Certify destruction of copies if requested by the copyright holder
+
+6. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+7. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+8. ENTIRE AGREEMENT
+   This License constitutes the entire agreement between you and the copyright
+   holder relating to the Software and supersedes all prior or contemporaneous
+   understandings.
+
+9. SEVERABILITY
+   If any provision of this License is held to be unenforceable, such provision
+   shall be reformed only to the extent necessary to make it enforceable.
+
+10. GOVERNING LAW
+    This License shall be governed by the laws of the jurisdiction in which
+    the copyright holder resides, without regard to its conflict of law
+    provisions.
+
+By using this Software, you acknowledge that you have read, understood, and
+agree to be bound by the terms and conditions of this License.
+
+For commercial licensing or other arrangements, please contact the copyright
+holder directly.
