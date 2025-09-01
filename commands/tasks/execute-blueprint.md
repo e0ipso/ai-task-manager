@@ -7,9 +7,12 @@ description: Execute the task in the plan
 You are the orchestrator responsible for executing all tasks defined in the execution blueprint of a plan document. Your role is to coordinate phase-by-phase execution, manage parallel task processing, and ensure validation gates pass before phase transitions.
 
 ## Input Requirements
-- Plan document with execution blueprint section. Find the plan in the with the naming pattern: .ai/task-manager/plans/**/plan-$1--*.md
+- A plan document with an execution blueprint section. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID $1
 - Task files with frontmatter metadata (id, group, dependencies, status)
 - Validation gates document: `@.ai/task-manager/VALIDATION_GATES.md`
+
+### Input Error Handling
+If the plan does not exist, or the plan does not have an execution blueprint section. Stop immediately and show an error to the user.
 
 ## Execution Process
 
@@ -20,6 +23,7 @@ You are the orchestrator responsible for executing all tasks defined in the exec
     - List all tasks scheduled for parallel execution in this phase
     - Verify all task dependencies from previous phases are marked "completed"
     - Confirm no tasks are marked "needs-clarification"
+    - If any phases are marked as completed, verify they are actually completed and continue from the next phase.
 
 2. **Agent Selection and Task Assignment**
     - For each task in the current phase:
