@@ -152,15 +152,15 @@ export class EnhancedLogger {
     this.activeOperations.delete(operationId);
 
     const level = success ? LogLevel.INFO : LogLevel.ERROR;
-    const message = success 
+    const message = success
       ? `Completed operation: ${operation.operationType} (${operation.duration}ms)`
       : `Failed operation: ${operation.operationType} - ${error}`;
 
-    this.log(level, message, 'OPERATION', { 
-      operationId, 
+    this.log(level, message, 'OPERATION', {
+      operationId,
       duration: operation.duration,
       success,
-      error 
+      error,
     });
   }
 
@@ -180,11 +180,15 @@ export class EnhancedLogger {
       progressMessage: message,
     };
 
-    this.debug(`Operation progress: ${operation.operationType} - ${progress}%${message ? ` (${message})` : ''}`, 'OPERATION', {
-      operationId,
-      progress,
-      message,
-    });
+    this.debug(
+      `Operation progress: ${operation.operationType} - ${progress}%${message ? ` (${message})` : ''}`,
+      'OPERATION',
+      {
+        operationId,
+        progress,
+        message,
+      }
+    );
   }
 
   /**
@@ -312,7 +316,7 @@ export class EnhancedLogger {
 
     try {
       await this.logFileHandle.close();
-      
+
       // Create new log file
       const logFile = path.join(this.config.logDirectory, `ai-task-manager-${Date.now()}.log`);
       this.logFileHandle = await fs.open(logFile, 'a');
@@ -351,7 +355,7 @@ export class EnhancedLogger {
         fileStats
           .sort((a, b) => b.stats.mtime.getTime() - a.stats.mtime.getTime())
           .slice(this.config.maxLogFiles)
-          .forEach(async (file) => {
+          .forEach(async file => {
             try {
               await fs.unlink(file.path);
               this.info(`Deleted old log file: ${file.name}`, 'LOGGER');
@@ -481,11 +485,11 @@ export function createVerboseLogger(logDirectory?: string): EnhancedLogger {
     enableFileLogging: !!logDirectory,
     timestampFormat: 'time',
   };
-  
+
   if (logDirectory) {
     config.logDirectory = logDirectory;
   }
-  
+
   return new EnhancedLogger(config);
 }
 

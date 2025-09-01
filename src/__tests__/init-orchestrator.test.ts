@@ -61,12 +61,18 @@ describe('InitOrchestrator Integration Tests', () => {
 
       // Verify file structure was created
       const aiTasksDir = path.join(tempDir, '.ai-tasks');
-      const aiTasksExists = await fs.access(aiTasksDir).then(() => true).catch(() => false);
+      const aiTasksExists = await fs
+        .access(aiTasksDir)
+        .then(() => true)
+        .catch(() => false);
       expect(aiTasksExists).toBe(true);
 
       // Verify configuration file
       const configPath = path.join(aiTasksDir, 'config.json');
-      const configExists = await fs.access(configPath).then(() => true).catch(() => false);
+      const configExists = await fs
+        .access(configPath)
+        .then(() => true)
+        .catch(() => false);
       expect(configExists).toBe(true);
 
       if (configExists) {
@@ -93,7 +99,10 @@ describe('InitOrchestrator Integration Tests', () => {
 
       // Verify no actual files were created
       const aiTasksDir = path.join(tempDir, '.ai-tasks');
-      const aiTasksExists = await fs.access(aiTasksDir).then(() => true).catch(() => false);
+      const aiTasksExists = await fs
+        .access(aiTasksDir)
+        .then(() => true)
+        .catch(() => false);
       expect(aiTasksExists).toBe(false);
     }, 15000);
 
@@ -133,7 +142,7 @@ describe('InitOrchestrator Integration Tests', () => {
         verbose: true,
       };
 
-      const result = await orchestrator.orchestrateInit(options);
+      await orchestrator.orchestrateInit(options);
 
       // Verify logging functionality
       const logs = orchestrator.getLogs();
@@ -142,7 +151,9 @@ describe('InitOrchestrator Integration Tests', () => {
       // Check for key log entries
       const logMessages = logs.map(log => log.message);
       expect(logMessages).toContain(expect.stringContaining('Starting init orchestration'));
-      expect(logMessages).toContain(expect.stringContaining('Init orchestration completed successfully'));
+      expect(logMessages).toContain(
+        expect.stringContaining('Init orchestration completed successfully')
+      );
 
       // Verify operation tracking
       const operations = orchestrator.getLogs().filter(log => log.context === 'OPERATION');
@@ -181,7 +192,10 @@ describe('InitOrchestrator Integration Tests', () => {
 
       // Verify rollback occurred - no partial workspace should remain
       const aiTasksDir = path.join(tempDir, '.ai-tasks');
-      const aiTasksExists = await fs.access(aiTasksDir).then(() => true).catch(() => false);
+      const aiTasksExists = await fs
+        .access(aiTasksDir)
+        .then(() => true)
+        .catch(() => false);
       expect(aiTasksExists).toBe(false);
     }, 15000);
 
@@ -202,8 +216,8 @@ describe('InitOrchestrator Integration Tests', () => {
       expect(progressLogs.length).toBeGreaterThan(0);
 
       // Verify all expected phases were completed
-      const phaseLogs = logs.filter(log => 
-        log.context === 'PHASE' && log.message.includes('completed')
+      const phaseLogs = logs.filter(
+        log => log.context === 'PHASE' && log.message.includes('completed')
       );
       expect(phaseLogs.length).toBeGreaterThanOrEqual(6); // 6 phases
     }, 20000);
@@ -227,7 +241,8 @@ describe('InitOrchestrator Integration Tests', () => {
 
     it('should handle insufficient permissions gracefully', async () => {
       // This test might not work on all systems, so we'll make it conditional
-      if (process.getuid && process.getuid() !== 0) { // Not running as root
+      if (process.getuid && process.getuid() !== 0) {
+        // Not running as root
         // Create directory with restrictive permissions
         const restrictedDir = path.join(tempDir, 'restricted');
         await fs.mkdir(restrictedDir);
