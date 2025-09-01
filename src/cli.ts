@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { TaskManager } from './task-manager';
 import { UserInterface, UIOptions } from './ui';
+import { FileSystemManager, createDefaultInstallationConfig } from './filesystem';
 
 const program = new Command();
 
@@ -27,11 +28,12 @@ program
   .helpOption('-h, --help', 'Display help information')
   .addHelpText('after', `
 Examples:
-  $ npx @e0ipso/ai-task-manager init
+  $ npx @e0ipso/ai-task-manager install
   $ npx @e0ipso/ai-task-manager init --project "My Project" --non-interactive
   $ npx @e0ipso/ai-task-manager create --title "Fix bug" --description "Fix login issue"
   $ npx @e0ipso/ai-task-manager list --status pending
   $ npx @e0ipso/ai-task-manager status
+  $ npx @e0ipso/ai-task-manager verify --repair
 
 For more information, visit: https://github.com/e0ipso/ai-task-manager`);
 
@@ -354,6 +356,315 @@ Examples:
     }
   });
 
+// Enhanced install command with comprehensive filesystem operations
+program
+  .command('install')
+  .description('Install AI Task Manager with templates and Claude commands')
+  .option('-f, --force', 'Force installation even if conflicts exist')
+  .option('--overwrite-mode <mode>', 'Conflict resolution mode (ask, overwrite, skip, merge)', 'ask')
+  .option('--no-backup', 'Skip creating backups of existing files')
+  .option('--no-verify', 'Skip installation verification')
+  .option('--dry-run', 'Preview installation without making changes')
+  .option('--no-color', 'Disable colored output')
+  .addHelpText('after', `
+Examples:
+  $ ai-task-manager install
+  $ ai-task-manager install --force --overwrite-mode overwrite
+  $ ai-task-manager install --dry-run
+  $ ai-task-manager install --no-backup --no-verify`)
+  .action(async (options) => {
+    try {
+      const ui = new UserInterface({ colors: !options.noColor });
+      const fsManager = new FileSystemManager();
+      const targetDirectory = process.cwd();
+
+      // Create installation configuration
+      const config = createDefaultInstallationConfig(targetDirectory);
+      config.overwriteMode = options.overwriteMode || 'ask';
+      config.createBackup = !options.noBackup;
+      config.verifyIntegrity = !options.noVerify;
+      config.dryRun = options.dryRun;
+
+      if (options.force) {
+        config.overwriteMode = 'overwrite';
+      }
+
+      ui.showInfo('🔧 Installing AI Task Manager', [
+        `Target directory: ${targetDirectory}`,
+        `Mode: ${config.overwriteMode}`,
+        `Backup: ${config.createBackup ? 'enabled' : 'disabled'}`,
+        `Verification: ${config.verifyIntegrity ? 'enabled' : 'disabled'}`,
+        ...(config.dryRun ? ['⚠️  DRY RUN MODE - No changes will be made'] : [])
+      ]);
+
+      // Check existing installation
+      const existingInstallation = await fsManager.detectInstallation(targetDirectory);
+      
+      if (existingInstallation.isInstalled) {
+        if (!options.force && !options.dryRun) {
+          ui.showInfo('📦 Existing installation detected', [
+            `Version: ${existingInstallation.version || 'unknown'}`,
+            `Path: ${existingInstallation.installationPath}`,
+          ], [
+            'Use --force to overwrite existing installation',
+            'Use --dry-run to preview changes'
+          ]);
+        }
+      }
+
+      // Perform installation with progress tracking
+      const result = await ui.withProgress(
+        async () => {
+          return await fsManager.installAITaskManager(targetDirectory, config);
+        },
+        'Installing AI Task Manager',
+        options.dryRun 
+          ? 'Dry run completed - no changes made'
+          : 'Installation completed successfully'
+      );
+
+      if (options.dryRun) {
+        ui.showInfo('📋 Installation Preview', [
+          `Total operations: ${result.operations.length}`,
+          `Files to create: ${result.summary.filesCreated}`,
+          `Directories to create: ${result.summary.directoriesCreated}`,
+          `Estimated size: ${(result.summary.bytesTransferred / 1024).toFixed(1)}KB`
+        ]);
+
+        if (result.errors.length > 0) {
+          ui.showError('❌ Potential Issues Found', 
+            result.errors.map(e => e.error),
+            ['Review and fix these issues before installation']
+          );
+        }
+        return;
+      }
+
+      if (result.success) {
+        ui.showInfo('✅ Installation Successful', [
+          `Files created: ${result.summary.filesCreated}`,
+          `Directories created: ${result.summary.directoriesCreated}`,
+          `Duration: ${(result.summary.duration / 1000).toFixed(1)}s`,
+          `Size transferred: ${(result.summary.bytesTransferred / 1024).toFixed(1)}KB`
+        ], [
+          'You can now use AI Task Manager commands',
+          'Try "ai-task-manager init" to create a workspace'
+        ]);
+      } else {
+        ui.showError('❌ Installation Failed', 
+          result.errors.map(e => e.error),
+          [
+            'Check file permissions in the target directory',
+            'Ensure you have sufficient disk space',
+            'Try running with --force if conflicts exist'
+          ]
+        );
+        process.exit(1);
+      }
+
+    } catch (error) {
+      const ui = new UserInterface({ colors: !options.noColor });
+      ui.showError('❌ Installation Error', [
+        error instanceof Error ? error.message : String(error)
+      ], [
+        'Check that you have write permissions',
+        'Ensure the target directory is accessible',
+        'Try running the command again'
+      ]);
+      process.exit(1);
+    }
+  });
+
+// Verify command for installation integrity
+program
+  .command('verify')
+  .description('Verify AI Task Manager installation integrity')
+  .option('--repair', 'Attempt to repair damaged installation')
+  .option('--no-color', 'Disable colored output')
+  .addHelpText('after', `
+Examples:
+  $ ai-task-manager verify
+  $ ai-task-manager verify --repair`)
+  .action(async (options) => {
+    try {
+      const ui = new UserInterface({ colors: !options.noColor });
+      const fsManager = new FileSystemManager();
+      const targetDirectory = process.cwd();
+
+      ui.showInfo('🔍 Verifying Installation', [
+        `Checking: ${targetDirectory}`
+      ]);
+
+      // Get installation status
+      const status = await fsManager.getInstallationStatus(targetDirectory);
+      
+      if (!status.isInstalled) {
+        ui.showInfo('❌ No Installation Found', [
+          'AI Task Manager is not installed in this directory'
+        ], [
+          'Run "ai-task-manager install" to install',
+          'Ensure you are in the correct directory'
+        ]);
+        process.exit(1);
+      }
+
+      // Run verification
+      const verification = await ui.withProgress(
+        async () => {
+          return await fsManager.verifyInstallation(targetDirectory);
+        },
+        'Verifying installation integrity',
+        'Verification completed'
+      );
+
+      // Display results
+      if (verification.valid) {
+        ui.showInfo('✅ Installation Healthy', [
+          `Verified: ${verification.checkedFiles} files`,
+          `Status: ${status.health}`,
+          `Version: ${status.version || 'unknown'}`
+        ]);
+      } else {
+        const criticalIssues = verification.issues.filter(i => 
+          i.severity === 'critical' || i.severity === 'high'
+        ).length;
+
+        ui.showError('❌ Installation Issues Found', [
+          verification.summary,
+          `Critical/High issues: ${criticalIssues}`,
+          `Total issues: ${verification.issues.length}`
+        ]);
+
+        // Show detailed issues
+        for (const issue of verification.issues.slice(0, 10)) { // Show first 10 issues
+          console.log(`  • ${issue.path}: ${issue.issue} (${issue.severity})`);
+        }
+
+        if (verification.issues.length > 10) {
+          console.log(`  ... and ${verification.issues.length - 10} more issues`);
+        }
+
+        if (options.repair) {
+          ui.showInfo('🔧 Attempting Repair', [
+            'This will reinstall damaged components'
+          ]);
+
+          const repairResult = await ui.withProgress(
+            async () => {
+              const config = createDefaultInstallationConfig(targetDirectory);
+              config.overwriteMode = 'overwrite';
+              config.createBackup = true;
+              return await fsManager.repairInstallation(targetDirectory, config);
+            },
+            'Repairing installation',
+            'Repair completed'
+          );
+
+          if (repairResult.success) {
+            ui.showInfo('✅ Repair Successful', [
+              `Fixed: ${repairResult.summary.filesCreated} files`,
+              'Installation should now be healthy'
+            ], [
+              'Run verify again to confirm the repair'
+            ]);
+          } else {
+            ui.showError('❌ Repair Failed', 
+              repairResult.errors.map(e => e.error),
+              ['Manual intervention may be required']
+            );
+            process.exit(1);
+          }
+        } else {
+          console.log('\n💡 Use --repair flag to attempt automatic repair');
+        }
+      }
+
+    } catch (error) {
+      const ui = new UserInterface({ colors: !options.noColor });
+      ui.showError('❌ Verification Error', [
+        error instanceof Error ? error.message : String(error)
+      ]);
+      process.exit(1);
+    }
+  });
+
+// Uninstall command
+program
+  .command('uninstall')
+  .description('Uninstall AI Task Manager from current directory')
+  .option('--force', 'Skip confirmation prompt')
+  .option('--no-color', 'Disable colored output')
+  .addHelpText('after', `
+Examples:
+  $ ai-task-manager uninstall
+  $ ai-task-manager uninstall --force`)
+  .action(async (options) => {
+    try {
+      const ui = new UserInterface({ colors: !options.noColor });
+      const fsManager = new FileSystemManager();
+      const targetDirectory = process.cwd();
+
+      // Check if installation exists
+      const status = await fsManager.getInstallationStatus(targetDirectory);
+      
+      if (!status.isInstalled) {
+        ui.showInfo('ℹ️  No Installation Found', [
+          'AI Task Manager is not installed in this directory'
+        ]);
+        return;
+      }
+
+      // Confirmation prompt (unless forced)
+      if (!options.force) {
+        ui.showInfo('⚠️  Uninstall Confirmation', [
+          'This will remove:',
+          '  • .ai/ directory and all templates',
+          '  • .claude/commands/tasks/ directory',
+          '  • All AI Task Manager files',
+          '',
+          'This action cannot be undone!'
+        ]);
+
+        // In a real implementation, you'd prompt the user here
+        console.log('Use --force to skip this confirmation');
+        return;
+      }
+
+      // Perform uninstallation
+      const success = await ui.withProgress(
+        async () => {
+          return await fsManager.uninstallAITaskManager(targetDirectory);
+        },
+        'Removing AI Task Manager',
+        'Uninstallation completed'
+      );
+
+      if (success) {
+        ui.showInfo('✅ Uninstallation Successful', [
+          'AI Task Manager has been removed from this directory'
+        ], [
+          'You can reinstall anytime with "ai-task-manager install"'
+        ]);
+      } else {
+        ui.showError('❌ Uninstallation Failed', [
+          'Some files could not be removed'
+        ], [
+          'Check file permissions',
+          'Try running with elevated privileges',
+          'Manual cleanup may be required'
+        ]);
+        process.exit(1);
+      }
+
+    } catch (error) {
+      const ui = new UserInterface({ colors: !options.noColor });
+      ui.showError('❌ Uninstallation Error', [
+        error instanceof Error ? error.message : String(error)
+      ]);
+      process.exit(1);
+    }
+  });
+
 // Add global error handler
 process.on('uncaughtException', (error) => {
   console.error('❌ Fatal error:', error.message);
@@ -371,10 +682,13 @@ program.on('command:*', (operands) => {
   console.error(`❌ Unknown command: ${unknownCommand}`);
   console.log('');
   console.log('Available commands:');
-  console.log('  init     Initialize a new task workspace');
-  console.log('  create   Create a new task');
-  console.log('  list     List tasks with filtering options');
-  console.log('  status   Show workspace status');
+  console.log('  install    Install AI Task Manager with templates and commands');
+  console.log('  verify     Verify installation integrity and optionally repair');
+  console.log('  uninstall  Remove AI Task Manager from current directory');
+  console.log('  init       Initialize a new task workspace');
+  console.log('  create     Create a new task');
+  console.log('  list       List tasks with filtering options');
+  console.log('  status     Show workspace status');
   console.log('');
   console.log('Use "ai-task-manager --help" for general help');
   process.exit(1);
