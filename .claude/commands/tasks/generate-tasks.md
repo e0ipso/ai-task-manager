@@ -1,6 +1,6 @@
 ---
-argument-hint: [plan-document-path]
-description: Create a comprehensive plan to accomplish the request from the user.
+argument-hint: [plan-ID]
+description: Generate tasks to implement the plan with the provided ID.
 ---
 # Comprehensive Task List Creation
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
@@ -110,24 +110,10 @@ If the plan lacks sufficient detail:
 
 ## Update the plan document
 
-After creating all tasks with their dependencies, update the original plan document with two critical sections: a task inventory and a phase-based execution blueprint.
+After creating all tasks with their dependencies, update the original plan document with two critical sections: a task dependency visualization and a phase-based execution blueprint.
 
-### Section 1: Task Inventory
+### Section 1: Dependency Visualization
 
-#### Requirements
-Add a comprehensive list of all created tasks with the following format:
-
-```markdown
-## Task Inventory
-
-### Group: [Group Name]
-- Task 001: [Brief task description]
-  - Dependencies: [002, 003] or "None"
-- Task 002: [Brief task description]
-  - Dependencies: None
-```
-
-#### Dependency Visualization
 If any tasks have dependencies, create a Mermaid diagram showing the dependency graph:
 
 ```mermaid
