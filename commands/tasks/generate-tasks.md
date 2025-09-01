@@ -110,24 +110,10 @@ If the plan lacks sufficient detail:
 
 ## Update the plan document
 
-After creating all tasks with their dependencies, update the original plan document with two critical sections: a task inventory and a phase-based execution blueprint.
+After creating all tasks with their dependencies, update the original plan document with two critical sections: a task dependency visualization and a phase-based execution blueprint.
 
-### Section 1: Task Inventory
+### Section 1: Dependency Visualization
 
-#### Requirements
-Add a comprehensive list of all created tasks with the following format:
-
-```markdown
-## Task Inventory
-
-### Group: [Group Name]
-- Task 001: [Brief task description]
-  - Dependencies: [002, 003] or "None"
-- Task 002: [Brief task description]
-  - Dependencies: None
-```
-
-#### Dependency Visualization
 If any tasks have dependencies, create a Mermaid diagram showing the dependency graph:
 
 ```mermaid
