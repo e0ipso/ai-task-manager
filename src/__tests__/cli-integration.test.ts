@@ -6,11 +6,11 @@ const execAsync = promisify(exec);
 
 describe('CLI Integration Tests', () => {
   const CLI_PATH = path.join(__dirname, '..', 'cli.ts');
-  
+
   test('should show helpful error for invalid assistant', async () => {
     try {
       await execAsync(`npx ts-node ${CLI_PATH} init --assistants invalid`);
-      fail('Expected command to fail with invalid assistant');
+      throw new Error('Expected command to fail with invalid assistant');
     } catch (error: any) {
       expect(error.stderr).toContain('Invalid assistant name: invalid');
       expect(error.stderr).toContain('Supported assistants: claude, gemini');
@@ -21,7 +21,7 @@ describe('CLI Integration Tests', () => {
   test('should show helpful error for misspelled assistant', async () => {
     try {
       await execAsync(`npx ts-node ${CLI_PATH} init --assistants claud`);
-      fail('Expected command to fail with misspelled assistant');
+      throw new Error('Expected command to fail with misspelled assistant');
     } catch (error: any) {
       expect(error.stderr).toContain('Invalid assistant name: claud');
       expect(error.stderr).toContain('Did you mean "claude" instead of "claud"?');
@@ -31,7 +31,7 @@ describe('CLI Integration Tests', () => {
   test('should show helpful error for empty assistant value', async () => {
     try {
       await execAsync(`npx ts-node ${CLI_PATH} init --assistants ""`);
-      fail('Expected command to fail with empty assistant');
+      throw new Error('Expected command to fail with empty assistant');
     } catch (error: any) {
       expect(error.stderr).toContain('Assistant input cannot be empty or undefined');
       expect(error.stderr).toContain('Valid options: claude, gemini');
@@ -41,7 +41,7 @@ describe('CLI Integration Tests', () => {
   test('should show helpful error for missing assistants flag', async () => {
     try {
       await execAsync(`npx ts-node ${CLI_PATH} init`);
-      fail('Expected command to fail with missing assistants flag');
+      throw new Error('Expected command to fail with missing assistants flag');
     } catch (error: any) {
       expect(error.stderr).toContain("required option '--assistants <assistants>' not specified");
     }
@@ -50,7 +50,7 @@ describe('CLI Integration Tests', () => {
   test('should show help for unknown command', async () => {
     try {
       await execAsync(`npx ts-node ${CLI_PATH} unknown-command`);
-      fail('Expected command to fail with unknown command');
+      throw new Error('Expected command to fail with unknown command');
     } catch (error: any) {
       // The error might be in stdout or stderr depending on how the command is handled
       const output = error.stdout + error.stderr;

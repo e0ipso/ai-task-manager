@@ -56,7 +56,7 @@ Structure your response as follows:
 - If context is insufficient: List specific clarifying questions
 - If context is sufficient: Provide the comprehensive plan using the structure above. Use the information in @TASK_MANAGER_INFO.md for the directory structure and additional information about plans.
 
-##### Frontmatter Structure
+#### Frontmatter Structure
 ```yaml
 ---
 id: 01
@@ -64,6 +64,7 @@ summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for auto
 created: 2025-09-01
 ---
 ```
+
 ### Important Notes
 - Never generate a partial or assumed plan without adequate context
 - Prioritize accuracy over speed
