@@ -3,13 +3,7 @@
  */
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  VerificationResult,
-  FileInfo,
-  InstallationConfig,
-  CompletedOperation,
-  FileSystemError,
-} from './types';
+import { VerificationResult, FileInfo, CompletedOperation, FileSystemError } from './types';
 import { FileSystemUtils } from './utils';
 
 export interface VerificationManifest {
@@ -120,11 +114,7 @@ export class InstallationVerifier {
   /**
    * Verify complete installation against manifest
    */
-  async verifyInstallation(
-    installationPath: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _config?: InstallationConfig
-  ): Promise<VerificationResult> {
+  async verifyInstallation(installationPath: string): Promise<VerificationResult> {
     if (!this.manifest) {
       throw this.createError('No verification manifest available', 'MANIFEST_NOT_AVAILABLE');
     }

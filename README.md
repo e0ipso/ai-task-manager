@@ -322,6 +322,13 @@ npm run build
 7. Push to the branch: `git push origin feature-name`
 8. Submit a pull request
 
+## Documentation
+
+### Development Documentation
+
+- **[NPM Authentication Guide](./docs/NPM_AUTHENTICATION.md)**: Comprehensive guide for setting up secure NPM authentication for CI/CD pipelines
+- **[NPM Authentication Quick Reference](./docs/NPM_AUTH_QUICK_REFERENCE.md)**: Quick setup checklist and troubleshooting
+
 ## Support
 
 - **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/e0ipso/ai-task-manager/issues)
