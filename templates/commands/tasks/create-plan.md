@@ -93,98 +93,16 @@ The schema for this frontmatter is:
 
 ### Plan ID Generation
 
-When creating a new plan, you need to determine the next available plan ID. The plan ID serves as a unique identifier and must follow specific formatting conventions.
-
-#### Key Distinctions
-- **Front-matter ID**: Use numeric values (e.g., `id: 6`) - this is an integer for schema validation
-- **Directory/File Names**: Use zero-padded strings (e.g., `06--plan-name`) - this ensures proper sorting in file systems
-
-#### Automatic ID Generation Command
-
-Use this bash command to automatically generate the next plan ID:
-
+**Auto-generate the next plan ID:**
 ```bash
 echo $(($(find .ai/task-manager/plans -name "plan-*.md" -exec grep "^id:" {} \; | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
 ```
 
-#### How It Works
-1. **Finds plan files** using the pattern `plan-*.md`
-2. **Extracts front-matter IDs** using grep to find `id:` lines
-3. **Strips the `id:` prefix** using sed to get numeric values only
-4. **Sorts numerically** to find the highest existing ID
-5. **Handles empty results** by defaulting to 0 if no plans exist
-6. **Adds 1** to get the next available ID
+**Key formatting:**
+- **Front-matter**: Use numeric values (`id: 7`)
+- **Directory names**: Use zero-padded strings (`07--plan-name`)
 
-This command reads the actual `id:` values from plan front-matter, making it the definitive source of truth.
-
-#### Usage Instructions
-
-1. **Run from repository root** (where `.ai/` directory exists):
-   ```bash
-   # Get the next plan ID
-   NEXT_ID=$(echo $(($(find .ai/task-manager/plans/ -maxdepth 1 -type d -name '[0-9]*--*' 2>/dev/null | sed 's/.*\/\([0-9]*\)--.*/\1/' | sort -n | tail -n 1 | sed 's/^$/0/') + 1)))
-   echo "Next plan ID: $NEXT_ID"
-   ```
-
-2. **Use numeric value in front-matter**:
-   ```yaml
-   ---
-   id: 6  # Use the numeric value directly
-   summary: "Your plan summary"
-   created: 2025-09-01
-   ---
-   ```
-
-3. **Use zero-padded value for directory/file names**:
-   ```bash
-   # For ID 6, create directory as:
-   mkdir ".ai/task-manager/plans/06--your-plan-name"
-   ```
-
-#### Edge Case Handling
-
-The command handles several edge cases automatically:
-
-- **Empty plans directory**: Returns `1` for the first plan
-- **Non-existent plans directory**: Returns `1` (command won't fail)
-- **Gaps in sequence**: Finds the maximum existing ID and adds 1
-- **Non-sequential IDs**: Works correctly (e.g., if you have 1, 3, 5, it returns 6)
-
-#### Examples
-
-**Scenario 1: First plan (empty directory)**
-```bash
-$ echo $(($(find .ai/task-manager/plans/ -maxdepth 1 -type d -name '[0-9]*--*' 2>/dev/null | sed 's/.*\/\([0-9]*\)--.*/\1/' | sort -n | tail -n 1 | sed 's/^$/0/') + 1))
-1
-```
-Use `id: 1` in front-matter, create `01--plan-name` directory.
-
-**Scenario 2: Existing plans (01, 02, 03)**
-```bash
-$ echo $(($(find .ai/task-manager/plans/ -maxdepth 1 -type d -name '[0-9]*--*' 2>/dev/null | sed 's/.*\/\([0-9]*\)--.*/\1/' | sort -n | tail -n 1 | sed 's/^$/0/') + 1))
-4
-```
-Use `id: 4` in front-matter, create `04--plan-name` directory.
-
-**Scenario 3: Gaps in sequence (01, 03, 07)**
-```bash
-$ echo $(($(find .ai/task-manager/plans/ -maxdepth 1 -type d -name '[0-9]*--*' 2>/dev/null | sed 's/.*\/\([0-9]*\)--.*/\1/' | sort -n | tail -n 1 | sed 's/^$/0/') + 1))
-8
-```
-Use `id: 8` in front-matter, create `08--plan-name` directory.
-
-#### Manual Fallback
-
-If the command fails or you need to manually determine the ID:
-
-1. List existing plan directories:
-   ```bash
-   ls -1 .ai/task-manager/plans/ | grep '^[0-9]'
-   ```
-
-2. Find the highest numeric prefix and add 1
-
-3. Use the numeric value in front-matter and zero-pad for directory names
+This command reads `id:` values from existing plan front-matter as the source of truth. Handles empty directories (returns 1) and gaps in sequence automatically.
 
 ### Important Notes
 - Never generate a partial or assumed plan without adequate context
