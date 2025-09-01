@@ -77,7 +77,7 @@ describe('FileSystemUtils', () => {
       expect(info.size).toBe(Buffer.byteLength(content));
       expect(info.type).toBe('file');
       expect(info.checksum).toBeDefined();
-      expect(info.modified).toBeInstanceOf(Date);
+      expect(info.modified.getTime()).toBeGreaterThan(0);
     });
 
     it('should get directory information', async () => {

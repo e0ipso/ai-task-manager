@@ -1,3 +1,4 @@
+
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -7,8 +8,13 @@ module.exports = {
     '**/?(*.)+(spec|test).ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\.ts$': 'ts-jest',
+    // Transform all JS files, including those in node_modules
+    '^.+\.js$': 'babel-jest',
   },
+  // Remove transformIgnorePatterns to ensure all node_modules are transformed
+  // transformIgnorePatterns: [], // This would transform everything, which is slow.
+  // Let's try to be more specific if this works.
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',

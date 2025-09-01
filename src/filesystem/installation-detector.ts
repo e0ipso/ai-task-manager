@@ -246,6 +246,7 @@ export class InstallationDetector {
       let health: 'healthy' | 'partial' | 'corrupted' | 'unknown' = 'unknown';
 
       if (detection.isInstalled) {
+        console.log('Integrity issues:', integrity); // Added for debugging
         if (integrity.length === 0) {
           health = 'healthy';
         } else if (
@@ -331,6 +332,7 @@ export class InstallationDetector {
       '.ai/task-manager/plans',
       '.ai/task-manager/templates',
       '.claude/commands/tasks',
+      '.gemini/commands/tasks',
     ];
 
     for (const relativePath of commonFiles) {

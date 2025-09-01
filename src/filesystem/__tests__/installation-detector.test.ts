@@ -44,6 +44,9 @@ describe('InstallationDetector', () => {
       
       await fs.writeFile(versionFile, '1.0.0');
       await fs.writeFile(configFile, '{}');
+      await FileSystemUtils.createDirectory(path.join(aiDir, 'plans'));
+      await FileSystemUtils.createDirectory(path.join(aiDir, 'templates'));
+      await FileSystemUtils.createDirectory(path.join(tempDir, '.claude', 'commands', 'tasks'));
 
       const result = await detector.detectInstallation(tempDir);
 

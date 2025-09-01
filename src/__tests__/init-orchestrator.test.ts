@@ -7,6 +7,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { tmpdir } from 'os';
 import { InitOrchestrator, InitOptions } from '../init-orchestrator';
+import { LogLevel } from '../logging';
 
 describe('InitOrchestrator Integration Tests', () => {
   let tempDir: string;
@@ -290,8 +291,8 @@ describe('InitOrchestrator Integration Tests', () => {
 
       // Verify different log levels are present
       const logLevels = new Set(logs.map(log => log.level));
-      expect(logLevels.has('info')).toBe(true);
-      expect(logLevels.has('debug')).toBe(true);
+      expect(logLevels.has(LogLevel.INFO)).toBe(true);
+      expect(logLevels.has(LogLevel.DEBUG)).toBe(true);
 
       // Verify contexts are properly set
       const contexts = new Set(logs.map(log => log.context).filter(Boolean));

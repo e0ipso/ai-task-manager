@@ -93,6 +93,9 @@ describe('FileSystemManager', () => {
       await fs.mkdir(aiDir, { recursive: true });
       await fs.writeFile(path.join(aiDir, 'VERSION'), '1.0.0');
       await fs.writeFile(path.join(aiDir, 'config.json'), '{}');
+      await fs.mkdir(path.join(aiDir, 'plans'), { recursive: true });
+      await fs.mkdir(path.join(aiDir, 'templates'), { recursive: true });
+      await fs.mkdir(path.join(tempDir, '.claude', 'commands', 'tasks'), { recursive: true });
 
       const result = await fsManager.detectInstallation(tempDir);
 

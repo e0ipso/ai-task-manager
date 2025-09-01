@@ -275,7 +275,7 @@ jobs:
           export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
           # Placeholder for NPM_TOKEN (will be configured in Task 014)
-          # export NPM_TOKEN="${{ secrets.NPM_TOKEN }}"
+          export NPM_TOKEN="${{ secrets.NPM_TOKEN }}"
           
           # Run semantic-release with detailed logging
           npx semantic-release --debug 2>&1 | tee semantic-release.log
@@ -305,7 +305,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Placeholder for Task 014
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Placeholder for Task 014
           # Use explicit Git credentials for semantic-release
           GIT_AUTHOR_NAME: "github-actions[bot]"
           GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
