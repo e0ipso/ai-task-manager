@@ -7,8 +7,7 @@
 import { FileSystemManager } from '../filesystem/filesystem-manager';
 import { createDefaultInstallationConfig } from '../filesystem';
 import { CommandManager } from '../command-manager';
-import { createAssistantConfig, AssistantConfig } from '../types/assistant-config';
-import { SupportedAssistant } from '../utils/assistant-validator';
+import { createAssistantConfig } from '../types/assistant-config';
 import fs from 'fs/promises';
 import path from 'path';
 import { tmpdir } from 'os';
@@ -182,13 +181,11 @@ This is another test command for multi-assistant installation.`;
       // Install structure and commands
       const config = createDefaultInstallationConfig(tempDir);
       await fsManager.installForAssistants(tempDir, config, assistantConfig);
-      
-      await commandManager.installCommandsForAssistants(
-        sourceDir,
-        tempDir,
-        assistantConfig,
-        { overwrite: false, validate: true }
-      );
+
+      await commandManager.installCommandsForAssistants(sourceDir, tempDir, assistantConfig, {
+        overwrite: false,
+        validate: true,
+      });
 
       const claudeTasksDir = path.join(tempDir, '.ai', 'claude', 'tasks');
       const geminiTasksDir = path.join(tempDir, '.ai', 'gemini', 'tasks');
@@ -227,14 +224,12 @@ This is a base command for testing.`;
 
       const assistantConfig = createAssistantConfig(['claude', 'gemini'], tempDir);
       const config = createDefaultInstallationConfig(tempDir);
-      
+
       await fsManager.installForAssistants(tempDir, config, assistantConfig);
-      await commandManager.installCommandsForAssistants(
-        sourceDir,
-        tempDir,
-        assistantConfig,
-        { overwrite: false, validate: true }
-      );
+      await commandManager.installCommandsForAssistants(sourceDir, tempDir, assistantConfig, {
+        overwrite: false,
+        validate: true,
+      });
     });
 
     it('should allow independent file modifications in each directory', async () => {
@@ -245,7 +240,7 @@ This is a base command for testing.`;
       const claudeCommandPath = path.join(claudeTasksDir, 'base-command.md');
       const originalContent = await fs.readFile(claudeCommandPath, 'utf8');
       const modifiedContent = originalContent + '\n\n<!-- Modified in Claude directory -->';
-      
+
       await fs.writeFile(claudeCommandPath, modifiedContent);
 
       // Verify Claude directory has modified content
@@ -265,7 +260,10 @@ This is a base command for testing.`;
 
       // Add a file to Claude directory only
       const customClaudeFile = path.join(claudeTasksDir, 'claude-specific.md');
-      await fs.writeFile(customClaudeFile, '# Claude-specific command\n\nThis command is only for Claude.');
+      await fs.writeFile(
+        customClaudeFile,
+        '# Claude-specific command\n\nThis command is only for Claude.'
+      );
 
       // Verify file exists in Claude directory
       expect(await pathExists(customClaudeFile)).toBe(true);
@@ -329,12 +327,10 @@ This is test command number ${i} for performance testing.
 
       const singleStart = performance.now();
       await fsManager.installForAssistants(tempDir, config1, singleConfig);
-      await commandManager.installCommandsForAssistants(
-        sourceDir,
-        tempDir,
-        singleConfig,
-        { overwrite: false, validate: true }
-      );
+      await commandManager.installCommandsForAssistants(sourceDir, tempDir, singleConfig, {
+        overwrite: false,
+        validate: true,
+      });
       const singleDuration = performance.now() - singleStart;
 
       // Clean up for next test
@@ -346,18 +342,16 @@ This is test command number ${i} for performance testing.
 
       const multipleStart = performance.now();
       await fsManager.installForAssistants(tempDir, config2, multipleConfig);
-      await commandManager.installCommandsForAssistants(
-        sourceDir,
-        tempDir,
-        multipleConfig,
-        { overwrite: false, validate: true }
-      );
+      await commandManager.installCommandsForAssistants(sourceDir, tempDir, multipleConfig, {
+        overwrite: false,
+        validate: true,
+      });
       const multipleDuration = performance.now() - multipleStart;
 
       // Performance assertions
       expect(singleDuration).toBeGreaterThan(0);
       expect(multipleDuration).toBeGreaterThan(0);
-      
+
       // Multiple assistant installation should take longer but not excessively so
       // Allow up to 3x the time for reasonable overhead
       expect(multipleDuration).toBeLessThan(singleDuration * 3);
@@ -387,14 +381,12 @@ This is a command for testing directory isolation.`;
 
       const assistantConfig = createAssistantConfig(['claude', 'gemini'], tempDir);
       const config = createDefaultInstallationConfig(tempDir);
-      
+
       await fsManager.installForAssistants(tempDir, config, assistantConfig);
-      await commandManager.installCommandsForAssistants(
-        sourceDir,
-        tempDir,
-        assistantConfig,
-        { overwrite: false, validate: true }
-      );
+      await commandManager.installCommandsForAssistants(sourceDir, tempDir, assistantConfig, {
+        overwrite: false,
+        validate: true,
+      });
     });
 
     it('should maintain separate file permissions', async () => {
@@ -412,7 +404,7 @@ This is a command for testing directory isolation.`;
 
       // Permissions should be different
       expect(claudeStats.mode).not.toEqual(geminiStats.mode);
-      
+
       // Restore permissions for cleanup
       await fs.chmod(claudeCommandPath, 0o644);
     });
@@ -426,18 +418,18 @@ This is a command for testing directory isolation.`;
         fs.writeFile(path.join(claudeTasksDir, 'concurrent-claude.md'), 'Claude concurrent test'),
         fs.writeFile(path.join(geminiTasksDir, 'concurrent-gemini.md'), 'Gemini concurrent test'),
         fs.readdir(claudeTasksDir),
-        fs.readdir(geminiTasksDir)
+        fs.readdir(geminiTasksDir),
       ];
 
       const results = await Promise.all(promises);
-      
+
       // Should complete without errors
       expect(results).toHaveLength(4);
 
       // Verify files were created in correct directories
       expect(await pathExists(path.join(claudeTasksDir, 'concurrent-claude.md'))).toBe(true);
       expect(await pathExists(path.join(geminiTasksDir, 'concurrent-gemini.md'))).toBe(true);
-      
+
       // Verify no cross-contamination
       expect(await pathExists(path.join(claudeTasksDir, 'concurrent-gemini.md'))).toBe(false);
       expect(await pathExists(path.join(geminiTasksDir, 'concurrent-claude.md'))).toBe(false);
@@ -447,8 +439,11 @@ This is a command for testing directory isolation.`;
   describe('Error Handling and Edge Cases', () => {
     it('should handle duplicate assistants in configuration', async () => {
       // createAssistantConfig should handle duplicates automatically
-      const assistantConfig = createAssistantConfig(['claude', 'claude', 'gemini', 'gemini'], tempDir);
-      
+      const assistantConfig = createAssistantConfig(
+        ['claude', 'claude', 'gemini', 'gemini'],
+        tempDir
+      );
+
       // Verify only unique assistants are configured
       expect(assistantConfig.assistants).toEqual(['claude', 'gemini']);
       expect(assistantConfig.installationTargets).toHaveLength(2);
@@ -464,7 +459,7 @@ This is a command for testing directory isolation.`;
       // Verify assistant configuration integrity
       expect(assistantConfig.assistants).toEqual(['claude', 'gemini']);
       expect(assistantConfig.installationTargets).toHaveLength(2);
-      
+
       for (const target of assistantConfig.installationTargets) {
         expect(['claude', 'gemini']).toContain(target.assistant);
         expect(await pathExists(target.baseDirectory)).toBe(true);

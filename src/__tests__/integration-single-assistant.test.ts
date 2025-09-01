@@ -18,7 +18,7 @@ jest.mock('inquirer', () => ({
 // Mock UI components to avoid inquirer import issues
 jest.mock('../ui', () => ({
   UserInterface: jest.fn().mockImplementation((options: any) => ({
-    runInitializationFlow: jest.fn().mockImplementation(() => 
+    runInitializationFlow: jest.fn().mockImplementation(() =>
       Promise.resolve({
         projectName: options?.defaults?.projectName || 'test-project',
         description: options?.defaults?.description || 'Test project description',
@@ -26,7 +26,7 @@ jest.mock('../ui', () => ({
         includeExamples: options?.defaults?.includeExamples !== false,
       })
     ),
-    withProgress: jest.fn().mockImplementation(async (operation, title, successMessage) => {
+    withProgress: jest.fn().mockImplementation(async operation => {
       return await operation();
     }),
     showInitializationSuccess: jest.fn(),
@@ -56,38 +56,40 @@ jest.mock('../command-manager', () => ({
 // Mock the entire filesystem manager for cleaner testing
 jest.mock('../filesystem', () => ({
   FileSystemManager: jest.fn().mockImplementation(() => ({
-    installForAssistants: jest.fn().mockImplementation(async (targetDir, config, assistantConfig) => {
-      // Create the directory structure based on assistant configuration
-      for (const target of (assistantConfig as any).installationTargets) {
-        await fs.mkdir(target.baseDirectory, { recursive: true });
-        await fs.mkdir(target.commandsDirectory, { recursive: true });
-        await fs.mkdir(target.tasksDirectory, { recursive: true });
+    installForAssistants: jest
+      .fn()
+      .mockImplementation(async (targetDir, config, assistantConfig) => {
+        // Create the directory structure based on assistant configuration
+        for (const target of (assistantConfig as any).installationTargets) {
+          await fs.mkdir(target.baseDirectory, { recursive: true });
+          await fs.mkdir(target.commandsDirectory, { recursive: true });
+          await fs.mkdir(target.tasksDirectory, { recursive: true });
 
-        // Create some dummy command files
-        const dummyCommand = path.join(target.commandsDirectory, 'example.md');
-        await fs.writeFile(dummyCommand, '# Example Command\n\nThis is a test command file.');
-        
-        // Set proper permissions
-        await fs.chmod(dummyCommand, 0o644);
-        await fs.chmod(target.baseDirectory, 0o755);
-        await fs.chmod(target.commandsDirectory, 0o755);
-        await fs.chmod(target.tasksDirectory, 0o755);
-      }
+          // Create some dummy command files
+          const dummyCommand = path.join(target.commandsDirectory, 'example.md');
+          await fs.writeFile(dummyCommand, '# Example Command\n\nThis is a test command file.');
 
-      return {
-        success: true,
-        summary: {
-          filesCreated: (assistantConfig as any).installationTargets.length * 1, // 1 file per target
-          directoriesCreated: (assistantConfig as any).installationTargets.length * 3, // 3 dirs per target
-          bytesTransferred: 1024,
-        },
-        operations: (assistantConfig as any).installationTargets.map((target: any) => ({
-          type: 'create_directory',
-          target: target.baseDirectory,
-        })),
-        errors: [],
-      };
-    }),
+          // Set proper permissions
+          await fs.chmod(dummyCommand, 0o644);
+          await fs.chmod(target.baseDirectory, 0o755);
+          await fs.chmod(target.commandsDirectory, 0o755);
+          await fs.chmod(target.tasksDirectory, 0o755);
+        }
+
+        return {
+          success: true,
+          summary: {
+            filesCreated: (assistantConfig as any).installationTargets.length * 1, // 1 file per target
+            directoriesCreated: (assistantConfig as any).installationTargets.length * 3, // 3 dirs per target
+            bytesTransferred: 1024,
+          },
+          operations: (assistantConfig as any).installationTargets.map((target: any) => ({
+            type: 'create_directory',
+            target: target.baseDirectory,
+          })),
+          errors: [],
+        };
+      }),
     verifyInstallation: jest.fn().mockResolvedValue({
       valid: true,
       checkedFiles: 5,
@@ -95,7 +97,7 @@ jest.mock('../filesystem', () => ({
       issues: [],
     }),
   })),
-  createDefaultInstallationConfig: jest.fn().mockImplementation((targetDir) => ({
+  createDefaultInstallationConfig: jest.fn().mockImplementation(targetDir => ({
     targetDirectory: targetDir,
     overwriteMode: 'ask',
     backupMode: 'auto',
@@ -153,9 +155,9 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should create .ai/claude/ directory structure', async () => {
       const options = createClaudeOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
       expect(result.projectName).toBe('claude-test-project');
 
@@ -175,24 +177,24 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should copy command files to .ai/claude/commands/', async () => {
       const options = createClaudeOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
 
       // Check for command files in Claude directory
       const claudeCommandsDir = path.join(tempDir, '.ai', 'claude', 'commands');
       const commandFiles = await fs.readdir(claudeCommandsDir);
-      
+
       // Verify at least some command files were created
       expect(commandFiles.length).toBeGreaterThan(0);
-      
+
       // Check that commands are properly structured files
       for (const commandFile of commandFiles) {
         const commandPath = path.join(claudeCommandsDir, commandFile);
         const stats = await fs.stat(commandPath);
         expect(stats.isFile()).toBe(true);
-        
+
         // Verify file permissions (0o644 = readable by owner, group, others; writable by owner)
         expect(stats.mode & 0o777).toBe(0o644);
       }
@@ -200,29 +202,29 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should create task files in .ai/claude/tasks/', async () => {
       const options = createClaudeOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
 
       // Check for task files in Claude directory
       const claudeTasksDir = path.join(tempDir, '.ai', 'claude', 'tasks');
-      
+
       // Directory should exist (even if empty initially)
       await expect(fs.access(claudeTasksDir)).resolves.toBeUndefined();
-      
+
       const taskDirStats = await fs.stat(claudeTasksDir);
       expect(taskDirStats.isDirectory()).toBe(true);
-      
+
       // Verify directory permissions (0o755 = rwx for owner, rx for group and others)
       expect(taskDirStats.mode & 0o777).toBe(0o755);
     });
 
     it('should preserve file permissions correctly', async () => {
       const options = createClaudeOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
 
       // Verify directory permissions
@@ -252,7 +254,7 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should work with dry-run mode', async () => {
       const options = createClaudeOptions({ dryRun: true });
-      
+
       // Mock the filesystem manager to handle dry-run properly
       const { FileSystemManager } = require('../filesystem');
       FileSystemManager.mockImplementation(() => ({
@@ -269,9 +271,9 @@ describe('Single Assistant Integration Tests', () => {
           issues: [],
         }),
       }));
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
 
       // In dry-run mode, no actual files should be created in .ai directories
@@ -295,19 +297,19 @@ describe('Single Assistant Integration Tests', () => {
       await fs.writeFile(testFilePath, 'original content');
 
       // Second installation with force mode
-      const forceOptions = createClaudeOptions({ 
+      const forceOptions = createClaudeOptions({
         force: true,
-        project: 'claude-forced-project' 
+        project: 'claude-forced-project',
       });
       const forceResult = await orchestrator.orchestrateInit(forceOptions);
-      
+
       expect(forceResult.success).toBe(true);
       expect(forceResult.projectName).toBe('claude-forced-project');
 
       // Verify installation still exists and was updated
       const claudeBaseDir = path.join(tempDir, '.ai', 'claude');
       await expect(fs.access(claudeBaseDir)).resolves.toBeUndefined();
-      
+
       // Check the updated config
       const configPath = path.join(tempDir, '.ai-tasks', 'config.json');
       const configContent = await fs.readFile(configPath, 'utf-8');
@@ -318,9 +320,9 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should integrate properly with the full init flow', async () => {
       const options = createClaudeOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
       expect(result.operationsSummary.filesCreated).toBeGreaterThan(0);
       expect(result.operationsSummary.directoriesCreated).toBeGreaterThan(0);
@@ -328,14 +330,14 @@ describe('Single Assistant Integration Tests', () => {
       // Verify the core AI Task Manager structure exists
       const aiTasksDir = path.join(tempDir, '.ai-tasks');
       const configPath = path.join(aiTasksDir, 'config.json');
-      
+
       await expect(fs.access(aiTasksDir)).resolves.toBeUndefined();
       await expect(fs.access(configPath)).resolves.toBeUndefined();
 
       // Verify configuration contains assistant information
       const configContent = await fs.readFile(configPath, 'utf-8');
       const config = JSON.parse(configContent);
-      
+
       expect(config.assistants).toEqual(['claude']);
       expect(config.assistantDirectories).toHaveProperty('claude');
       expect(config.assistantDirectories.claude).toBe(path.join(tempDir, '.ai', 'claude'));
@@ -363,9 +365,9 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should create .ai/gemini/ directory structure', async () => {
       const options = createGeminiOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
       expect(result.projectName).toBe('gemini-test-project');
 
@@ -385,24 +387,24 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should copy command files to .ai/gemini/commands/', async () => {
       const options = createGeminiOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
 
       // Check for command files in Gemini directory
       const geminiCommandsDir = path.join(tempDir, '.ai', 'gemini', 'commands');
       const commandFiles = await fs.readdir(geminiCommandsDir);
-      
+
       // Verify at least some command files were created
       expect(commandFiles.length).toBeGreaterThan(0);
-      
+
       // Check that commands are properly structured files
       for (const commandFile of commandFiles) {
         const commandPath = path.join(geminiCommandsDir, commandFile);
         const stats = await fs.stat(commandPath);
         expect(stats.isFile()).toBe(true);
-        
+
         // Verify file permissions
         expect(stats.mode & 0o777).toBe(0o644);
       }
@@ -410,9 +412,9 @@ describe('Single Assistant Integration Tests', () => {
 
     it('should integrate properly with the full init flow', async () => {
       const options = createGeminiOptions();
-      
+
       const result = await orchestrator.orchestrateInit(options);
-      
+
       expect(result.success).toBe(true);
       expect(result.operationsSummary.filesCreated).toBeGreaterThan(0);
       expect(result.operationsSummary.directoriesCreated).toBeGreaterThan(0);
@@ -421,7 +423,7 @@ describe('Single Assistant Integration Tests', () => {
       const configPath = path.join(tempDir, '.ai-tasks', 'config.json');
       const configContent = await fs.readFile(configPath, 'utf-8');
       const config = JSON.parse(configContent);
-      
+
       expect(config.assistants).toEqual(['gemini']);
       expect(config.assistantDirectories).toHaveProperty('gemini');
       expect(config.assistantDirectories.gemini).toBe(path.join(tempDir, '.ai', 'gemini'));
@@ -443,14 +445,14 @@ describe('Single Assistant Integration Tests', () => {
         force: false,
         noColor: true,
       };
-      
+
       const claudeResult = await orchestrator.orchestrateInit(claudeOptions);
       expect(claudeResult.success).toBe(true);
 
       // Verify Claude exists, Gemini doesn't
       const claudeDir = path.join(tempDir, '.ai', 'claude');
       const geminiDir = path.join(tempDir, '.ai', 'gemini');
-      
+
       await expect(fs.access(claudeDir)).resolves.toBeUndefined();
       await expect(fs.access(geminiDir)).rejects.toThrow();
 
@@ -467,7 +469,7 @@ describe('Single Assistant Integration Tests', () => {
         force: true,
         noColor: true,
       };
-      
+
       const geminiResult = await orchestrator.orchestrateInit(geminiOptions);
       expect(geminiResult.success).toBe(true);
 
@@ -485,7 +487,9 @@ describe('Single Assistant Integration Tests', () => {
       for (const testCase of testCases) {
         // Clean up between tests
         await fs.rm(path.join(tempDir, '.ai'), { recursive: true, force: true }).catch(() => {});
-        await fs.rm(path.join(tempDir, '.ai-tasks'), { recursive: true, force: true }).catch(() => {});
+        await fs
+          .rm(path.join(tempDir, '.ai-tasks'), { recursive: true, force: true })
+          .catch(() => {});
 
         const options: InitOptions = {
           project: `${testCase.assistant}-consistency-test`,
@@ -544,7 +548,7 @@ describe('Single Assistant Integration Tests', () => {
         force: false,
         noColor: true,
       };
-      
+
       const firstResult = await orchestrator.orchestrateInit(firstOptions);
       expect(firstResult.success).toBe(true);
 
@@ -574,7 +578,7 @@ describe('Single Assistant Integration Tests', () => {
       };
 
       const result = await orchestrator.orchestrateInit(options);
-      
+
       // Should handle the error gracefully
       expect(result.success).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
@@ -591,7 +595,9 @@ describe('Single Assistant Integration Tests', () => {
       for (const testCase of testCases) {
         // Clean up between tests
         await fs.rm(path.join(tempDir, '.ai'), { recursive: true, force: true }).catch(() => {});
-        await fs.rm(path.join(tempDir, '.ai-tasks'), { recursive: true, force: true }).catch(() => {});
+        await fs
+          .rm(path.join(tempDir, '.ai-tasks'), { recursive: true, force: true })
+          .catch(() => {});
 
         const options: InitOptions = {
           project: `config-validation-${testCase.assistants.join('-')}`,
@@ -611,7 +617,7 @@ describe('Single Assistant Integration Tests', () => {
 
         expect(config.assistants).toEqual(testCase.expectedAssistants);
         expect(Object.keys(config.assistantDirectories)).toEqual(testCase.expectedAssistants);
-        
+
         // Verify directory mappings are correct
         for (const assistant of testCase.expectedAssistants) {
           const expectedPath = path.join(tempDir, '.ai', assistant);
