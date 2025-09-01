@@ -213,6 +213,80 @@ The schema for this frontmatter is:
 [Any helpful context or suggestions]
 ```
 
+### Task ID Generation
+
+When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
+
+#### Command
+```bash
+PLAN_ID=$1; LAST_ID=$(find ./.ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks/ -name "[0-9][0-9]--*.md" 2>/dev/null | xargs -r basename -a 2>/dev/null | sed 's/--.*$//' | sort -n | tail -1); echo $((${LAST_ID:-0} + 1))
+```
+
+#### Parameter Usage
+- `$1` is the plan ID parameter passed to this template
+- The command accepts the raw plan ID (e.g., `6` for plan `06`)
+- It automatically handles zero-padding for directory lookup
+
+#### Front-matter vs Filename Format
+**IMPORTANT:** There is a distinction between numeric and zero-padded formats:
+
+- **Front-matter ID**: Use numeric values: `id: 3` (not `id: "03"`)
+- **Filename**: Use zero-padded format: `03--task-name.md`
+
+#### Usage Examples
+
+**Example 1: Plan 6 with existing tasks**
+```bash
+# Command execution (plan ID = 6)
+PLAN_ID=6; LAST_ID=$(find ./.ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks/ -name "[0-9][0-9]--*.md" 2>/dev/null | xargs -r basename -a 2>/dev/null | sed 's/--.*$//' | sort -n | tail -1); echo $((${LAST_ID:-0} + 1))
+# Output: 4 (if last task was 03--something.md)
+
+# Front-matter usage:
+---
+id: 4
+group: "implementation"
+dependencies: [1, 2]
+status: "pending"
+created: "2024-01-15"
+---
+```
+
+**Example 2: Plan 1 with no existing tasks**
+```bash
+# Command execution (plan ID = 1)
+PLAN_ID=1; LAST_ID=$(find ./.ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks/ -name "[0-9][0-9]--*.md" 2>/dev/null | xargs -r basename -a 2>/dev/null | sed 's/--.*$//' | sort -n | tail -1); echo $((${LAST_ID:-0} + 1))
+# Output: 1 (empty tasks directory)
+
+# Front-matter usage:
+---
+id: 1
+group: "setup"
+dependencies: []
+status: "pending"
+created: "2024-01-15"
+---
+```
+
+#### Edge Case Handling
+The command handles several edge cases automatically:
+- **Empty tasks directory**: Returns `1` as the first task ID
+- **Non-sequential task IDs**: Returns the maximum existing ID + 1
+- **Missing plan directory**: Returns `1` (graceful fallback)
+- **Mixed numbering**: Correctly finds the highest numeric ID regardless of gaps
+
+#### Command Execution Context
+- Run this command from the repository root directory
+- The command works with the current file system state
+- It searches within the plan directory structure: `.ai/task-manager/plans/##--plan-name/tasks/`
+
+#### Manual Fallback
+If the command fails or returns unexpected results:
+1. Navigate to `.ai/task-manager/plans/##--plan-name/tasks/`
+2. List existing task files: `ls -1 *.md 2>/dev/null | sort`
+3. Identify the highest numbered task file
+4. Add 1 to get the next ID
+5. Use numeric format in front-matter, zero-padded format for filename
+
 ### Validation Checklist
 Before finalizing, ensure:
 - [ ] Each task has a single skill domain

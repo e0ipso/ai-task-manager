@@ -332,3 +332,21 @@ export async function move(src: string, dest: string): Promise<void> {
     });
   }
 }
+
+/**
+ * Resolve path segments relative to a base directory with cross-platform compatibility
+ * @param baseDir - The base directory (defaults to '.' if not provided, null, or undefined)
+ * @param segments - Additional path segments to resolve
+ * @returns The resolved absolute path
+ */
+export function resolvePath(baseDir: string | undefined, ...segments: string[]): string {
+  // Handle edge cases: null, undefined, or empty strings
+  const base = baseDir || '.';
+  
+  // Filter out any null, undefined, or empty string segments
+  const validSegments = segments.filter(segment => 
+    segment !== null && segment !== undefined && segment !== ''
+  );
+  
+  return path.resolve(base, ...validSegments);
+}

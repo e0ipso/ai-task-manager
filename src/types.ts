@@ -18,6 +18,10 @@ export interface InitOptions {
    * Comma-separated list of assistants to configure
    */
   assistants: string;
+  /**
+   * Optional destination directory for the configuration
+   */
+  destinationDirectory?: string;
 }
 
 /**
