@@ -41,7 +41,9 @@ export function validateAssistants(input: string): AssistantValidationResult {
 
   // Handle case where all entries were empty after trimming
   if (rawAssistants.length === 0) {
-    result.errors.push('No valid assistant names found in input (only commas and whitespace detected)');
+    result.errors.push(
+      'No valid assistant names found in input (only commas and whitespace detected)'
+    );
     return result;
   }
 
@@ -71,7 +73,7 @@ export function validateAssistants(input: string): AssistantValidationResult {
   if (invalidNames.length > 0) {
     const invalidNamesStr = invalidNames.join(', ');
     const supportedNamesStr = SUPPORTED_ASSISTANTS.join(', ');
-    
+
     // Check for common misspellings and provide suggestions
     const suggestions: string[] = [];
     for (const invalidName of invalidNames) {
@@ -81,14 +83,15 @@ export function validateAssistants(input: string): AssistantValidationResult {
         suggestions.push(`Did you mean "gemini" instead of "${invalidName}"?`);
       }
     }
-    
-    let errorMessage = `Invalid assistant name${invalidNames.length > 1 ? 's' : ''}: ${invalidNamesStr}. ` +
+
+    let errorMessage =
+      `Invalid assistant name${invalidNames.length > 1 ? 's' : ''}: ${invalidNamesStr}. ` +
       `Supported assistants: ${supportedNamesStr}`;
-    
+
     if (suggestions.length > 0) {
       errorMessage += '. ' + suggestions.join('. ');
     }
-    
+
     result.errors.push(errorMessage);
   }
 

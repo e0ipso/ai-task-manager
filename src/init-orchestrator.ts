@@ -13,6 +13,7 @@ import { TemplateManager } from './templates';
 import { CommandManager } from './command-manager';
 import { EnhancedLogger, createVerboseLogger, ProgressTracker } from './logging';
 import { SupportedAssistant } from './utils/assistant-validator';
+import { AssistantConfig, createAssistantConfig } from './types/assistant-config';
 
 /**
  * Configuration options for initializing a new AI Task Manager project
@@ -43,6 +44,7 @@ export interface InitOptions {
 export interface InitContext {
   targetDirectory: string;
   options: InitOptions;
+  assistantConfig: AssistantConfig;
   ui: UserInterface;
   fsManager: FileSystemManager;
   taskManager: TaskManager;
@@ -236,6 +238,9 @@ export class InitOrchestrator {
   private async createContext(targetDirectory: string, options: InitOptions): Promise<InitContext> {
     this.logger.debug('Creating initialization context', 'ORCHESTRATOR');
 
+    // Create assistant configuration with default to 'claude' for backwards compatibility
+    const assistantConfig = createAssistantConfig(options.assistants || ['claude'], targetDirectory);
+
     const uiOptions: UIOptions = {
       nonInteractive: options.nonInteractive ?? false,
       colors: !options.noColor,
@@ -250,6 +255,7 @@ export class InitOrchestrator {
     const context: InitContext = {
       targetDirectory,
       options,
+      assistantConfig,
       ui: new UserInterface(uiOptions),
       fsManager: new FileSystemManager({
         verificationEnabled: !options.dryRun,
@@ -261,7 +267,11 @@ export class InitOrchestrator {
       progressTracker: this.progressTracker,
     };
 
-    this.logger.debug('Context created successfully', 'ORCHESTRATOR', { targetDirectory, options });
+    this.logger.debug('Context created successfully', 'ORCHESTRATOR', { 
+      targetDirectory, 
+      options, 
+      assistants: assistantConfig.assistants 
+    });
     return context;
   }
 
@@ -344,13 +354,16 @@ export class InitOrchestrator {
    * Phase 3: Workspace preparation
    */
   private async prepareWorkspace(context: InitContext, projectConfig: any): Promise<void> {
-    this.logger.debug('Preparing workspace', 'WORKSPACE', projectConfig);
+    this.logger.debug('Preparing workspace', 'WORKSPACE', {
+      ...projectConfig,
+      assistants: context.assistantConfig.assistants
+    });
 
     // Create basic directory structure
     const workspaceDir = path.join(context.targetDirectory, '.ai-tasks');
     await fs.mkdir(workspaceDir, { recursive: true });
 
-    // Create configuration file
+    // Create configuration file with assistant information
     const config = {
       projectName: projectConfig.projectName,
       description: projectConfig.description,
@@ -358,6 +371,8 @@ export class InitOrchestrator {
       version: '1.0.0',
       createdAt: new Date().toISOString(),
       includeExamples: projectConfig.includeExamples,
+      assistants: context.assistantConfig.assistants,
+      assistantDirectories: context.assistantConfig.directories,
     };
 
     await fs.writeFile(
@@ -365,20 +380,28 @@ export class InitOrchestrator {
       JSON.stringify(config, null, 2)
     );
 
-    this.logger.debug('Workspace prepared successfully', 'WORKSPACE');
+    this.logger.debug('Workspace prepared successfully', 'WORKSPACE', {
+      assistants: context.assistantConfig.assistants
+    });
   }
 
   /**
    * Phase 4: Execute installation using FileSystemManager
    */
   private async executeInstallation(context: InitContext): Promise<any> {
-    this.logger.debug('Executing installation', 'INSTALLATION');
+    this.logger.debug('Executing installation', 'INSTALLATION', {
+      assistants: context.assistantConfig.assistants
+    });
 
     const config = createDefaultInstallationConfig(context.targetDirectory);
     config.dryRun = context.options.dryRun || false;
     config.overwriteMode = context.options.force ? 'overwrite' : 'ask';
 
-    const result = await context.fsManager.installAITaskManager(context.targetDirectory, config);
+    const result = await context.fsManager.installForAssistants(
+      context.targetDirectory, 
+      config, 
+      context.assistantConfig
+    );
 
     if (!result.success) {
       const errorMessages = result.errors.map(e => e.error).join('; ');
@@ -388,6 +411,7 @@ export class InitOrchestrator {
     this.logger.debug('Installation executed successfully', 'INSTALLATION', {
       filesCreated: result.summary.filesCreated,
       directoriesCreated: result.summary.directoriesCreated,
+      assistants: context.assistantConfig.assistants,
     });
 
     return result;

@@ -24,7 +24,9 @@ describe('CLI Error Handling', () => {
     test('should reject input with only whitespace and commas', () => {
       const result = validateAssistants(' , , ,  ');
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('No valid assistant names found in input (only commas and whitespace detected)');
+      expect(result.errors).toContain(
+        'No valid assistant names found in input (only commas and whitespace detected)'
+      );
     });
 
     test('should validate correct single assistant', () => {
@@ -134,7 +136,7 @@ describe('CLI Error Handling', () => {
     });
 
     test('should handle non-string inputs', () => {
-      // @ts-expect-error Testing runtime behavior  
+      // @ts-expect-error Testing runtime behavior
       const result = validateAssistants(123);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Assistant input cannot be empty or undefined');
@@ -143,7 +145,9 @@ describe('CLI Error Handling', () => {
     test('should handle empty array-like input', () => {
       const result = validateAssistants(' , , ');
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('No valid assistant names found in input (only commas and whitespace detected)');
+      expect(result.errors).toContain(
+        'No valid assistant names found in input (only commas and whitespace detected)'
+      );
     });
 
     test('should handle single comma', () => {

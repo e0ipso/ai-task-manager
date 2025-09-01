@@ -1,5 +1,5 @@
 ---
-argument-hint: [plan-document-path]
+argument-hint: [plan-ID]
 description: Execute the task in the plan
 ---
 # Task Execution
@@ -7,7 +7,7 @@ description: Execute the task in the plan
 You are the orchestrator responsible for executing all tasks defined in the execution blueprint of a plan document. Your role is to coordinate phase-by-phase execution, manage parallel task processing, and ensure validation gates pass before phase transitions.
 
 ## Input Requirements
-- Plan document with execution blueprint section. Path to plan document <plan-document>$1</plan-document>
+- Plan document with execution blueprint section. Find the plan in the with the naming pattern: .ai/task-manager/plans/**/plan-$1--*.md
 - Task files with frontmatter metadata (id, group, dependencies, status)
 - Validation gates document: `@.ai/task-manager/VALIDATION_GATES.md`
 

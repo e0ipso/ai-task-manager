@@ -12,7 +12,7 @@ Include @.ai/task-manager/TASK_MANAGER_INFO.md for the directory structure of ta
 You will think hard to analyze the provided plan document and decompose it into atomic, actionable tasks with clear dependencies and groupings.
 
 ### Input
-- A plan document (typically named: `01--my-generated-plan.md`). The plan document is located at: <plan-document>$1</plan-document>
+- A plan document (typically named: `01--my-generated-plan.md`). Find the plan in the with the naming pattern: .ai/task-manager/plans/**/plan-$1--*.md
 - The plan contains high-level objectives and implementation steps
 
 ### Task Creation Guidelines
