@@ -11,7 +11,7 @@ import { FileSystemManager, createDefaultInstallationConfig, InstallationConfig 
 import { TaskManager } from './task-manager';
 import { TemplateManager } from './templates';
 import { CommandManager } from './command-manager';
-import { EnhancedLogger, createVerboseLogger, ProgressTracker } from './logging';
+import { EnhancedLogger, createVerboseLogger, ProgressTracker, LogEntry } from './logging';
 import { SupportedAssistant } from './utils/assistant-validator';
 import { AssistantConfig, createAssistantConfig } from './types/assistant-config';
 
@@ -536,7 +536,7 @@ export class InitOrchestrator {
   /**
    * Get detailed logs from the orchestration process
    */
-  getLogs(): Array<{ level: string; message: string; timestamp: Date; data?: any }> {
+  getLogs(): LogEntry[] {
     return this.logger.getLogs();
   }
 

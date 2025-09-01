@@ -86,7 +86,7 @@ export class AutoConflictResolver implements ConflictResolutionStrategy {
   constructor(private strategy: 'overwrite' | 'skip' | 'backup') {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async resolveConflict(): Promise<ConflictResolution> {
+  async resolveConflict(conflict: FileConflict): Promise<ConflictResolution> {
     switch (this.strategy) {
       case 'overwrite':
         return { action: 'overwrite' };
