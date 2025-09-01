@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { templateManager, type CopyResult } from './templates';
 
 export interface Task {
   id: string;
@@ -111,5 +112,18 @@ export class TaskManager {
 
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  /**
+   * Initialize AI Task Manager structure in the current project
+   */
+  async initializeAiTaskManager(projectPath?: string, overwrite: boolean = false): Promise<CopyResult> {
+    const targetPath = projectPath || process.cwd();
+    
+    return templateManager.initializeAiTaskManager(targetPath, {
+      overwrite,
+      createDirectories: true,
+      preserveTimestamps: true
+    });
   }
 }

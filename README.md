@@ -22,11 +22,6 @@ ai-task-manager --help
 ai-task-manager init
 ```
 
-### Create a task
-```bash
-ai-task-manager create --title "My Task" --description "Task description"
-```
-
 ### List tasks
 ```bash
 ai-task-manager list
@@ -58,4 +53,12 @@ npm run format
 
 ## License
 
-MIT
+Proprietary Software with Revocation Rights.
+
+This software is free to use, run, and operate for any lawful purposes. The
+author can revoke the license to use it at any time and by any reason. A license
+revocation notice may be provided through:
+
+- Direct communication to known users
+- Public announcement on the project repository
+- Update to the LICENSE file

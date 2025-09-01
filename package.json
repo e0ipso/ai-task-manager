@@ -33,6 +33,7 @@
   "files": [
     "dist/",
     "templates/",
+    "commands/",
     "README.md",
     "LICENSE"
   ],
