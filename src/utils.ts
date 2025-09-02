@@ -263,7 +263,7 @@ export function getTemplateFormat(assistant: Assistant): TemplateFormat {
  * @returns The absolute path to the template
  */
 export function getTemplatePath(templateFile: string): string {
-  return path.resolve('/workspace/templates', templateFile);
+  return path.resolve(__dirname, '../templates', templateFile);
 }
 
 /**
