@@ -263,7 +263,7 @@ export function getTemplateFormat(assistant: Assistant): TemplateFormat {
  * @returns The absolute path to the template
  */
 export function getTemplatePath(templateFile: string): string {
-  return path.resolve('/workspace/templates', templateFile);
+  return path.join(__dirname, '..', '..', 'templates', templateFile);
 }
 
 /**
@@ -371,4 +371,184 @@ export function resolvePath(baseDir: string | undefined, ...segments: string[]):
   );
 
   return path.resolve(base, ...validSegments);
+}
+
+/**
+ * Interface for parsed markdown frontmatter
+ */
+export interface MarkdownFrontmatter {
+  [key: string]: unknown;
+}
+
+/**
+ * Parse YAML frontmatter from markdown content
+ * @param content - The markdown content with frontmatter
+ * @returns Object containing frontmatter and body content
+ */
+export function parseFrontmatter(content: string): {
+  frontmatter: MarkdownFrontmatter;
+  body: string;
+} {
+  const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/;
+  const match = content.match(frontmatterRegex);
+
+  if (!match) {
+    return {
+      frontmatter: {},
+      body: content,
+    };
+  }
+
+  const frontmatterContent = match[1] || '';
+  const bodyContent = match[2] || '';
+
+  // Simple YAML parser for our specific use case
+  const frontmatter: MarkdownFrontmatter = {};
+  const lines = frontmatterContent.split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const colonIndex = trimmed.indexOf(':');
+    if (colonIndex === -1) continue;
+
+    const key = trimmed.substring(0, colonIndex).trim();
+    const value = trimmed.substring(colonIndex + 1).trim();
+
+    // Remove quotes if present
+    frontmatter[key] = value.replace(/^["']|["']$/g, '');
+  }
+
+  return {
+    frontmatter,
+    body: bodyContent,
+  };
+}
+
+/**
+ * Escape a string for TOML format
+ * @param str - The string to escape
+ * @returns The escaped string suitable for TOML
+ */
+export function escapeTomlString(str: string): string {
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+}
+
+/**
+ * Convert markdown template content to TOML format for Gemini
+ * @param mdContent - The markdown template content
+ * @returns The converted TOML content
+ */
+export function convertMdToToml(mdContent: string): string {
+  const { frontmatter, body } = parseFrontmatter(mdContent);
+
+  // Process the body content for Gemini format
+  let processedBody = body
+    // Transform $ARGUMENTS → {{args}}
+    .replace(/\$ARGUMENTS/g, '{{args}}')
+    // Transform $1 → {{plan_id}} (and other numbered parameters if needed)
+    .replace(/\$1/g, '{{plan_id}}')
+    .replace(/\$2/g, '{{param2}}')
+    .replace(/\$3/g, '{{param3}}');
+
+  // Build TOML content
+  let tomlContent = '[metadata]\n';
+
+  // Add frontmatter fields to metadata section
+  for (const [key, value] of Object.entries(frontmatter)) {
+    if (key === 'argument-hint') {
+      // Special handling for argument-hint - convert to {{}} format
+      const convertedHint = String(value)
+        .replace(/\[plan-ID\]/g, '{{plan_id}}')
+        .replace(/\[user-prompt\]/g, '{{args}}');
+      tomlContent += `argument-hint = "${escapeTomlString(convertedHint)}"\n`;
+    } else {
+      tomlContent += `${key} = "${escapeTomlString(String(value))}"\n`;
+    }
+  }
+
+  // Add the prompt section with escaped content
+  tomlContent += '\n[prompt]\n';
+  tomlContent += `content = """${escapeTomlString(processedBody)}"""\n`;
+
+  return tomlContent;
+}
+
+/**
+ * Read a markdown template file and optionally convert to TOML
+ * @param templatePath - Path to the markdown template
+ * @param targetFormat - Target format ('md' or 'toml')
+ * @returns The template content in the requested format
+ */
+export async function readAndProcessTemplate(
+  templatePath: string,
+  targetFormat: TemplateFormat
+): Promise<string> {
+  try {
+    const mdContent = await fs.readFile(templatePath, 'utf-8');
+
+    if (targetFormat === 'md') {
+      return mdContent;
+    } else if (targetFormat === 'toml') {
+      return convertMdToToml(mdContent);
+    } else {
+      throw new Error(`Unsupported template format: ${targetFormat}`);
+    }
+  } catch (_error) {
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
+    throw new FileSystemError(`Failed to read and process template: ${templatePath}`, {
+      originalError: errorMessage,
+      path: templatePath,
+      targetFormat,
+    });
+  }
+}
+
+/**
+ * Write processed template content to destination
+ * @param content - The template content to write
+ * @param destPath - Destination file path
+ */
+export async function writeProcessedTemplate(content: string, destPath: string): Promise<void> {
+  try {
+    // Ensure destination directory exists
+    await fs.ensureDir(path.dirname(destPath));
+    
+    // Write the content
+    await fs.writeFile(destPath, content, 'utf-8');
+  } catch (_error) {
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
+    throw new FileSystemError(`Failed to write processed template: ${destPath}`, {
+      originalError: errorMessage,
+      path: destPath,
+    });
+  }
+}
+
+/**
+ * Get the names of all markdown template files in a given subdirectory of /workspace/templates.
+ * @param templateSubdir - The subdirectory within /workspace/templates (e.g., 'commands/tasks')
+ * @returns An array of template names (filenames without .md extension)
+ * @throws FileSystemError if the directory cannot be read
+ */
+export async function getMarkdownTemplateNames(templateSubdir: string): Promise<string[]> {
+  const fullPath = path.join(__dirname, '..', '..', 'templates', templateSubdir);
+  try {
+    const files = await fs.readdir(fullPath);
+    return files
+      .filter(file => file.endsWith('.md'))
+      .map(file => path.basename(file, '.md'));
+  } catch (_error) {
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
+    throw new FileSystemError(`Failed to read template directory: ${fullPath}`, {
+      originalError: errorMessage,
+      path: fullPath,
+    });
+  }
 }

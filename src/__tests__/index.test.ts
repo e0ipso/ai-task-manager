@@ -40,6 +40,10 @@ describe('index.ts', () => {
       const resolved = base === '.' ? '/workspace' : base;
       return `${resolved}/${segments.join('/')}`;
     });
+    
+    // New function mocks for our refactored implementation
+    mockUtils.readAndProcessTemplate.mockResolvedValue('mock-template-content');
+    mockUtils.writeProcessedTemplate.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -110,19 +114,34 @@ describe('index.ts', () => {
       );
     });
 
-    it('should copy assistant-specific templates', async () => {
+    it('should process assistant-specific templates', async () => {
       await init(defaultOptions);
 
-      expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
+      // Verify that templates are read from MD sources and processed
+      expect(mockUtils.readAndProcessTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/create-plan.md',
+        'md'
+      );
+      expect(mockUtils.readAndProcessTemplate).toHaveBeenCalledWith(
+        '/workspace/templates/commands/tasks/execute-blueprint.md',
+        'md'
+      );
+      expect(mockUtils.readAndProcessTemplate).toHaveBeenCalledWith(
+        '/workspace/templates/commands/tasks/generate-tasks.md',
+        'md'
+      );
+
+      // Verify that processed templates are written to destinations
+      expect(mockUtils.writeProcessedTemplate).toHaveBeenCalledWith(
+        'mock-template-content',
         '/workspace/.claude/commands/tasks/create-plan.md'
       );
-      expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
-        '/workspace/templates/commands/tasks/execute-blueprint.md',
+      expect(mockUtils.writeProcessedTemplate).toHaveBeenCalledWith(
+        'mock-template-content',
         '/workspace/.claude/commands/tasks/execute-blueprint.md'
       );
-      expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
-        '/workspace/templates/commands/tasks/generate-tasks.md',
+      expect(mockUtils.writeProcessedTemplate).toHaveBeenCalledWith(
+        'mock-template-content',
         '/workspace/.claude/commands/tasks/generate-tasks.md'
       );
     });
@@ -278,13 +297,24 @@ describe('index.ts', () => {
       expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.claude/commands/tasks');
       expect(mockUtils.ensureDir).toHaveBeenCalledWith('/workspace/.gemini/commands/tasks');
 
-      // Verify that templates are copied for both assistants
-      expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
+      // Verify that templates are processed for both assistants
+      // Claude should get MD format
+      expect(mockUtils.readAndProcessTemplate).toHaveBeenCalledWith(
         '/workspace/templates/commands/tasks/create-plan.md',
+        'md'
+      );
+      expect(mockUtils.writeProcessedTemplate).toHaveBeenCalledWith(
+        'mock-template-content',
         '/workspace/.claude/commands/tasks/create-plan.md'
       );
-      expect(mockUtils.copyTemplate).toHaveBeenCalledWith(
-        '/workspace/templates/commands/tasks/create-plan.toml',
+
+      // Gemini should get TOML format (converted from MD)
+      expect(mockUtils.readAndProcessTemplate).toHaveBeenCalledWith(
+        '/workspace/templates/commands/tasks/create-plan.md',
+        'toml'
+      );
+      expect(mockUtils.writeProcessedTemplate).toHaveBeenCalledWith(
+        'mock-template-content',
         '/workspace/.gemini/commands/tasks/create-plan.toml'
       );
     });
