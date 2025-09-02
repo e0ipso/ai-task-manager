@@ -82,9 +82,9 @@ project-root/
 ├── .gemini/
 │   └── commands/                  # Custom slash commands for Gemini
 │       └── tasks/
-│           ├── create-plan.md
-│           ├── execute-blueprint.md
-│           └── generate-tasks.md
+│           ├── create-plan.toml
+│           ├── execute-blueprint.toml
+│           └── generate-tasks.toml
 └── project files...
 ```
 
