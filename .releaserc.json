@@ -153,7 +153,7 @@
       "@semantic-release/npm",
       {
         "npmPublish": true,
-        "tarballDir": "dist"
+        "tarballDir": "release"
       }
     ],
     [
@@ -162,8 +162,7 @@
         "assets": [
           "CHANGELOG.md",
           "package.json",
-          "package-lock.json",
-          "dist/**"
+          "package-lock.json"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
@@ -173,7 +172,7 @@
       {
         "assets": [
           {
-            "path": "dist/*.tgz",
+            "path": "release/*.tgz",
             "label": "Distribution package"
           }
         ],
