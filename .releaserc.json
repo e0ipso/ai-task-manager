@@ -61,92 +61,19 @@
             "breaking": true,
             "release": "major"
           }
-        ],
-        "parserOpts": {
-          "noteKeywords": [
-            "BREAKING CHANGE",
-            "BREAKING CHANGES"
-          ]
-        }
+        ]
       }
     ],
     [
       "@semantic-release/release-notes-generator",
       {
-        "preset": "conventionalcommits",
-        "presetConfig": {
-          "types": [
-            {
-              "type": "feat",
-              "section": "✨ Features"
-            },
-            {
-              "type": "fix",
-              "section": "🐛 Bug Fixes"
-            },
-            {
-              "type": "perf",
-              "section": "⚡ Performance Improvements"
-            },
-            {
-              "type": "revert",
-              "section": "⏪ Reverts"
-            },
-            {
-              "type": "docs",
-              "section": "📚 Documentation",
-              "hidden": false
-            },
-            {
-              "type": "style",
-              "section": "💎 Styles",
-              "hidden": true
-            },
-            {
-              "type": "refactor",
-              "section": "♻️ Code Refactoring"
-            },
-            {
-              "type": "test",
-              "section": "🧪 Tests",
-              "hidden": true
-            },
-            {
-              "type": "build",
-              "section": "🔨 Build System",
-              "hidden": true
-            },
-            {
-              "type": "ci",
-              "section": "🚀 Continuous Integration",
-              "hidden": true
-            },
-            {
-              "type": "chore",
-              "section": "🔧 Chores",
-              "hidden": true
-            }
-          ]
-        },
-        "parserOpts": {
-          "noteKeywords": [
-            "BREAKING CHANGE",
-            "BREAKING CHANGES"
-          ]
-        },
-        "writerOpts": {
-          "commitsSort": [
-            "subject",
-            "scope"
-          ]
-        }
+        "preset": "conventionalcommits"
       }
     ],
     [
       "@semantic-release/changelog",
       {
-        "changelogFile": "CHANGELOG.md",
-        "changelogTitle": "# Changelog\n\nAll notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines."
+        "changelogFile": "CHANGELOG.md"
       }
     ],
     [
@@ -175,21 +102,10 @@
             "path": "release/*.tgz",
             "label": "Distribution package"
           }
-        ],
-        "successComment": "🎉 This ${issue.pull_request ? 'PR is included' : 'issue has been resolved'} in version ${nextRelease.version} :tada:",
-        "failComment": "❌ The release from branch ${branch.name} had failed due to the following errors:\\n- ${errors.map(err => err.message).join('\\n- ')}",
-        "failTitle": "🚨 The automated release is failing",
-        "labels": [
-          "released"
-        ],
-        "releasedLabels": [
-          "released<%= nextRelease.channel ? ` on @${nextRelease.channel}` : '' %> from <%= branch.name %>"
         ]
       }
     ]
   ],
   "tagFormat": "v${version}",
-  "repositoryUrl": "https://github.com/e0ipso/ai-task-manager.git",
-  "dryRun": false,
-  "debug": false
+  "repositoryUrl": "https://github.com/e0ipso/ai-task-manager.git"
 }
