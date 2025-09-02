@@ -22,10 +22,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20.x'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm ci
 
       - name: Test
         run: npm test
@@ -35,8 +36,6 @@ jobs:
 
       - name: Release
         uses: cycjimmy/semantic-release-action@v4
-        with:
-          semantic_version: 21.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
