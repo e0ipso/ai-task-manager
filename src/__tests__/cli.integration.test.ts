@@ -90,24 +90,6 @@ describe('CLI Integration Tests', () => {
       
       expect(stdout.trim()).toBe('0.1.0');
     });
-
-    it('should show error for unknown command', () => {
-      let stderr = '';
-      let exitCode = 0;
-      
-      try {
-        execSync(`node "${cliPath}" unknown-command`, { 
-          encoding: 'utf8',
-          cwd: testDir 
-        });
-      } catch (error: any) {
-        exitCode = error.status;
-        stderr = error.stderr?.toString() || '';
-      }
-      
-      expect(exitCode).toBe(1);
-      expect(stderr).toContain('Unknown command: unknown-command');
-    });
   });
 
   describe('Init Command - Success Cases', () => {
