@@ -39,6 +39,5 @@ module.exports = {
   maxWorkers: process.env.CI ? '50%' : '100%',
   // Better error reporting
   errorOnDeprecated: true,
-  bail: false, // Continue running tests even if some fail
-  forceExit: true // Ensure Jest exits after tests complete
+  bail: false // Continue running tests even if some fail
 };

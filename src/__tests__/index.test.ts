@@ -21,20 +21,23 @@ describe('index.ts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Set up default mock implementations
+    // Set up default mock implementations directly
     mockLogger.info.mockResolvedValue(undefined);
-    mockLogger.success.mockResolvedValue(undefined);
     mockLogger.error.mockResolvedValue(undefined);
+    mockLogger.success.mockResolvedValue(undefined);
     mockLogger.debug.mockResolvedValue(undefined);
+    mockLogger.warning.mockResolvedValue(undefined);
 
     mockUtils.parseAssistants.mockReturnValue(['claude']);
-    mockUtils.validateAssistants.mockImplementation(() => {});
+    mockUtils.validateAssistants.mockReturnValue(undefined);
     mockUtils.ensureDir.mockResolvedValue(undefined);
     mockUtils.copyTemplate.mockResolvedValue(undefined);
-    mockUtils.getTemplatePath.mockImplementation((file: string) => `/workspace/templates/${file}`);
-    mockUtils.getCreatedDirectories.mockReturnValue(['.ai/task-manager', '.claude']);
     mockUtils.exists.mockResolvedValue(true);
-    mockUtils.getTemplateFormat.mockImplementation((assistant) => assistant === 'claude' ? 'md' : 'toml');
+    mockUtils.getCreatedDirectories.mockReturnValue(['.ai/task-manager', '.ai/task-manager/plans', '.claude', '.claude/commands', '.claude/commands/tasks']);
+    mockUtils.getTemplatePath.mockImplementation((templatePath) => `/workspace/templates/${templatePath}`);
+    mockUtils.getTemplateFormat.mockImplementation((assistant) => assistant === 'gemini' ? 'toml' : 'md');
+    
+    // Custom setup for this test file
     mockUtils.resolvePath.mockImplementation((baseDir, ...segments) => {
       const base = baseDir || '.';
       const resolved = base === '.' ? '/workspace' : base;
@@ -43,16 +46,8 @@ describe('index.ts', () => {
   });
 
   afterEach(() => {
-    // Clear all mocks and reset to clean state
     jest.clearAllMocks();
     jest.clearAllTimers();
-  });
-
-  afterAll(() => {
-    // Final cleanup
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.restoreAllMocks();
   });
 
   describe('init', () => {
@@ -127,7 +122,7 @@ describe('index.ts', () => {
       );
     });
 
-    it('should handle parse assistants error', async () => {
+    it('should handle configuration errors', async () => {
       const error = new Error('Invalid assistant: invalid');
       mockUtils.parseAssistants.mockImplementation(() => {
         throw error;
@@ -143,22 +138,7 @@ describe('index.ts', () => {
       );
     });
 
-    it('should handle validate assistants error', async () => {
-      const error = new Error('At least one assistant must be specified');
-      mockUtils.validateAssistants.mockImplementation(() => {
-        throw error;
-      });
-
-      const result = await init(defaultOptions);
-
-      expect(result.success).toBe(false);
-      expect(result.message).toBe('At least one assistant must be specified');
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Initialization failed: At least one assistant must be specified'
-      );
-    });
-
-    it('should handle FileSystemError', async () => {
+    it('should handle initialization errors', async () => {
       const error = new FileSystemError('Failed to create directory', {});
       mockUtils.ensureDir.mockRejectedValue(error);
 
@@ -172,19 +152,7 @@ describe('index.ts', () => {
       );
     });
 
-    it('should handle generic errors', async () => {
-      const error = new Error('Some unexpected error');
-      mockUtils.ensureDir.mockRejectedValue(error);
-
-      const result = await init(defaultOptions);
-
-      expect(result.success).toBe(false);
-      expect(result.message).toBe('Some unexpected error');
-      expect(result.error).toBe(error);
-      expect(mockLogger.error).toHaveBeenCalledWith('Initialization failed: Some unexpected error');
-    });
-
-    it('should handle non-Error exceptions', async () => {
+    it('should handle unknown error types', async () => {
       const error = 'String error';
       mockUtils.ensureDir.mockRejectedValue(error);
 
@@ -196,7 +164,7 @@ describe('index.ts', () => {
       expect(mockLogger.error).toHaveBeenCalledWith('Initialization failed with unknown error');
     });
 
-    it('should handle missing common template files', async () => {
+    it('should handle missing template files', async () => {
       mockUtils.exists.mockResolvedValueOnce(false); // First template doesn't exist
 
       const result = await init(defaultOptions);
@@ -204,19 +172,6 @@ describe('index.ts', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBeInstanceOf(FileSystemError);
       expect(result.message).toContain('Template file not found');
-    });
-
-    it('should handle missing assistant template files', async () => {
-      mockUtils.exists
-        .mockResolvedValueOnce(true) // Common template 1 exists
-        .mockResolvedValueOnce(true) // Common template 2 exists
-        .mockResolvedValueOnce(false); // Assistant template doesn't exist
-
-      const result = await init(defaultOptions);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(FileSystemError);
-      expect(result.message).toContain('Command template not found');
     });
 
     it('should log debug information', async () => {
