@@ -1,3 +1,7 @@
+## <small>1.0.1 (2025-09-02)</small>
+
+* fix: add publishConfig to set package as public ([979d83a](https://github.com/e0ipso/ai-task-manager/commit/979d83a))
+
 ## 1.0.0 (2025-09-02)
 
 * fix: build before running tests in CI workflow ([72ab18f](https://github.com/e0ipso/ai-task-manager/commit/72ab18f))
