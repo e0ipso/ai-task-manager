@@ -8,7 +8,9 @@ module.exports = {
     '**/?(*.)+(spec|test).ts'
   ],
   transform: {
-    '^.+\.ts$': 'ts-jest',
+    '^.+\.ts$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json'
+    }],
     // Transform all JS files, including those in node_modules
     '^.+\.js$': 'babel-jest',
   },

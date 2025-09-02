@@ -449,7 +449,7 @@ export function convertMdToToml(mdContent: string): string {
   const { frontmatter, body } = parseFrontmatter(mdContent);
 
   // Process the body content for Gemini format
-  let processedBody = body
+  const processedBody = body
     // Transform $ARGUMENTS → {{args}} (not followed by alphanumeric that would make it an identifier)
     .replace(/\$ARGUMENTS(?![0-9])/g, '{{args}}')
     // Transform $1 → {{plan_id}} (exact match, not part of longer number)
