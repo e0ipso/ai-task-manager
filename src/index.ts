@@ -38,15 +38,15 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     const resolvedBaseDir = resolvePath(baseDir);
 
     // Log start of initialization
-    await logger.info(`🚀 Initializing AI Task Manager in: ${resolvedBaseDir}...`);
+    await logger.info(`Initializing AI Task Manager in: ${resolvedBaseDir}...`);
 
     // Parse and validate assistants
     const assistants = parseAssistants(options.assistants);
-    await logger.debug(`🔍 Parsed assistants: ${assistants.join(', ')}`);
+    await logger.debug(`Parsed assistants: ${assistants.join(', ')}`);
 
     // Validate assistants
     validateAssistants(assistants);
-    await logger.debug('✅ Assistant validation passed');
+    await logger.debug('Assistant validation passed');
 
     // Create .ai/task-manager structure
     await logger.info('📁 Creating .ai/task-manager directory structure...');
@@ -65,14 +65,14 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Show success message with created directories
     const createdDirectories = getCreatedDirectories(assistants, baseDir);
     await logger.success('AI Task Manager initialized successfully!');
-    await logger.info('📂 Created directory structure:');
+    await logger.info('Created directory structure:');
 
     for (const dir of createdDirectories) {
       await logger.info(`  ✓ ${dir}`);
     }
 
     // Show copied templates
-    await logger.info('📄 Template files copied:');
+    await logger.info('Template files copied:');
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md')}`);
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md')}`);
 
