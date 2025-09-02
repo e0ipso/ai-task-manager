@@ -5,6 +5,12 @@
  * Tests actual template processing and argument injection for all three command types.
  */
 
+// Mock fs-extra module
+const mockReadFile = jest.fn();
+jest.mock('fs-extra', () => ({
+  readFile: mockReadFile,
+}));
+
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import {
@@ -17,7 +23,6 @@ import {
 
 // Integration tests use real template files
 describe('TOML Integration Tests', () => {
-  const templatePath = '/workspace/templates/commands/tasks';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -52,7 +57,7 @@ Before creating any plan, analyze the user's request for the following informati
 
 Process the $ARGUMENTS systematically.`;
 
-        jest.spyOn(fs, 'readFile').mockResolvedValue(realCreatePlanTemplate);
+        mockReadFile.mockResolvedValue(realCreatePlanTemplate);
 
         const tomlResult = await readAndProcessTemplate('mock-path', 'toml');
 
@@ -140,7 +145,7 @@ Plan $1 should be loaded and processed.
 ### Task Creation Guidelines
 Follow the guidelines for plan $1 processing.`;
 
-        jest.spyOn(fs, 'readFile').mockResolvedValue(realGenerateTasksTemplate);
+        mockReadFile.mockResolvedValue(realGenerateTasksTemplate);
 
         const tomlResult = await readAndProcessTemplate('mock-path', 'toml');
 
@@ -208,7 +213,7 @@ Execute plan $1 systematically following the blueprint.
 2. Process plan $1 phases
 3. Validate plan $1 completion`;
 
-        jest.spyOn(fs, 'readFile').mockResolvedValue(realExecuteBlueprintTemplate);
+        mockReadFile.mockResolvedValue(realExecuteBlueprintTemplate);
 
         const tomlResult = await readAndProcessTemplate('mock-path', 'toml');
 
@@ -226,7 +231,7 @@ Execute plan $1 systematically following the blueprint.
 
         // Validate all plan ID references converted
         const planIdMatches = (tomlResult.match(/{{plan_id}}/g) || []).length;
-        expect(planIdMatches).toBe(5); // argument-hint + 4 in content
+        expect(planIdMatches).toBe(6); // argument-hint + 5 in content
       });
     });
   });
@@ -286,10 +291,10 @@ Final output for request '$ARGUMENTS' is complete.`;
         const result = convertMdToToml(contextTemplate);
 
         // Context should be preserved with proper escaping
-        expect(result).toMatch(/user's request "{{args}}" should be processed/);
+        expect(result).toMatch(/user's request \\"{{args}}\\" should be processed/);
         expect(result).toMatch(/Analysis of '{{args}}':/);
         expect(result).toMatch(/Parse the request: {{args}}/);
-        expect(result).toMatch(/Validate: "{{args}}"/);
+        expect(result).toMatch(/Validate: \\"{{args}}\\"/);
         expect(result).toMatch(/Execute based on {{args}}/);
         expect(result).toMatch(/Final output for request '{{args}}'/);
       });

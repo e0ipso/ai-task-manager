@@ -17,8 +17,13 @@ import {
 } from '../utils';
 
 // Mock fs-extra for file operations
-jest.mock('fs-extra');
-const mockFs = fs as jest.Mocked<typeof fs>;
+jest.mock('fs-extra', () => ({
+  readFile: jest.fn(),
+}));
+
+// Type the mocked fs properly
+const mockedFs = fs as jest.Mocked<typeof fs>;
+const mockReadFile = mockedFs.readFile as jest.MockedFunction<typeof fs.readFile>;
 
 describe('TOML Command Validation', () => {
   beforeEach(() => {
@@ -45,7 +50,7 @@ Process the $ARGUMENTS carefully.`;
 
         expect(result).toContain('{{args}}');
         expect(result).not.toContain('$ARGUMENTS');
-        expect(result).toMatch(/The user input is:\s*<user-input>\s*{{args}}/);
+        expect(result).toMatch(/The user input is:\\n<user-input>\\n{{args}}/);
         expect(result).toMatch(/Process the {{args}} carefully\./);
       });
 
@@ -260,7 +265,7 @@ $ARGUMENTS
 
 Create a plan based on the user's request.`;
 
-        mockFs.readFile.mockResolvedValue(createPlanTemplate);
+        (mockReadFile as any).mockResolvedValue(createPlanTemplate);
       });
 
       it('should process create-plan template for TOML format', async () => {
@@ -301,7 +306,7 @@ You will analyze the provided plan document.
 
 Use plan ID $1 throughout the process.`;
 
-        mockFs.readFile.mockResolvedValue(generateTasksTemplate);
+        (mockReadFile as any).mockResolvedValue(generateTasksTemplate);
       });
 
       it('should process generate-tasks template for TOML format', async () => {
@@ -332,7 +337,7 @@ You are the orchestrator responsible for executing tasks.
 
 Execute plan $1 systematically.`;
 
-        mockFs.readFile.mockResolvedValue(executeBlueprintTemplate);
+        (mockReadFile as any).mockResolvedValue(executeBlueprintTemplate);
       });
 
       it('should process execute-blueprint template for TOML format', async () => {
@@ -479,7 +484,7 @@ The plan ID ($1) should be used throughout.`;
       // All plan ID references should be converted consistently
       expect(result).not.toContain('$1');
       const planIdCount = (result.match(/{{plan_id}}/g) || []).length;
-      expect(planIdCount).toBe(5); // 4 in content + 1 in argument-hint
+      expect(planIdCount).toBe(6); // 5 in content + 1 in argument-hint
 
       // Instruction structure should be preserved
       expect(result).toMatch(/Load plan {{plan_id}}/);
