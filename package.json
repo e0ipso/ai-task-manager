@@ -1,7 +1,7 @@
 {
   "name": "@e0ipso/ai-task-manager",
   "version": "0.1.0",
-  "description": "AI-powered task management CLI tool",
+  "description": "Task management for AI coding assistants",
   "main": "dist/index.js",
   "bin": {
     "ai-task-manager": "dist/cli.js"
