@@ -1,7 +1,7 @@
 name: Release
 on:
   push:
-    branches: [main, master]
+    branches: [main]
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: 'lts/*'
           cache: 'npm'
 
       - name: Install dependencies
