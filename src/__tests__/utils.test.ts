@@ -32,17 +32,23 @@ const mockFs = fs as jest.Mocked<any>;
 jest.mock('os');
 const mockOs = os as jest.Mocked<typeof os>;
 
-// Mock path module - keep real implementations for most functions but mock resolve
+// Mock path module - keep real implementations for most functions but mock resolve and join
 jest.mock('path', () => {
   const actualPath = jest.requireActual('path');
   return {
     ...actualPath,
     resolve: jest.fn().mockImplementation((...args: string[]) => 
       actualPath.resolve(...args)
+    ),
+    join: jest.fn().mockImplementation((...args: string[]) =>
+      actualPath.join(...args)
     )
   };
 });
-const mockPath = path as jest.Mocked<typeof path> & { resolve: jest.MockedFunction<typeof path.resolve> };
+const mockPath = path as jest.Mocked<typeof path> & {
+  resolve: jest.MockedFunction<typeof path.resolve>;
+  join: jest.MockedFunction<typeof path.join>;
+};
 
 describe('utils.ts', () => {
   beforeEach(() => {
@@ -227,16 +233,16 @@ describe('utils.ts', () => {
 
   describe('getTemplatePath', () => {
     it('should return template path', () => {
-      mockPath.resolve.mockReturnValue('/workspace/templates/test.md');
+      mockPath.join.mockReturnValue('/workspace/templates/test.md');
       const result = getTemplatePath('test.md');
-      expect(mockPath.resolve).toHaveBeenCalledWith(expect.any(String), '../templates', 'test.md');
+      expect(mockPath.join).toHaveBeenCalledWith(expect.any(String), '..', 'templates', 'test.md');
       expect(result).toBe('/workspace/templates/test.md');
     });
 
     it('should handle nested template paths', () => {
-      mockPath.resolve.mockReturnValue('/workspace/templates/commands/tasks/create-plan.md');
+      mockPath.join.mockReturnValue('/workspace/templates/commands/tasks/create-plan.md');
       const result = getTemplatePath('commands/tasks/create-plan.md');
-      expect(mockPath.resolve).toHaveBeenCalledWith(expect.any(String), '../templates', 'commands/tasks/create-plan.md');
+      expect(mockPath.join).toHaveBeenCalledWith(expect.any(String), '..', 'templates', 'commands/tasks/create-plan.md');
       expect(result).toBe('/workspace/templates/commands/tasks/create-plan.md');
     });
   });

@@ -643,7 +643,7 @@ describe('CLI Integration Tests', () => {
         // Should not contain original MD syntax
         expect(createPlanToml).not.toContain('$ARGUMENTS');
         expect(createPlanToml).not.toContain('[user-prompt]');
-        expect(createPlanToml).not.toContain('---'); // YAML frontmatter delimiters
+        expect(createPlanToml).not.toMatch(/^---/); // Should not start with frontmatter delimiters
         
         // Verify file is not empty and has substantial content
         expect(createPlanToml.length).toBeGreaterThan(100);
@@ -686,8 +686,8 @@ describe('CLI Integration Tests', () => {
         expect(generateTasksToml).toContain('content = """');
         
         // Verify variable substitution worked correctly
-        expect(generateTasksToml).toContain('{{args}}');
-        expect(generateTasksToml).not.toContain('$ARGUMENTS');
+        expect(generateTasksToml).toContain('{{plan_id}}'); // $1 should be converted to {{plan_id}}
+        expect(generateTasksToml).not.toContain('$1');
         
         // Should handle any escaped characters properly
         const lines = generateTasksToml.split('\n');

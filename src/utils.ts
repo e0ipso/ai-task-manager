@@ -263,7 +263,7 @@ export function getTemplateFormat(assistant: Assistant): TemplateFormat {
  * @returns The absolute path to the template
  */
 export function getTemplatePath(templateFile: string): string {
-  return path.join(__dirname, '..', '..', 'templates', templateFile);
+  return path.join(__dirname, '..', 'templates', templateFile);
 }
 
 /**
@@ -389,7 +389,7 @@ export function parseFrontmatter(content: string): {
   frontmatter: MarkdownFrontmatter;
   body: string;
 } {
-  const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/;
+  const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n([\s\S]*))?$/;
   const match = content.match(frontmatterRegex);
 
   if (!match) {
@@ -400,7 +400,7 @@ export function parseFrontmatter(content: string): {
   }
 
   const frontmatterContent = match[1] || '';
-  const bodyContent = match[2] || '';
+  const bodyContent = match[2] || ''; // match[2] is now undefined when no body exists
 
   // Simple YAML parser for our specific use case
   const frontmatter: MarkdownFrontmatter = {};
@@ -449,13 +449,13 @@ export function convertMdToToml(mdContent: string): string {
   const { frontmatter, body } = parseFrontmatter(mdContent);
 
   // Process the body content for Gemini format
-  const processedBody = body
-    // Transform $ARGUMENTS → {{args}}
-    .replace(/\$ARGUMENTS/g, '{{args}}')
-    // Transform $1 → {{plan_id}} (and other numbered parameters if needed)
-    .replace(/\$1/g, '{{plan_id}}')
-    .replace(/\$2/g, '{{param2}}')
-    .replace(/\$3/g, '{{param3}}');
+  let processedBody = body
+    // Transform $ARGUMENTS → {{args}} (not followed by alphanumeric that would make it an identifier)
+    .replace(/\$ARGUMENTS(?![0-9])/g, '{{args}}')
+    // Transform $1 → {{plan_id}} (exact match, not part of longer number)
+    .replace(/\$1(?![0-9])/g, '{{plan_id}}')
+    .replace(/\$2(?![0-9])/g, '{{param2}}')
+    .replace(/\$3(?![0-9])/g, '{{param3}}');
 
   // Build TOML content
   let tomlContent = '[metadata]\n';
@@ -532,13 +532,13 @@ export async function writeProcessedTemplate(content: string, destPath: string):
 }
 
 /**
- * Get the names of all markdown template files in a given subdirectory of /workspace/templates.
- * @param templateSubdir - The subdirectory within /workspace/templates (e.g., 'commands/tasks')
+ * Get the names of all markdown template files in a given subdirectory of templates.
+ * @param templateSubdir - The subdirectory within templates (e.g., 'commands/tasks')
  * @returns An array of template names (filenames without .md extension)
  * @throws FileSystemError if the directory cannot be read
  */
 export async function getMarkdownTemplateNames(templateSubdir: string): Promise<string[]> {
-  const fullPath = path.join(__dirname, '..', '..', 'templates', templateSubdir);
+  const fullPath = path.join(__dirname, '..', 'templates', templateSubdir);
   try {
     const files = await fs.readdir(fullPath);
     return files.filter(file => file.endsWith('.md')).map(file => path.basename(file, '.md'));

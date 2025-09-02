@@ -47,6 +47,7 @@ describe('index.ts', () => {
     // New function mocks for our refactored implementation
     mockUtils.readAndProcessTemplate.mockResolvedValue('mock-template-content');
     mockUtils.writeProcessedTemplate.mockResolvedValue(undefined);
+    mockUtils.getMarkdownTemplateNames.mockResolvedValue(['create-plan', 'execute-blueprint', 'generate-tasks']);
   });
 
   afterEach(() => {
