@@ -34,8 +34,6 @@ module.exports = {
     'subject-empty': [2, 'never'],
     // Ensure the commit subject doesn't end with a period
     'subject-full-stop': [2, 'never', '.'],
-    // Ensure the commit subject is lowercase
-    'subject-case': [2, 'always', 'lower-case'],
     // Limit the subject line to 72 characters
     'subject-max-length': [2, 'always', 72],
     // Ensure the commit body has a maximum line length
