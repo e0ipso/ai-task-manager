@@ -15,30 +15,11 @@ describe('CLI Integration Tests', () => {
   let testDir: string;
   let originalCwd: string;
   const cliPath = path.resolve(__dirname, '../../dist/cli.js');
-  let activeProcesses: Set<any> = new Set();
-  let activeTimers: Set<NodeJS.Timeout> = new Set();
-
-  // Helper function to track timers
-  const trackTimer = (timer: NodeJS.Timeout): NodeJS.Timeout => {
-    activeTimers.add(timer);
-    return timer;
-  };
-
-  // Helper function to clear tracked timer
-  const clearTrackedTimer = (timer: NodeJS.Timeout | null) => {
-    if (timer) {
-      clearTimeout(timer);
-      activeTimers.delete(timer);
-    }
-  };
-
-  // Helper function to track processes
-  const trackProcess = (process: any) => {
-    activeProcesses.add(process);
-    return process;
-  };
   
   beforeEach(async () => {
+    // Use fake timers for deterministic tests
+    jest.useFakeTimers();
+    
     // Store original working directory
     originalCwd = process.cwd();
     
@@ -47,26 +28,11 @@ describe('CLI Integration Tests', () => {
     
     // Change to test directory
     process.chdir(testDir);
-    
-    // Clear tracking sets
-    activeProcesses.clear();
-    activeTimers.clear();
   });
   
   afterEach(async () => {
-    // Kill any remaining active processes
-    for (const process of activeProcesses) {
-      if (!process.killed) {
-        process.kill('SIGKILL');
-      }
-    }
-    activeProcesses.clear();
-    
-    // Clear any remaining timers
-    for (const timer of activeTimers) {
-      clearTimeout(timer);
-    }
-    activeTimers.clear();
+    // Restore real timers
+    jest.useRealTimers();
     
     // Restore original working directory
     process.chdir(originalCwd);
@@ -75,19 +41,9 @@ describe('CLI Integration Tests', () => {
     await fs.remove(testDir);
   });
   
-  afterAll(async () => {
-    // Final cleanup - ensure all resources are released
-    for (const process of activeProcesses) {
-      if (!process.killed) {
-        process.kill('SIGKILL');
-      }
-    }
-    activeProcesses.clear();
-    
-    for (const timer of activeTimers) {
-      clearTimeout(timer);
-    }
-    activeTimers.clear();
+  afterAll(() => {
+    // Ensure real timers are restored
+    jest.useRealTimers();
   });
 
   describe('CLI Basic Functionality', () => {
@@ -525,60 +481,53 @@ describe('CLI Integration Tests', () => {
       expect(exitCode).toBe(1);
     });
 
-    it('should handle process termination gracefully', (done) => {
-      // This test verifies that the CLI can be terminated
-      const child = trackProcess(spawn('node', [cliPath, 'init', '--assistants', 'claude'], {
-        cwd: testDir,
-        stdio: ['pipe', 'pipe', 'pipe']
-      }));
+    it('should handle process termination gracefully', async () => {
+      // Use real timers for this test since we're dealing with actual process spawning
+      jest.useRealTimers();
+      
+      return new Promise<void>((resolve, reject) => {
+        const child = spawn('node', [cliPath, 'init', '--assistants', 'claude'], {
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
 
-      let processExited = false;
-      let killTimer: NodeJS.Timeout | null = null;
-      let safetyTimer: NodeJS.Timeout | null = null;
+        let processExited = false;
+        const timeout = 5000;
 
-      // Cleanup function to clear timers and kill child process
-      const cleanup = () => {
-        clearTrackedTimer(killTimer);
-        clearTrackedTimer(safetyTimer);
-        killTimer = null;
-        safetyTimer = null;
-        
-        if (!processExited && !child.killed) {
-          child.kill('SIGKILL');
-        }
-        activeProcesses.delete(child);
-      };
-
-      // Kill the process after a short delay
-      killTimer = trackTimer(setTimeout(() => {
-        child.kill('SIGTERM');
-        clearTrackedTimer(killTimer);
-        killTimer = null;
-      }, 200));
-
-      child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
-        processExited = true;
-        cleanup();
-        // Process should either exit normally or be terminated
-        expect(processExited).toBe(true);
-        done();
-      });
-
-      child.on('error', (error: Error) => {
-        processExited = true;
-        cleanup();
-        done(error);
-      });
-
-      // Safety timeout
-      safetyTimer = trackTimer(setTimeout(() => {
-        if (!processExited) {
-          child.kill('SIGKILL');
+        // Set up process event handlers
+        child.on('close', () => {
           processExited = true;
-          cleanup();
-          done();
-        }
-      }, 5000));
+          resolve();
+        });
+
+        child.on('error', (error: Error) => {
+          processExited = true;
+          reject(error);
+        });
+
+        // Kill the process after a short delay
+        const killTimer = setTimeout(() => {
+          if (!processExited) {
+            child.kill('SIGTERM');
+          }
+        }, 200);
+
+        // Safety timeout to prevent test hanging
+        const safetyTimer = setTimeout(() => {
+          if (!processExited) {
+            child.kill('SIGKILL');
+            processExited = true;
+            clearTimeout(killTimer);
+            resolve();
+          }
+        }, timeout);
+
+        // Cleanup on exit
+        child.on('close', () => {
+          clearTimeout(killTimer);
+          clearTimeout(safetyTimer);
+        });
+      });
     }, 8000);
   });
 

@@ -519,7 +519,7 @@ export async function writeProcessedTemplate(content: string, destPath: string):
   try {
     // Ensure destination directory exists
     await fs.ensureDir(path.dirname(destPath));
-    
+
     // Write the content
     await fs.writeFile(destPath, content, 'utf-8');
   } catch (_error) {
