@@ -38,41 +38,41 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     const resolvedBaseDir = resolvePath(baseDir);
 
     // Log start of initialization
-    await logger.info(`Initializing AI Task Manager in: ${resolvedBaseDir}...`);
+    await logger.info(`🚀 Initializing AI Task Manager in: ${resolvedBaseDir}...`);
 
     // Parse and validate assistants
     const assistants = parseAssistants(options.assistants);
-    await logger.debug(`Parsed assistants: ${assistants.join(', ')}`);
+    await logger.debug(`🔍 Parsed assistants: ${assistants.join(', ')}`);
 
     // Validate assistants
     validateAssistants(assistants);
-    await logger.debug('Assistant validation passed');
+    await logger.debug('✅ Assistant validation passed');
 
     // Create .ai/task-manager structure
-    await logger.info('Creating .ai/task-manager directory structure...');
+    await logger.info('📁 Creating .ai/task-manager directory structure...');
     await ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
 
     // Copy common templates to .ai/task-manager
-    await logger.info('Copying common template files...');
+    await logger.info('📋 Copying common template files...');
     await copyCommonTemplates(baseDir);
 
     // Create assistant-specific directories and copy templates
     for (const assistant of assistants) {
-      await logger.info(`Setting up ${assistant} assistant configuration...`);
+      await logger.info(`🤖 Setting up ${assistant} assistant configuration...`);
       await createAssistantStructure(assistant, baseDir);
     }
 
     // Show success message with created directories
     const createdDirectories = getCreatedDirectories(assistants, baseDir);
     await logger.success('AI Task Manager initialized successfully!');
-    await logger.info('Created directory structure:');
+    await logger.info('📂 Created directory structure:');
 
     for (const dir of createdDirectories) {
       await logger.info(`  ✓ ${dir}`);
     }
 
     // Show copied templates
-    await logger.info('Template files copied:');
+    await logger.info('📄 Template files copied:');
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md')}`);
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md')}`);
 
@@ -151,7 +151,7 @@ async function copyCommonTemplates(baseDir: string): Promise<void> {
     }
 
     await copyTemplate(template.source, template.dest);
-    await logger.debug(`Copied ${template.source} to ${template.dest}`);
+    await logger.debug(`📤 Copied ${template.source} to ${template.dest}`);
   }
 }
 
@@ -163,11 +163,11 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
   const tasksDir = resolvePath(baseDir, `.${assistant}/commands/tasks`);
 
   await ensureDir(tasksDir);
-  await logger.debug(`Created directory structure for ${assistant} in ${tasksDir}`);
+  await logger.debug(`🏗️ Created directory structure for ${assistant} in ${tasksDir}`);
 
   // Determine template format based on assistant type
   const templateFormat = getTemplateFormat(assistant);
-  await logger.debug(`Using ${templateFormat} template format for ${assistant} assistant`);
+  await logger.debug(`🎨 Using ${templateFormat} template format for ${assistant} assistant`);
 
   // Copy assistant-specific command templates with appropriate format
   const commandTemplateNames = await getMarkdownTemplateNames('commands/tasks');
@@ -195,7 +195,7 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     await writeProcessedTemplate(processedContent, destPath);
 
     await logger.debug(
-      `Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`
+      `⚡ Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`
     );
   }
 }
