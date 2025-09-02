@@ -629,6 +629,405 @@ describe('CLI Integration Tests', () => {
     });
   });
 
+  describe('Gemini Integration Tests', () => {
+    describe('Gemini-only Initialization', () => {
+      it('should successfully initialize with only gemini assistant', async () => {
+        const result = execSync(`node "${cliPath}" init --assistants gemini`, { 
+          encoding: 'utf8',
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        expect(result).toContain('AI Task Manager initialized successfully!');
+        
+        // Verify common directory structure was created
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager/plans'))).toBe(true);
+        
+        // Verify gemini-specific directory structure was created
+        expect(await fs.pathExists(path.join(testDir, '.gemini'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks'))).toBe(true);
+        
+        // Verify claude directory was NOT created
+        expect(await fs.pathExists(path.join(testDir, '.claude'))).toBe(false);
+        
+        // Verify common template files were copied
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager/VALIDATION_GATES.md'))).toBe(true);
+        
+        // Verify gemini-specific TOML files were created
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/generate-tasks.toml'))).toBe(true);
+        
+        // Verify claude MD files were NOT created
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(false);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/execute-blueprint.md'))).toBe(false);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/generate-tasks.md'))).toBe(false);
+      });
+
+      it('should create TOML files with proper structure and content', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        // Read and verify create-plan.toml structure
+        const createPlanToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 
+          'utf8'
+        );
+
+        // Check for required TOML sections
+        expect(createPlanToml).toContain('[metadata]');
+        expect(createPlanToml).toContain('[prompt]');
+        expect(createPlanToml).toContain('content = """');
+        
+        // Check for converted frontmatter
+        expect(createPlanToml).toContain('argument-hint = "{{args}}"'); // Converted from [user-prompt]
+        expect(createPlanToml).toContain('description = "Create a comprehensive plan to accomplish the request from the user."');
+        
+        // Check for converted variable substitution
+        expect(createPlanToml).toContain('{{args}}'); // Converted from $ARGUMENTS
+        
+        // Should not contain original MD syntax
+        expect(createPlanToml).not.toContain('$ARGUMENTS');
+        expect(createPlanToml).not.toContain('[user-prompt]');
+        expect(createPlanToml).not.toContain('---'); // YAML frontmatter delimiters
+        
+        // Verify file is not empty and has substantial content
+        expect(createPlanToml.length).toBeGreaterThan(100);
+      });
+
+      it('should create TOML files with proper TOML escaping', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const executeTaskToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'), 
+          'utf8'
+        );
+
+        // Check for proper string escaping in TOML
+        // Should handle quotes, newlines, and other special characters properly
+        expect(executeTaskToml).toMatch(/content = """/); // Triple quoted strings
+        
+        // Verify TOML structure is valid
+        expect(executeTaskToml).toContain('[metadata]');
+        expect(executeTaskToml).toContain('[prompt]');
+      });
+
+      it('should handle special characters in template conversion', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const generateTasksToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/generate-tasks.toml'), 
+          'utf8'
+        );
+
+        // Verify the TOML content can be parsed without errors
+        expect(generateTasksToml).toContain('[metadata]');
+        expect(generateTasksToml).toContain('[prompt]');
+        expect(generateTasksToml).toContain('content = """');
+        
+        // Verify variable substitution worked correctly
+        expect(generateTasksToml).toContain('{{args}}');
+        expect(generateTasksToml).not.toContain('$ARGUMENTS');
+        
+        // Should handle any escaped characters properly
+        const lines = generateTasksToml.split('\n');
+        const metadataLines = lines.filter(line => line.includes('=') && !line.includes('content = """'));
+        
+        // All metadata lines should have properly quoted values
+        for (const line of metadataLines) {
+          if (line.trim() && line.includes('=')) {
+            const parts = line.split('=', 2);
+            const value = parts[1];
+            if (value) {
+              expect(value.trim()).toMatch(/^"/); // Should start with quote
+              expect(value.trim()).toMatch(/"$/); // Should end with quote
+            }
+          }
+        }
+      });
+    });
+
+    describe('Mixed Claude and Gemini Initialization', () => {
+      it('should create both Claude and Gemini structures simultaneously', async () => {
+        const result = execSync(`node "${cliPath}" init --assistants claude,gemini`, { 
+          encoding: 'utf8',
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        expect(result).toContain('AI Task Manager initialized successfully!');
+        
+        // Verify both assistant directory structures exist
+        expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks'))).toBe(true);
+        
+        // Verify Claude MD files exist
+        expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/execute-blueprint.md'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/generate-tasks.md'))).toBe(true);
+        
+        // Verify Gemini TOML files exist  
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/generate-tasks.toml'))).toBe(true);
+        
+        // Verify no cross-contamination (Claude shouldn't have TOML, Gemini shouldn't have MD in tasks)
+        expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.toml'))).toBe(false);
+        expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(false);
+      });
+
+      it('should generate identical content for both formats from same source', async () => {
+        execSync(`node "${cliPath}" init --assistants claude,gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        // Read Claude MD file
+        const claudeCreatePlan = await fs.readFile(
+          path.join(testDir, '.claude/commands/tasks/create-plan.md'), 
+          'utf8'
+        );
+        
+        // Read Gemini TOML file  
+        const geminiCreatePlan = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 
+          'utf8'
+        );
+
+        // Verify Claude file contains original MD syntax
+        expect(claudeCreatePlan).toContain('$ARGUMENTS');
+        expect(claudeCreatePlan).toContain('---'); // YAML frontmatter
+        expect(claudeCreatePlan).toContain('argument-hint: [user-prompt]');
+        
+        // Verify Gemini file contains converted TOML syntax
+        expect(geminiCreatePlan).toContain('{{args}}');
+        expect(geminiCreatePlan).toContain('[metadata]');
+        expect(geminiCreatePlan).toContain('argument-hint = "{{args}}"');
+        
+        // Both should contain the core instructional content (with format differences)
+        expect(claudeCreatePlan).toContain('Comprehensive Plan Creation');
+        expect(geminiCreatePlan).toContain('Comprehensive Plan Creation');
+      });
+
+      it('should maintain template consistency across formats', async () => {
+        execSync(`node "${cliPath}" init --assistants claude,gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        // Test all three template files
+        const templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+        
+        for (const template of templates) {
+          // Read both formats
+          const claudeTemplate = await fs.readFile(
+            path.join(testDir, `.claude/commands/tasks/${template}.md`), 
+            'utf8'
+          );
+          
+          const geminiTemplate = await fs.readFile(
+            path.join(testDir, `.gemini/commands/tasks/${template}.toml`), 
+            'utf8'
+          );
+
+          // Both should have substantial content
+          expect(claudeTemplate.length).toBeGreaterThan(50);
+          expect(geminiTemplate.length).toBeGreaterThan(50);
+          
+          // Gemini should have proper TOML structure
+          expect(geminiTemplate).toContain('[metadata]');
+          expect(geminiTemplate).toContain('[prompt]');
+          expect(geminiTemplate).toContain('content = """');
+          
+          // Claude should have YAML frontmatter
+          expect(claudeTemplate).toContain('---');
+          expect(claudeTemplate).toMatch(/^---\n/);
+        }
+      });
+    });
+
+    describe('TOML Content Validation', () => {
+      it('should properly convert frontmatter to TOML metadata', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const createPlanToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 
+          'utf8'
+        );
+
+        // Check for converted frontmatter fields
+        expect(createPlanToml).toContain('argument-hint = "{{args}}"'); // Special conversion
+        expect(createPlanToml).toContain('description = "Create a comprehensive plan to accomplish the request from the user."');
+        
+        // Should be in metadata section
+        const metadataSection = createPlanToml.split('[prompt]')[0];
+        expect(metadataSection).toContain('[metadata]');
+        expect(metadataSection).toContain('argument-hint =');
+        expect(metadataSection).toContain('description =');
+      });
+
+      it('should properly convert variable substitutions', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        // Test create-plan which uses $ARGUMENTS
+        const createPlanToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 
+          'utf8'
+        );
+        expect(createPlanToml).toContain('{{args}}');
+        expect(createPlanToml).not.toContain('$ARGUMENTS');
+        
+        // Test execute-blueprint and generate-tasks which use $1
+        const executeTaskToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'), 
+          'utf8'
+        );
+        expect(executeTaskToml).toContain('{{plan_id}}');
+        expect(executeTaskToml).not.toContain('$1');
+        
+        const generateTasksToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/generate-tasks.toml'), 
+          'utf8'
+        );
+        expect(generateTasksToml).toContain('{{plan_id}}');
+        expect(generateTasksToml).not.toContain('$1');
+      });
+
+      it('should handle special characters in TOML strings properly', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const executeTaskToml = await fs.readFile(
+          path.join(testDir, '.gemini/commands/tasks/execute-blueprint.toml'), 
+          'utf8'
+        );
+
+        // The content should be in a triple-quoted string which handles most special chars
+        expect(executeTaskToml).toContain('content = """');
+        
+        // Verify that quotes within content are properly escaped if needed
+        const contentStart = executeTaskToml.indexOf('content = """') + 'content = """'.length;
+        const contentEnd = executeTaskToml.lastIndexOf('"""');
+        const content = executeTaskToml.substring(contentStart, contentEnd);
+        
+        // Content should not contain any additional triple quotes within the content
+        expect(content).not.toContain('"""');
+      });
+
+      it('should create valid TOML that can be parsed', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+        
+        for (const templateName of templates) {
+          const tomlFilePath = path.join(testDir, `.gemini/commands/tasks/${templateName}.toml`);
+          const tomlContent = await fs.readFile(tomlFilePath, 'utf8');
+
+          // Basic TOML structure validation
+          expect(tomlContent).toContain('[metadata]');
+          expect(tomlContent).toContain('[prompt]');
+          
+          // Check for proper section ordering (metadata before prompt)
+          const metadataIndex = tomlContent.indexOf('[metadata]');
+          const promptIndex = tomlContent.indexOf('[prompt]');
+          expect(metadataIndex).toBeLessThan(promptIndex);
+          
+          // Check for proper key-value format in metadata section
+          const metadataSection = tomlContent.substring(metadataIndex, promptIndex);
+          const metadataLines = metadataSection.split('\n').filter(line => line.includes('='));
+          
+          for (const line of metadataLines) {
+            const trimmedLine = line.trim();
+            if (trimmedLine && !trimmedLine.startsWith('#')) {
+              // Should have format: key = "value"
+              expect(trimmedLine).toMatch(/^[a-zA-Z-_]+ = ".+"$/);
+            }
+          }
+          
+          // Prompt section should have content field with triple quotes
+          const promptSection = tomlContent.substring(promptIndex);
+          expect(promptSection).toContain('content = """');
+          expect(promptSection).toContain('"""');
+        }
+      });
+    });
+
+    describe('Directory Structure Validation for Gemini', () => {
+      it('should create correct gemini directory hierarchy', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        // Check gemini-specific directory structure
+        const expectedDirs = [
+          '.gemini',
+          '.gemini/commands', 
+          '.gemini/commands/tasks'
+        ];
+
+        for (const dir of expectedDirs) {
+          const fullPath = path.join(testDir, dir);
+          const stats = await fs.stat(fullPath);
+          expect(stats.isDirectory()).toBe(true);
+        }
+        
+        // Verify common directories also exist
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager'))).toBe(true);
+        expect(await fs.pathExists(path.join(testDir, '.ai/task-manager/plans'))).toBe(true);
+      });
+
+      it('should create all required TOML template files', async () => {
+        execSync(`node "${cliPath}" init --assistants gemini`, { 
+          cwd: testDir,
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        const expectedFiles = [
+          '.gemini/commands/tasks/create-plan.toml',
+          '.gemini/commands/tasks/execute-blueprint.toml',
+          '.gemini/commands/tasks/generate-tasks.toml'
+        ];
+
+        for (const file of expectedFiles) {
+          const fullPath = path.join(testDir, file);
+          expect(await fs.pathExists(fullPath)).toBe(true);
+          
+          // Verify file is not empty
+          const stats = await fs.stat(fullPath);
+          expect(stats.size).toBeGreaterThan(0);
+          
+          // Verify file has TOML content
+          const content = await fs.readFile(fullPath, 'utf8');
+          expect(content).toContain('[metadata]');
+          expect(content).toContain('[prompt]');
+        }
+      });
+    });
+  });
+
   describe('Cross-platform Compatibility', () => {
     it('should work with different path separators', async () => {
       execSync(`node "${cliPath}" init --assistants claude`, { 

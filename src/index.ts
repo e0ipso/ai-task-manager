@@ -17,6 +17,9 @@ import {
   exists,
   resolvePath,
   getTemplateFormat,
+  readAndProcessTemplate,
+  writeProcessedTemplate,
+  getMarkdownTemplateNames,
 } from './utils';
 
 /**
@@ -167,24 +170,31 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
   await logger.debug(`Using ${templateFormat} template format for ${assistant} assistant`);
 
   // Copy assistant-specific command templates with appropriate format
-  const commandTemplateNames = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+  const commandTemplateNames = await getMarkdownTemplateNames('commands/tasks');
 
   for (const templateName of commandTemplateNames) {
     const templateFile = `${templateName}.${templateFormat}`;
-    const sourcePath = getTemplatePath(`commands/tasks/${templateFile}`);
+    
+    // Always read from the MD template source (DRY principle)
+    const mdSourcePath = getTemplatePath(`commands/tasks/${templateName}.md`);
     const destPath = resolvePath(baseDir, `.${assistant}/commands/tasks/${templateFile}`);
 
-    // Check if source template exists
-    if (!(await exists(sourcePath))) {
-      throw new FileSystemError(`Command template not found: ${sourcePath}`, {
-        templatePath: sourcePath,
+    // Check if MD source template exists
+    if (!(await exists(mdSourcePath))) {
+      throw new FileSystemError(`Command template not found: ${mdSourcePath}`, {
+        templatePath: mdSourcePath,
         assistant,
         templateFormat,
       });
     }
 
-    await copyTemplate(sourcePath, destPath);
-    await logger.debug(`Copied ${templateFile} for ${assistant} to ${destPath}`);
+    // Read and process the template based on target format
+    const processedContent = await readAndProcessTemplate(mdSourcePath, templateFormat);
+    
+    // Write the processed content to destination
+    await writeProcessedTemplate(processedContent, destPath);
+    
+    await logger.debug(`Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`);
   }
 }
 
