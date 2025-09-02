@@ -79,8 +79,7 @@
     [
       "@semantic-release/npm",
       {
-        "npmPublish": true,
-        "tarballDir": "release"
+        "npmPublish": true
       }
     ],
     [
@@ -94,17 +93,7 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          {
-            "path": "release/*.tgz",
-            "label": "Distribution package"
-          }
-        ]
-      }
-    ]
+    "@semantic-release/github"
   ],
   "tagFormat": "v${version}",
   "repositoryUrl": "https://github.com/e0ipso/ai-task-manager.git"
