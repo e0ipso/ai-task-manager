@@ -31,7 +31,9 @@ Before starting execution check if you are in the `main` branch. If so, create a
 
 2. **Agent Selection and Task Assignment**
     - For each task in the current phase:
-        - Analyze task requirements and technical domain
+        - Read task frontmatter to extract the `skills` property (array of technical skills)
+        - Analyze task requirements and technical domain from description
+        - Match task skills against available sub-agent capabilities
         - Select the most appropriate Claude Code sub-agent (if any are available). If no sub-agent is appropriate, use the generic one.
         - Consider task-specific requirements from the task document
 
@@ -66,8 +68,8 @@ agent.
 
 #### Matching Criteria
 Select agents based on:
-1. **Primary skill match**: Task technical requirements
-2. **Domain expertise**: Specific frameworks or libraries mentioned
+1. **Primary skill match**: Task technical requirements from the `skills` array in task frontmatter
+2. **Domain expertise**: Specific frameworks or libraries mentioned in task descriptions
 3. **Task complexity**: Senior vs. junior agent capabilities
 4. **Resource efficiency**: Avoid over-provisioning for simple tasks
 

@@ -174,7 +174,7 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
   for (const templateName of commandTemplateNames) {
     const templateFile = `${templateName}.${templateFormat}`;
-    
+
     // Always read from the MD template source (DRY principle)
     const mdSourcePath = getTemplatePath(`commands/tasks/${templateName}.md`);
     const destPath = resolvePath(baseDir, `.${assistant}/commands/tasks/${templateFile}`);
@@ -190,11 +190,13 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
     // Read and process the template based on target format
     const processedContent = await readAndProcessTemplate(mdSourcePath, templateFormat);
-    
+
     // Write the processed content to destination
     await writeProcessedTemplate(processedContent, destPath);
-    
-    await logger.debug(`Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`);
+
+    await logger.debug(
+      `Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`
+    );
   }
 }
 

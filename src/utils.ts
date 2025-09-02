@@ -449,7 +449,7 @@ export function convertMdToToml(mdContent: string): string {
   const { frontmatter, body } = parseFrontmatter(mdContent);
 
   // Process the body content for Gemini format
-  let processedBody = body
+  const processedBody = body
     // Transform $ARGUMENTS → {{args}}
     .replace(/\$ARGUMENTS/g, '{{args}}')
     // Transform $1 → {{plan_id}} (and other numbered parameters if needed)
@@ -541,9 +541,7 @@ export async function getMarkdownTemplateNames(templateSubdir: string): Promise<
   const fullPath = path.join(__dirname, '..', '..', 'templates', templateSubdir);
   try {
     const files = await fs.readdir(fullPath);
-    return files
-      .filter(file => file.endsWith('.md'))
-      .map(file => path.basename(file, '.md'));
+    return files.filter(file => file.endsWith('.md')).map(file => path.basename(file, '.md'));
   } catch (_error) {
     const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
     throw new FileSystemError(`Failed to read template directory: ${fullPath}`, {
