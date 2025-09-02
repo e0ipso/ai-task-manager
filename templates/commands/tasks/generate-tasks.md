@@ -43,14 +43,41 @@ Each task must be:
 - **Time-bounded**: Completable in a reasonable timeframe by a skilled developer
 - **Verifiable**: Has clear completion criteria
 
-#### Skill Agent Categories
-Examples of single-skill domains:
-- Frontend: CSS styling, React components, vanilla JavaScript
-- Backend: API endpoints, database schemas, server configuration
-- Testing: Unit tests, integration tests, E2E tests (Playwright)
-- Documentation: API docs, user guides, code comments
-- DevOps: CI/CD pipelines, Docker configs, deployment scripts
-- Framework-specific: Drupal modules, WordPress plugins, etc.
+#### Skill Selection and Technical Requirements
+
+**Core Principle**: Each task should require 1-2 specific technical skills that can be handled by specialized agents. Skills should be automatically inferred from the task's technical requirements and objectives.
+
+**Skill Selection Criteria**:
+1. **Technical Specificity**: Choose skills that directly match the technical work required
+2. **Agent Specialization**: Select skills that allow a single skilled agent to complete the task
+3. **Minimal Overlap**: Avoid combining unrelated skill domains in a single task
+4. **Creative Inference**: Derive skills from task objectives and implementation context
+
+**Inspirational Skill Examples** (use kebab-case format):
+- Frontend: `react-components`, `css`, `js`, `vue-components`, `html`
+- Backend: `api-endpoints`, `database`, `authentication`, `server-config`
+- Testing: `jest`, `playwright`, `unit-testing`, `e2e-testing`
+- DevOps: `docker`, `github-actions`, `deployment`, `ci-cd`
+- Languages: `typescript`, `python`, `php`, `bash`, `sql`
+- Frameworks: `nextjs`, `express`, `drupal-backend`, `wordpress-plugins`
+
+**Automatic Skill Inference Examples**:
+- "Create user login form" → `["react-components", "authentication"]`
+- "Build REST API for orders" → `["api-endpoints", "database"]`
+- "Add Docker deployment" → `["docker", "deployment"]`
+- "Write Jest tests for utils" → `["jest"]`
+
+**Assignment Guidelines**:
+- **1 skill**: Focused, single-domain tasks
+- **2 skills**: Tasks requiring complementary domains
+- **Split if 3+**: Indicates task should be broken down
+
+```yaml
+# Examples
+skills: ["css"]  # Pure styling
+skills: ["api-endpoints", "database"]  # API with persistence
+skills: ["react-components", "jest"]  # Implementation + testing
+```
 
 #### Meaningful Test Strategy Guidelines
 
@@ -114,6 +141,7 @@ test('user registration handles duplicate emails', () => {
 - Avoid creating separate tasks for testing each CRUD operation individually
 - Question whether simple functions need dedicated test tasks
 
+
 ### Process
 
 #### Step 1: Task Decomposition
@@ -151,6 +179,7 @@ group: "user-authentication"
 dependencies: []  # List of task IDs, e.g., [2, 3]
 status: "pending"  # pending | in-progress | completed | needs-clarification
 created: "2024-01-15"
+skills: ["react-components", "authentication"]  # Technical skills required for this task
 ---
 ```
 
@@ -158,7 +187,7 @@ The schema for this frontmatter is:
 ```json
 {
   "type": "object",
-  "required": ["id", "group", "dependencies", "status", "created"],
+  "required": ["id", "group", "dependencies", "status", "created", "skills"],
   "properties": {
     "id": {
       "type": ["number"],
@@ -184,6 +213,16 @@ The schema for this frontmatter is:
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "description": "Creation date in YYYY-MM-DD format"
+    },
+    "skills": {
+      "type": "array",
+      "description": "Technical skills required for this task (1-2 skills recommended)",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
     }
   },
   "additionalProperties": false
@@ -195,13 +234,16 @@ The schema for this frontmatter is:
 ## Objective
 [Clear statement of what this task accomplishes]
 
+## Skills Required
+[Reference to the skills listed in frontmatter - these should align with the technical work needed]
+
 ## Acceptance Criteria
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
 
 ## Technical Requirements
-[Specific technical details, APIs, libraries, etc.]
+[Specific technical details, APIs, libraries, etc. - use this to infer appropriate skills]
 
 ## Input Dependencies
 [What artifacts/code from other tasks are needed]
@@ -210,7 +252,7 @@ The schema for this frontmatter is:
 [What this task produces for other tasks to consume]
 
 ## Implementation Notes
-[Any helpful context or suggestions]
+[Any helpful context or suggestions, including skill-specific guidance]
 ```
 
 ### Task ID Generation
@@ -258,6 +300,7 @@ group: "implementation"
 dependencies: [1, 2]
 status: "pending"
 created: "2024-01-15"
+skills: ["api-endpoints", "database"]
 ---
 ```
 
@@ -274,6 +317,7 @@ group: "setup"
 dependencies: []
 status: "pending"
 created: "2024-01-15"
+skills: ["docker", "ci-cd"]
 ---
 ```
 
@@ -299,7 +343,8 @@ If the command fails or returns unexpected results:
 
 ### Validation Checklist
 Before finalizing, ensure:
-- [ ] Each task has a single skill domain
+- [ ] Each task has 1-2 appropriate technical skills assigned
+- [ ] Skills are automatically inferred from task objectives and technical requirements
 - [ ] All dependencies form an acyclic graph
 - [ ] Task IDs are unique and sequential
 - [ ] Groups are consistent and meaningful
