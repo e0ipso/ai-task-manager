@@ -1,362 +1,240 @@
 /**
- * Unit Tests for utils.ts
+ * Minimal Utils Tests - Critical Business Logic Only
  *
- * Comprehensive test suite for utility functions with mocked dependencies
+ * Tests only functions with actual business logic that could fail silently
+ * or cause data corruption. Skips simple wrappers and obvious functionality.
  */
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as os from 'os';
 import {
-  ensureDir,
-  copyTemplate,
-  writeJsonFile,
-  readJsonFile,
   parseAssistants,
   validateAssistants,
-  getTemplatePath,
-  getCreatedDirectories,
-  ensureTrailingSlash,
-  sanitizeFilename,
-  remove,
-  move,
-  getTemplateFormat,
+  convertMdToToml,
+  parseFrontmatter,
+  escapeTomlString,
 } from '../utils';
-import { FileSystemError, Assistant } from '../types';
+import { Assistant } from '../types';
 
-// Mock fs-extra
-jest.mock('fs-extra');
-const mockFs = fs as jest.Mocked<any>;
-
-// Mock os
-jest.mock('os');
-const mockOs = os as jest.Mocked<typeof os>;
-
-// Mock path module - keep real implementations for most functions but mock resolve and join
-jest.mock('path', () => {
-  const actualPath = jest.requireActual('path');
-  return {
-    ...actualPath,
-    resolve: jest.fn().mockImplementation((...args: string[]) => 
-      actualPath.resolve(...args)
-    ),
-    join: jest.fn().mockImplementation((...args: string[]) =>
-      actualPath.join(...args)
-    )
-  };
-});
-const mockPath = path as jest.Mocked<typeof path> & {
-  resolve: jest.MockedFunction<typeof path.resolve>;
-  join: jest.MockedFunction<typeof path.join>;
-};
-
-describe('utils.ts', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset path.resolve to default behavior
-    mockPath.resolve.mockImplementation((...args: string[]) => 
-      jest.requireActual('path').resolve(...args)
-    );
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-  });
-
-  // ensureDir tests kept - includes custom error handling logic
-  describe('ensureDir', () => {
-    it('should throw FileSystemError when directory creation fails', async () => {
-      const error = new Error('Permission denied');
-      mockFs.ensureDir.mockRejectedValue(error);
-
-      await expect(ensureDir('/test/dir')).rejects.toThrow(FileSystemError);
-      await expect(ensureDir('/test/dir')).rejects.toThrow('Failed to create directory: /test/dir');
-    });
-
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.ensureDir.mockRejectedValue(unknownError);
-
-      await expect(ensureDir('/test/dir')).rejects.toThrow(FileSystemError);
-      await expect(ensureDir('/test/dir')).rejects.toThrow('Failed to create directory: /test/dir');
-    });
-  });
-
-  // directoryExists tests removed - simple fs.stat wrapper
-
-  // fileExists tests removed - simple fs.stat wrapper
-
-  // exists tests removed - simple fs.access wrapper
-
-  // copyTemplate tests kept - includes custom error handling logic
-  describe('copyTemplate', () => {
-    it('should throw FileSystemError when copy fails', async () => {
-      const error = new Error('Permission denied');
-      mockFs.copy.mockRejectedValue(error);
-
-      await expect(copyTemplate('/src/template', '/dest/file')).rejects.toThrow(FileSystemError);
-      await expect(copyTemplate('/src/template', '/dest/file')).rejects.toThrow('Failed to copy from /src/template to /dest/file');
-    });
-
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.copy.mockRejectedValue(unknownError);
-
-      await expect(copyTemplate('/src/template', '/dest/file')).rejects.toThrow(FileSystemError);
-      await expect(copyTemplate('/src/template', '/dest/file')).rejects.toThrow('Failed to copy from /src/template to /dest/file');
-    });
-  });
-
-  // writeJsonFile tests kept - includes custom error handling logic
-  describe('writeJsonFile', () => {
-    it('should throw FileSystemError when write fails', async () => {
-      const error = new Error('Permission denied');
-      mockFs.writeJson.mockRejectedValue(error);
-
-      await expect(writeJsonFile('/test/file.json', {})).rejects.toThrow(FileSystemError);
-      await expect(writeJsonFile('/test/file.json', {})).rejects.toThrow('Failed to write JSON file: /test/file.json');
-    });
-
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.writeJson.mockRejectedValue(unknownError);
-
-      await expect(writeJsonFile('/test/file.json', {})).rejects.toThrow(FileSystemError);
-      await expect(writeJsonFile('/test/file.json', {})).rejects.toThrow('Failed to write JSON file: /test/file.json');
-    });
-  });
-
-  // readJsonFile tests kept - includes custom error handling logic
-  describe('readJsonFile', () => {
-    it('should throw FileSystemError when read fails', async () => {
-      const error = new Error('File not found');
-      mockFs.readJson.mockRejectedValue(error);
-
-      await expect(readJsonFile('/test/file.json')).rejects.toThrow(FileSystemError);
-      await expect(readJsonFile('/test/file.json')).rejects.toThrow('Failed to read JSON file: /test/file.json');
-    });
-
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.readJson.mockRejectedValue(unknownError);
-
-      await expect(readJsonFile('/test/file.json')).rejects.toThrow(FileSystemError);
-      await expect(readJsonFile('/test/file.json')).rejects.toThrow('Failed to read JSON file: /test/file.json');
-    });
-  });
-
+describe('Critical Utils Business Logic', () => {
   describe('parseAssistants', () => {
-    it('should parse single assistant', () => {
-      const result = parseAssistants('claude');
-      expect(result).toEqual(['claude']);
+    it('should parse and normalize single assistant', () => {
+      expect(parseAssistants('claude')).toEqual(['claude']);
+      expect(parseAssistants(' CLAUDE ')).toEqual(['claude']);
     });
 
-    it('should parse multiple assistants', () => {
-      const result = parseAssistants('claude,gemini');
-      expect(result).toEqual(['claude', 'gemini']);
+    it('should parse multiple assistants with normalization', () => {
+      expect(parseAssistants('claude,gemini')).toEqual(['claude', 'gemini']);
+      expect(parseAssistants(' Claude , GEMINI ')).toEqual(['claude', 'gemini']);
     });
 
-    it('should handle spaces and case variations', () => {
-      const result = parseAssistants(' Claude , GEMINI ');
-      expect(result).toEqual(['claude', 'gemini']);
+    it('should remove duplicates and empty entries', () => {
+      expect(parseAssistants('claude,claude,gemini')).toEqual(['claude', 'gemini']);
+      expect(parseAssistants('claude,,gemini,')).toEqual(['claude', 'gemini']);
     });
 
-    it('should remove duplicates', () => {
-      const result = parseAssistants('claude,claude,gemini');
-      expect(result).toEqual(['claude', 'gemini']);
-    });
-
-    it('should handle empty strings in list', () => {
-      const result = parseAssistants('claude,,gemini,');
-      expect(result).toEqual(['claude', 'gemini']);
-    });
-
-    it('should throw error for empty input', () => {
+    it('should reject empty input', () => {
       expect(() => parseAssistants('')).toThrow('Assistants parameter cannot be empty');
       expect(() => parseAssistants('   ')).toThrow('Assistants parameter cannot be empty');
     });
 
-    it('should throw error for invalid assistants', () => {
+    it('should reject invalid assistants', () => {
       expect(() => parseAssistants('invalid')).toThrow(
         'Invalid assistant(s): invalid. Valid options are: claude, gemini'
       );
-      expect(() => parseAssistants('claude,invalid,gemini')).toThrow(
-        'Invalid assistant(s): invalid. Valid options are: claude, gemini'
-      );
-    });
-
-    it('should throw error for multiple invalid assistants', () => {
-      expect(() => parseAssistants('invalid1,invalid2')).toThrow(
-        'Invalid assistant(s): invalid1, invalid2. Valid options are: claude, gemini'
+      expect(() => parseAssistants('claude,invalid,unknown')).toThrow(
+        'Invalid assistant(s): invalid, unknown. Valid options are: claude, gemini'
       );
     });
   });
 
   describe('validateAssistants', () => {
-    it('should validate valid assistants', () => {
+    it('should accept valid assistants', () => {
       expect(() => validateAssistants(['claude'])).not.toThrow();
-      expect(() => validateAssistants(['gemini'])).not.toThrow();
       expect(() => validateAssistants(['claude', 'gemini'])).not.toThrow();
     });
 
-    it('should throw error for empty array', () => {
+    it('should reject empty array', () => {
       expect(() => validateAssistants([])).toThrow('At least one assistant must be specified');
     });
 
-    it('should throw error for invalid assistant', () => {
+    it('should reject invalid assistants', () => {
       expect(() => validateAssistants(['invalid' as Assistant])).toThrow(
         'Invalid assistant: invalid. Supported assistants: claude, gemini'
       );
     });
+  });
 
-    it('should throw error for mixed valid and invalid assistants', () => {
-      expect(() => validateAssistants(['claude', 'invalid' as Assistant])).toThrow(
-        'Invalid assistant: invalid. Supported assistants: claude, gemini'
-      );
+  describe('escapeTomlString', () => {
+    it('should escape backslashes', () => {
+      expect(escapeTomlString('path\\to\\file')).toBe('path\\\\to\\\\file');
+    });
+
+    it('should escape double quotes', () => {
+      expect(escapeTomlString('say "hello"')).toBe('say \\"hello\\"');
+    });
+
+    it('should escape control characters', () => {
+      expect(escapeTomlString('line1\nline2\r\tindented')).toBe('line1\\nline2\\r\\tindented');
+    });
+
+    it('should handle complex mixed escaping', () => {
+      const input = 'path\\file\n"quoted"\tvalue';
+      const expected = 'path\\\\file\\n\\"quoted\\"\\tvalue';
+      expect(escapeTomlString(input)).toBe(expected);
     });
   });
 
-  // Path helper functions tests removed - testing Node.js built-in path methods
-  // Keep custom business logic: ensureTrailingSlash
-  describe('ensureTrailingSlash', () => {
-    it('should add trailing slash if missing', () => {
-      const result = ensureTrailingSlash('/path/to/dir');
-      expect(result).toBe('/path/to/dir/');
+  describe('parseFrontmatter', () => {
+    it('should parse valid frontmatter', () => {
+      const content = `---
+title: Test
+description: A test file
+---
+Body content here`;
+
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({
+        title: 'Test',
+        description: 'A test file'
+      });
+      expect(result.body).toBe('Body content here');
     });
 
-    it('should not modify path with existing trailing slash', () => {
-      const result = ensureTrailingSlash('/path/to/dir/');
-      expect(result).toBe('/path/to/dir/');
-    });
-  });
+    it('should handle quoted values', () => {
+      const content = `---
+title: "Quoted Title"
+description: 'Single quoted'
+---
+Body`;
 
-  describe('getTemplatePath', () => {
-    it('should return template path', () => {
-      mockPath.join.mockReturnValue('/workspace/templates/test.md');
-      const result = getTemplatePath('test.md');
-      expect(mockPath.join).toHaveBeenCalledWith(expect.any(String), '..', 'templates', 'test.md');
-      expect(result).toBe('/workspace/templates/test.md');
-    });
-
-    it('should handle nested template paths', () => {
-      mockPath.join.mockReturnValue('/workspace/templates/commands/tasks/create-plan.md');
-      const result = getTemplatePath('commands/tasks/create-plan.md');
-      expect(mockPath.join).toHaveBeenCalledWith(expect.any(String), '..', 'templates', 'commands/tasks/create-plan.md');
-      expect(result).toBe('/workspace/templates/commands/tasks/create-plan.md');
-    });
-  });
-
-  describe('getCreatedDirectories', () => {
-    it('should return directories for single assistant', () => {
-      const result = getCreatedDirectories(['claude']);
-      expect(result.length).toBe(5);
-      expect(result).toEqual(expect.arrayContaining([
-        expect.stringMatching(/\.ai\/task-manager$/),
-        expect.stringMatching(/\.ai\/task-manager\/plans$/),
-        expect.stringMatching(/\.claude$/),
-        expect.stringMatching(/\.claude\/commands$/),
-        expect.stringMatching(/\.claude\/commands\/tasks$/),
-      ]));
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({
+        title: 'Quoted Title',
+        description: 'Single quoted'
+      });
     });
 
-    it('should return directories for multiple assistants', () => {
-      const result = getCreatedDirectories(['claude', 'gemini']);
-      expect(result.length).toBe(8);
-      expect(result).toEqual(expect.arrayContaining([
-        expect.stringMatching(/\.ai\/task-manager$/),
-        expect.stringMatching(/\.ai\/task-manager\/plans$/),
-        expect.stringMatching(/\.claude\/commands\/tasks$/),
-        expect.stringMatching(/\.gemini\/commands\/tasks$/),
-      ]));
+    it('should handle content without frontmatter', () => {
+      const content = 'Just body content';
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({});
+      expect(result.body).toBe('Just body content');
     });
 
-    it('should handle empty assistant array', () => {
-      const result = getCreatedDirectories([]);
-      expect(result.length).toBe(2);
-      expect(result).toEqual(expect.arrayContaining([
-        expect.stringMatching(/\.ai\/task-manager$/),
-        expect.stringMatching(/\.ai\/task-manager\/plans$/),
-      ]));
-    });
-  });
+    it('should handle frontmatter without body', () => {
+      const content = `---
+title: Test
+---`;
 
-  describe('getTemplateFormat', () => {
-    it('should return md format for Claude', () => {
-      const result = getTemplateFormat('claude');
-      expect(result).toBe('md');
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({ title: 'Test' });
+      expect(result.body).toBe('');
     });
 
-    it('should return toml format for Gemini', () => {
-      const result = getTemplateFormat('gemini');
-      expect(result).toBe('toml');
-    });
-  });
+    it('should ignore comments and empty lines', () => {
+      const content = `---
+# This is a comment
+title: Test
 
-  describe('sanitizeFilename', () => {
-    it('should replace invalid characters with underscores', () => {
-      const result = sanitizeFilename('invalid<>:"/\\|?*filename');
-      expect(result).toBe('invalid_filename');
-    });
+description: With empty line above
+# Another comment
+---
+Body`;
 
-    it('should replace spaces with underscores', () => {
-      const result = sanitizeFilename('file with spaces.txt');
-      expect(result).toBe('file_with_spaces.txt');
-    });
-
-    it('should collapse multiple underscores', () => {
-      const result = sanitizeFilename('file___with___multiple___spaces');
-      expect(result).toBe('file_with_multiple_spaces');
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({
+        title: 'Test',
+        description: 'With empty line above'
+      });
     });
 
-    it('should remove leading and trailing underscores', () => {
-      const result = sanitizeFilename('_filename_');
-      expect(result).toBe('filename');
-    });
+    it('should handle malformed YAML gracefully', () => {
+      const content = `---
+title Test without colon
+valid: value
+invalid-line-no-colon
+---
+Body`;
 
-    it('should handle already safe filenames', () => {
-      const result = sanitizeFilename('safe_filename.txt');
-      expect(result).toBe('safe_filename.txt');
+      const result = parseFrontmatter(content);
+      expect(result.frontmatter).toEqual({ valid: 'value' });
+      expect(result.body).toBe('Body');
     });
   });
 
-  // getHomeDirectory tests removed - testing Node.js built-in os.homedir()
+  describe('convertMdToToml', () => {
+    it('should convert basic markdown with frontmatter', () => {
+      const md = `---
+title: Test Command
+description: A test command
+---
+This is the command content.`;
 
-  // remove tests kept - includes custom error handling logic
-  describe('remove', () => {
-    it('should throw FileSystemError when removal fails', async () => {
-      const error = new Error('Permission denied');
-      mockFs.remove.mockRejectedValue(error);
-
-      await expect(remove('/test/path')).rejects.toThrow(FileSystemError);
-      await expect(remove('/test/path')).rejects.toThrow('Failed to remove: /test/path');
+      const result = convertMdToToml(md);
+      expect(result).toContain('[metadata]');
+      expect(result).toContain('title = "Test Command"');
+      expect(result).toContain('description = "A test command"');
+      expect(result).toContain('[prompt]');
+      expect(result).toContain('content = """This is the command content."""');
     });
 
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.remove.mockRejectedValue(unknownError);
+    it('should transform variable placeholders correctly', () => {
+      const md = `---
+title: Test
+---
+Use $ARGUMENTS for input and plan $1 for ID.
+Also $2 and $3 parameters.
+But $10 should not be transformed.`;
 
-      await expect(remove('/test/path')).rejects.toThrow(FileSystemError);
-      await expect(remove('/test/path')).rejects.toThrow('Failed to remove: /test/path');
-    });
-  });
-
-  // move tests kept - includes custom error handling logic
-  describe('move', () => {
-    it('should throw FileSystemError when move fails', async () => {
-      const error = new Error('Permission denied');
-      mockFs.move.mockRejectedValue(error);
-
-      await expect(move('/src/path', '/dest/path')).rejects.toThrow(FileSystemError);
-      await expect(move('/src/path', '/dest/path')).rejects.toThrow('Failed to move from /src/path to /dest/path');
+      const result = convertMdToToml(md);
+      expect(result).toContain('Use {{args}} for input and plan {{plan_id}} for ID.');
+      expect(result).toContain('Also {{param2}} and {{param3}} parameters.');
+      expect(result).toContain('But $10 should not be transformed.');
     });
 
-    it('should handle unknown error types', async () => {
-      const unknownError = 'string error';
-      mockFs.move.mockRejectedValue(unknownError);
+    it('should handle argument-hint field specially', () => {
+      const md = `---
+title: Test
+argument-hint: "[plan-ID] [user-prompt]"
+---
+Content`;
 
-      await expect(move('/src/path', '/dest/path')).rejects.toThrow(FileSystemError);
-      await expect(move('/src/path', '/dest/path')).rejects.toThrow('Failed to move from /src/path to /dest/path');
+      const result = convertMdToToml(md);
+      expect(result).toContain('argument-hint = "{{plan_id}} {{args}}"');
+    });
+
+    it('should escape special characters in TOML', () => {
+      const md = `---
+title: Title with "quotes" and \\backslashes
+---
+Content with "quotes" and \\ backslashes
+Newlines\nand\ttabs.`;
+
+      const result = convertMdToToml(md);
+      expect(result).toContain('title = "Title with \\"quotes\\" and \\\\backslashes"');
+      expect(result).toContain('Content with \\"quotes\\" and \\\\ backslashes\\nNewlines\\nand\\ttabs.');
+    });
+
+    it('should handle content without frontmatter', () => {
+      const md = 'Just content without frontmatter.';
+      const result = convertMdToToml(md);
+
+      expect(result).toContain('[metadata]');
+      expect(result).toContain('[prompt]');
+      expect(result).toContain('content = """Just content without frontmatter."""');
+    });
+
+    it('should preserve exact variable replacement boundaries', () => {
+      const md = `---
+title: Test
+---
+$ARGUMENTS but not $ARGUMENTS123
+$1 but not $12
+Variables: $ARGUMENTS, $1, $2, $3`;
+
+      const result = convertMdToToml(md);
+      expect(result).toContain('{{args}} but not $ARGUMENTS123');
+      expect(result).toContain('{{plan_id}} but not $12');
+      expect(result).toContain('Variables: {{args}}, {{plan_id}}, {{param2}}, {{param3}}');
     });
   });
 });

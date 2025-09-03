@@ -229,13 +229,13 @@ export async function getInitInfo(baseDir?: string): Promise<{
 async function displayWorkflowHelp(): Promise<void> {
   const separator = '═'.repeat(60);
   const thinSeparator = '─'.repeat(60);
-  
+
   await logger.info('');
   await logger.info(`╔${separator}╗`);
   await logger.info(`║${' '.repeat(18)}🚀 SUGGESTED WORKFLOW 🚀${' '.repeat(18)}║`);
   await logger.info(`╚${separator}╝`);
   await logger.info('');
-  
+
   await logger.info(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
   await logger.info('│                                                            │');
   await logger.info('│  Review and tweak these files to match your project:      │');
@@ -244,7 +244,7 @@ async function displayWorkflowHelp(): Promise<void> {
   await logger.info('│                                                            │');
   await logger.info(`└${thinSeparator}┘`);
   await logger.info('');
-  
+
   await logger.info(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
   await logger.info('│                                                            │');
   await logger.info('│  1️⃣  Create a plan:                                        │');

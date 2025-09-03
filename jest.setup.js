@@ -6,20 +6,20 @@ if (process.env.CI) {
   // Override console methods to track errors/warnings
   const originalConsoleError = console.error;
   const originalConsoleWarn = console.warn;
-  
+
   let hasConsoleErrors = false;
   let hasConsoleWarnings = false;
-  
+
   console.error = (...args) => {
     hasConsoleErrors = true;
     originalConsoleError.apply(console, args);
   };
-  
+
   console.warn = (...args) => {
     hasConsoleWarnings = true;
     originalConsoleWarn.apply(console, args);
   };
-  
+
   // After each test, check for console errors/warnings
   afterEach(() => {
     if (hasConsoleErrors) {
@@ -28,12 +28,12 @@ if (process.env.CI) {
     if (hasConsoleWarnings && process.env.FAIL_ON_CONSOLE_WARNINGS === 'true') {
       throw new Error('Test produced console.warn() calls. Please fix these issues.');
     }
-    
+
     // Reset flags for next test
     hasConsoleErrors = false;
     hasConsoleWarnings = false;
   });
-  
+
   // Set longer timeout for CI environment
   jest.setTimeout(30000);
 }
