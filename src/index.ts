@@ -64,6 +64,8 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Show success message with created directories
     await logger.success('🎉 AI Task Manager initialized successfully!');
 
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md')}`);
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md')}`);
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
       await logger.info(
@@ -229,45 +231,52 @@ export async function getInitInfo(baseDir?: string): Promise<{
 async function displayWorkflowHelp(): Promise<void> {
   const separator = '═'.repeat(60);
   const thinSeparator = '─'.repeat(60);
+  const chalk = await logger.getChalk();
 
-  await logger.info('');
-  await logger.info(`╔${separator}╗`);
-  await logger.info(`║${' '.repeat(18)}🚀 SUGGESTED WORKFLOW 🚀${' '.repeat(18)}║`);
-  await logger.info(`╚${separator}╝`);
-  await logger.info('');
+  console.log('');
+  console.log(`╔${separator}╗`);
+  console.log(`║${' '.repeat(18)}🚀 SUGGESTED WORKFLOW 🚀${' '.repeat(18)}║`);
+  console.log(`╚${separator}╝`);
+  console.log('');
 
-  await logger.info(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
-  await logger.info('│                                                            │');
-  await logger.info('│  Review and tweak these files to match your project:      │');
-  await logger.info('│  • .ai/task-manager/TASK_MANAGER_INFO.md                   │');
-  await logger.info('│  • .ai/task-manager/VALIDATION_GATES.md                    │');
-  await logger.info('│                                                            │');
-  await logger.info(`└${thinSeparator}┘`);
-  await logger.info('');
+  console.log(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
+  console.log('│                                                            │');
+  console.log('│  🔧 Review and tweak these files to match your project:   │');
+  console.log('│  • .ai/task-manager/TASK_MANAGER_INFO.md                   │');
+  console.log('│  • .ai/task-manager/VALIDATION_GATES.md                    │');
+  console.log('│                                                            │');
+  console.log(`└${thinSeparator}┘`);
+  console.log('');
 
-  await logger.info(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
-  await logger.info('│                                                            │');
-  await logger.info('│  1️⃣  Create a plan:                                        │');
-  await logger.info('│      /tasks:create-plan Create an authentication...       │');
-  await logger.info('│                                                            │');
-  await logger.info('│  2️⃣  Provide additional context if the assistant needs it  │');
-  await logger.info('│                                                            │');
-  await logger.info('│  3️⃣  ⚠️  MANUALLY REVIEW THE PLAN (don\'t skip this!)      │');
-  await logger.info('│      Find it in: .ai/task-manager/plans/01--*/plan-*.md   │');
-  await logger.info('│                                                            │');
-  await logger.info('│  4️⃣  Create the tasks for the plan:                        │');
-  await logger.info('│      /tasks:generate-tasks 1                              │');
-  await logger.info('│                                                            │');
-  await logger.info('│  5️⃣  ⚠️  REVIEW THE TASKS LIST (avoid scope creep!)       │');
-  await logger.info('│      Find them in: .ai/task-manager/plans/01--*/tasks/    │');
-  await logger.info('│                                                            │');
-  await logger.info('│  6️⃣  Execute the tasks:                                    │');
-  await logger.info('│      /tasks:execute-blueprint 1                           │');
-  await logger.info('│                                                            │');
-  await logger.info('│  7️⃣  Review the implementation and generated tests         │');
-  await logger.info('│                                                            │');
-  await logger.info(`└${thinSeparator}┘`);
-  await logger.info('');
-  await logger.info('💡 Pro tip: The manual review steps are crucial for success!');
-  await logger.info('');
+  console.log(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
+  console.log('│                                                            │');
+  console.log('│  1   Create a plan:                                        │');
+  const createPlanCmd = chalk?.cyan('/tasks:create-plan') || '/tasks:create-plan';
+  const createPlanPadding = ' '.repeat(60 - 6 - '/tasks:create-plan'.length - ' Create an authentication...'.length - 2);
+  console.log(`│      ${createPlanCmd} Create an authentication...${createPlanPadding}│`);
+  console.log('│                                                            │');
+  console.log('│  2   Provide additional context if the assistant needs it  │');
+  console.log('│                                                            │');
+  console.log('│  3   ⚠️  MANUALLY REVIEW THE PLAN (don\'t skip this!)      │');
+  console.log('│      📂 Find it in: .ai/task-manager/plans/01--*/plan-*.md│');
+  console.log('│                                                            │');
+  console.log('│  4   Create the tasks for the plan:                        │');
+  const generateTasksCmd = chalk?.magenta('/tasks:generate-tasks') || '/tasks:generate-tasks';
+  const generateTasksPadding = ' '.repeat(60 - 6 - '/tasks:generate-tasks'.length - ' 1'.length - 2);
+  console.log(`│      ${generateTasksCmd} 1${generateTasksPadding}│`);
+  console.log('│                                                            │');
+  console.log('│  5   ⚠️  REVIEW THE TASKS LIST (avoid scope creep!)       │');
+  console.log('│      📁 Find them in: .ai/task-manager/plans/01--*/tasks/ │');
+  console.log('│                                                            │');
+  console.log('│  6   Execute the tasks:                                    │');
+  const executeCmd = chalk?.green('/tasks:execute-blueprint') || '/tasks:execute-blueprint';
+  const executePadding = ' '.repeat(60 - 6 - '/tasks:execute-blueprint'.length - ' 1'.length - 2);
+  console.log(`│      ${executeCmd} 1${executePadding}│`);
+  console.log('│                                                            │');
+  console.log('│  7   Review the implementation and generated tests 🧪      │');
+  console.log('│                                                            │');
+  console.log(`└${thinSeparator}┘`);
+  console.log('');
+  console.log('💡 Pro tip: The manual review steps are crucial for success!');
+  console.log('');
 }
