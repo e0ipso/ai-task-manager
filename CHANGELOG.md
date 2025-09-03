@@ -1,3 +1,10 @@
+## <small>1.1.1 (2025-09-03)</small>
+
+* chore: streamline test suite and improve development workflow ([56cb5fc](https://github.com/e0ipso/ai-task-manager/commit/56cb5fc))
+* docs: improve the messages shown to the user ([9a67c6c](https://github.com/e0ipso/ai-task-manager/commit/9a67c6c))
+* docs: improve wording slightly ([6563049](https://github.com/e0ipso/ai-task-manager/commit/6563049))
+* fix: try to avoid overtesting ([5af6330](https://github.com/e0ipso/ai-task-manager/commit/5af6330))
+
 ## 1.1.0 (2025-09-03)
 
 * fix: better defaults for dev container ([5f7bf79](https://github.com/e0ipso/ai-task-manager/commit/5f7bf79))
