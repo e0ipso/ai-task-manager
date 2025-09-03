@@ -13,7 +13,6 @@ import {
   ensureDir,
   copyTemplate,
   getTemplatePath,
-  getCreatedDirectories,
   exists,
   resolvePath,
   getTemplateFormat,
@@ -63,18 +62,7 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     }
 
     // Show success message with created directories
-    const createdDirectories = getCreatedDirectories(assistants, baseDir);
-    await logger.success('AI Task Manager initialized successfully!');
-    await logger.info('Created directory structure:');
-
-    for (const dir of createdDirectories) {
-      await logger.info(`  ✓ ${dir}`);
-    }
-
-    // Show copied templates
-    await logger.info('Template files copied:');
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md')}`);
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md')}`);
+    await logger.success('🎉 AI Task Manager initialized successfully!');
 
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
@@ -89,7 +77,8 @@ export async function init(options: InitOptions): Promise<CommandResult> {
       );
     }
 
-    await logger.success('Project is ready for AI-powered task management!');
+    // Show suggested workflow help text
+    await displayWorkflowHelp();
 
     return {
       success: true,
@@ -232,4 +221,53 @@ export async function getInitInfo(baseDir?: string): Promise<{
     hasGeminiConfig,
     assistants,
   };
+}
+
+/**
+ * Display formatted workflow help text to guide users after successful installation
+ */
+async function displayWorkflowHelp(): Promise<void> {
+  const separator = '═'.repeat(60);
+  const thinSeparator = '─'.repeat(60);
+  
+  await logger.info('');
+  await logger.info(`╔${separator}╗`);
+  await logger.info(`║${' '.repeat(18)}🚀 SUGGESTED WORKFLOW 🚀${' '.repeat(18)}║`);
+  await logger.info(`╚${separator}╝`);
+  await logger.info('');
+  
+  await logger.info(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
+  await logger.info('│                                                            │');
+  await logger.info('│  Review and tweak these files to match your project:      │');
+  await logger.info('│  • .ai/task-manager/TASK_MANAGER_INFO.md                   │');
+  await logger.info('│  • .ai/task-manager/VALIDATION_GATES.md                    │');
+  await logger.info('│                                                            │');
+  await logger.info(`└${thinSeparator}┘`);
+  await logger.info('');
+  
+  await logger.info(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
+  await logger.info('│                                                            │');
+  await logger.info('│  1️⃣  Create a plan:                                        │');
+  await logger.info('│      /tasks:create-plan Create an authentication...       │');
+  await logger.info('│                                                            │');
+  await logger.info('│  2️⃣  Provide additional context if the assistant needs it  │');
+  await logger.info('│                                                            │');
+  await logger.info('│  3️⃣  ⚠️  MANUALLY REVIEW THE PLAN (don\'t skip this!)      │');
+  await logger.info('│      Find it in: .ai/task-manager/plans/01--*/plan-*.md   │');
+  await logger.info('│                                                            │');
+  await logger.info('│  4️⃣  Create the tasks for the plan:                        │');
+  await logger.info('│      /tasks:generate-tasks 1                              │');
+  await logger.info('│                                                            │');
+  await logger.info('│  5️⃣  ⚠️  REVIEW THE TASKS LIST (avoid scope creep!)       │');
+  await logger.info('│      Find them in: .ai/task-manager/plans/01--*/tasks/    │');
+  await logger.info('│                                                            │');
+  await logger.info('│  6️⃣  Execute the tasks:                                    │');
+  await logger.info('│      /tasks:execute-blueprint 1                           │');
+  await logger.info('│                                                            │');
+  await logger.info('│  7️⃣  Review the implementation and generated tests         │');
+  await logger.info('│                                                            │');
+  await logger.info(`└${thinSeparator}┘`);
+  await logger.info('');
+  await logger.info('💡 Pro tip: The manual review steps are crucial for success!');
+  await logger.info('');
 }

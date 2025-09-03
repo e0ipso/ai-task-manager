@@ -49,9 +49,6 @@ coverage/
 # Jest cache
 .jest/
 
-# TypeScript cache
-*.tsbuildinfo
-
 # Optional npm cache directory
 .npm
 
@@ -67,10 +64,6 @@ coverage/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-.env.test
-
 # Temporary folders
 tmp/
 temp/
@@ -78,3 +71,6 @@ temp/
 # AI and Claude specific
 /.ai/task-manager
 /.claude/settings.local.json
+
+# Generated TOML files (these are created on-the-fly from MD templates)
+templates/commands/tasks/*.toml
