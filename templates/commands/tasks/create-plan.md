@@ -117,7 +117,7 @@ This command reads `id:` values from existing plan front-matter as the source of
 - **Minimal Viable Implementation**: Build exactly what the user asked for, nothing more
 - **Question Everything Extra**: If not directly mentioned by the user, don't add it
 - **Avoid Feature Creep**: Resist the urge to add "helpful" features or "nice-to-have" additions
-- **YAGNI Principle**: You Aren't Gonna Need It - don't build for hypothetical future needs
+- **YAGNI Principle**: _You Aren't Gonna Need It_ - don't build for hypothetical future needs
 
 **Common Scope Creep Anti-Patterns to Avoid:**
 1. Adding extra commands or features "for completeness"
