@@ -1,3 +1,9 @@
+## <small>1.1.2 (2025-09-03)</small>
+
+* fix: better looking output table ([8b70518](https://github.com/e0ipso/ai-task-manager/commit/8b70518))
+* docs: add task manager conceptual context to CLAUDE.md ([032ffdb](https://github.com/e0ipso/ai-task-manager/commit/032ffdb))
+* chore: untrack unnecessary files ([c633dde](https://github.com/e0ipso/ai-task-manager/commit/c633dde))
+
 ## <small>1.1.1 (2025-09-03)</small>
 
 * chore: streamline test suite and improve development workflow ([56cb5fc](https://github.com/e0ipso/ai-task-manager/commit/56cb5fc))
