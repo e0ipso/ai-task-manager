@@ -30,7 +30,7 @@ async function initChalk(): Promise<void> {
 /**
  * Get chalk instance, initializing if necessary
  */
-async function getChalk(): Promise<any | null> {
+export async function getChalk(): Promise<any | null> {
   await initChalk();
   return chalkInstance;
 }
