@@ -65,8 +65,8 @@ ENV PATH=$PATH:/usr/local/share/npm-global/bin
 ENV SHELL=/bin/zsh
 
 # Set the default editor and visual
-ENV EDITOR=nano
-ENV VISUAL=nano
+ENV EDITOR=vim
+ENV VISUAL=vim
 
 # Default powerline10k theme
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
@@ -79,7 +79,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -x
 
 # Install Claude
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION:-latest}
 
 # Install Gemini
-RUN npm install -g @google/gemini-cli@${GEMINI_VERSION} \
+RUN npm install -g @google/gemini-cli@${GEMINI_VERSION:-latest}
