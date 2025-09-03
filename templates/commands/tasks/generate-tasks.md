@@ -81,6 +81,10 @@ skills: ["react-components", "jest"]  # Implementation + testing
 
 #### Meaningful Test Strategy Guidelines
 
+**IMPORTANT** Make sure to copy this _Meaningful Test Strategy Guidelines_ section into all the tasks focused on testing, and **also** keep them in mind when generating tasks.
+
+Your critical mantra for test generation is: "write a few tests, mostly integration".
+
 **Definition of "Meaningful Tests":**
 Tests that verify custom business logic, critical paths, and edge cases specific to the application. Focus on testing YOUR code, not the framework or library functionality.
 
