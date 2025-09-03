@@ -1,3 +1,9 @@
+## 1.1.0 (2025-09-03)
+
+* fix: better defaults for dev container ([5f7bf79](https://github.com/e0ipso/ai-task-manager/commit/5f7bf79))
+* feat: remove unnecessary templates ([758c8b6](https://github.com/e0ipso/ai-task-manager/commit/758c8b6))
+* ci: use latest LTS Node.js version in workflows ([14e6384](https://github.com/e0ipso/ai-task-manager/commit/14e6384))
+
 ## <small>1.0.1 (2025-09-02)</small>
 
 * fix: add publishConfig to set package as public ([979d83a](https://github.com/e0ipso/ai-task-manager/commit/979d83a))
