@@ -29,7 +29,7 @@ If the plan does not exist. Stop immediately and show an error to the user.
 - **Question Everything**: For each task, ask "Is this absolutely necessary to meet the plan objectives?"
 - **Avoid Gold-plating**: Resist the urge to add comprehensive features not explicitly required
 
-**Anti-patterns to Avoid:**
+**Antipatterns to Avoid:**
 - Creating separate tasks for "error handling" when it can be included in the main implementation
 - Breaking simple operations into multiple tasks (e.g., separate "validate input" and "process input" tasks)
 - Adding tasks for "future extensibility" or "best practices" not mentioned in the plan
@@ -72,7 +72,7 @@ Each task must be:
 - **2 skills**: Tasks requiring complementary domains
 - **Split if 3+**: Indicates task should be broken down
 
-```yaml
+```
 # Examples
 skills: ["css"]  # Pure styling
 skills: ["api-endpoints", "database"]  # API with persistence
@@ -164,7 +164,7 @@ For each task, identify:
 - **No circular dependencies**: Validate the dependency graph is acyclic
 
 Dependency Rule: Task B depends on Task A if:
-- B requires output/artifacts from A
+- B requires output or artifacts from A
 - B modifies code created by A
 - B tests functionality implemented in A
 
