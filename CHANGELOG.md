@@ -1,3 +1,7 @@
+## <small>1.1.3 (2025-09-03)</small>
+
+* fix: correct output box alignments ([f5214ea](https://github.com/e0ipso/ai-task-manager/commit/f5214ea))
+
 ## <small>1.1.2 (2025-09-03)</small>
 
 * fix: better looking output table ([8b70518](https://github.com/e0ipso/ai-task-manager/commit/8b70518))
