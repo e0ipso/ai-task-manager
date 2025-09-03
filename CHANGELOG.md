@@ -1,3 +1,9 @@
+## <small>1.1.4 (2025-09-03)</small>
+
+* fix: improve task generation ([a428d29](https://github.com/e0ipso/ai-task-manager/commit/a428d29))
+* docs: improve README visuals ([f7c67b5](https://github.com/e0ipso/ai-task-manager/commit/f7c67b5))
+* chore: untrack agent folders for this particular project ([3c916ad](https://github.com/e0ipso/ai-task-manager/commit/3c916ad))
+
 ## <small>1.1.3 (2025-09-03)</small>
 
 * fix: correct output box alignments ([f5214ea](https://github.com/e0ipso/ai-task-manager/commit/f5214ea))
