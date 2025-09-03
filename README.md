@@ -94,14 +94,14 @@ project-root/
 
 Review and tweak the `.ai/task-manager/TASK_MANAGER_INFO.md` and `.ai/task-manager/VALIDATION_GATES.md`. These files are yours to edit and should reflect your project's tech stack and goals.
 
-### Regular Workflow
+### Day-to-day Workflow
 
 1. Create a plan: `/tasks:create-plan Create an authentication workflow for the application using ...`
 2. Provide additional context if the assistant needs it.
 3. Manually review the plan and make the necessary edits. You might be tempted to skip this step, **do not skip this step**. Find the plan document in `.ai/task-manager/plans/01--authentication-workflow/plan-01--authentication-workflow.md`
-4. Create the tasks for the plan: `/tasks:generate-tasks 01`
-5. Review the list of tasks. This step is important to avoid scope creep. Find the tasks in the folder `.ai/task-manager/plans/01--authentication-workflow/tasks/`
-6. Execute the tasks: `/tasks:execute-blueprint 01`
+4. Create the tasks for the plan: `/tasks:generate-tasks 1`
+5. Review the list of tasks. This step is important to avoid scope creep and ensure the right things are to be built. Again, **do not skip this step**. Find the tasks in the folder `.ai/task-manager/plans/01--authentication-workflow/tasks/`
+6. Execute the tasks: `/tasks:execute-blueprint 1`
 7. Review the implementation and the generated tests.
 
 ### Troubleshooting
