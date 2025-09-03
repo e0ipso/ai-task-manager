@@ -251,12 +251,13 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(25)}┐`);
   console.log('│                                                            │');
   console.log('│  1   Create a plan:                                        │');
-  const createPlanCmd = chalk?.cyan('/tasks:create-plan Create an authentication...') || '/tasks:create-plan';
+  const createPlanCmd =
+    chalk?.cyan('/tasks:create-plan Create an authentication...') || '/tasks:create-plan';
   console.log(`│      ${createPlanCmd}        │`);
   console.log('│                                                            │');
   console.log('│  2   Provide additional context if the assistant needs it  │');
   console.log('│                                                            │');
-  console.log('│  3   ⚠️ MANUALLY REVIEW THE PLAN (don\'t skip this!)       │');
+  console.log("│  3   ⚠️ MANUALLY REVIEW THE PLAN (don't skip this!)       │");
   console.log('│      📂 Find it in: .ai/task-manager/plans/01--*/plan-*.md │');
   console.log('│                                                            │');
   console.log('│  4   Create the tasks for the plan:                        │');
