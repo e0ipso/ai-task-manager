@@ -103,48 +103,11 @@ Tests that verify custom business logic, critical paths, and edge cases specific
 - Configuration files or static data
 - Obvious functionality that would break immediately if incorrect
 
-**Testing Anti-patterns to Avoid:**
-```javascript
-// DON'T: Testing library functionality
-test('useState updates state', () => {
-  // This tests React, not your code
-});
-
-// DON'T: Testing trivial getters
-test('getName returns name property', () => {
-  expect(user.getName()).toBe(user.name);
-});
-
-// DON'T: Comprehensive test suites for simple functions
-test('add function with 15 different number combinations', () => {
-  // Overkill for a simple addition function
-});
-```
-
-**Testing Positive Patterns:**
-```javascript
-// DO: Test business logic
-test('calculateOrderTotal applies correct discounts and tax', () => {
-  // Tests your specific calculation logic
-});
-
-// DO: Test critical paths
-test('payment processing handles failed transactions', () => {
-  // Tests important error handling
-});
-
-// DO: Test edge cases
-test('user registration handles duplicate emails', () => {
-  // Tests specific business rule
-});
-```
-
 **Test Task Creation Rules:**
 - Combine related test scenarios into single tasks (e.g., "Test user authentication flow" not separate tasks for login, logout, validation)
 - Focus on integration and critical path testing over unit test coverage
 - Avoid creating separate tasks for testing each CRUD operation individually
 - Question whether simple functions need dedicated test tasks
-
 
 ### Process
 
@@ -245,6 +208,8 @@ The schema for this frontmatter is:
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
+
+Use your internal TODO tool to track these and keep on track.
 
 ## Technical Requirements
 [Specific technical details, APIs, libraries, etc. - use this to infer appropriate skills]
