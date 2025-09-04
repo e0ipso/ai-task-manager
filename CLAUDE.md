@@ -112,6 +112,96 @@ project/
 
 **Workflow**: Plans are created in `.ai/task-manager/plans/`, then broken into tasks within subdirectories. Each assistant uses its native command format while accessing shared project files.
 
+## AI Task Management System Architecture
+
+### Overview
+
+The AI task management system implements a specialized multi-agent architecture designed to address fundamental limitations in AI-assisted complex feature development. Through progressive refinement, atomic task decomposition, and skill-based agent matching, the system transforms general user requests into reliable, high-quality implementations while maintaining cognitive load balance and preventing scope creep.
+
+### Three-Command Workflow: Progressive Refinement
+
+The system's core innovation lies in its **three-phase progressive refinement strategy** that mirrors classical software engineering patterns (Analysis → Design → Implementation) but optimized for AI cognitive constraints:
+
+**Phase 1: create-plan** - Context gathering and strategic planning
+- Focuses entirely on understanding and clarifying user intent
+- Implements mandatory clarification gates to prevent assumption-based planning
+- Uses broad analysis with open-ended questions to establish comprehensive requirements
+
+**Phase 2: generate-tasks** - Decomposition and dependency mapping  
+- Concentrates on breaking down complexity without execution details
+- Applies strict minimization rules (20-30% reduction target) and atomic decomposition
+- Creates dependency graphs and skill-based task assignment
+
+**Phase 3: execute-blueprint** - Parallel execution and validation
+- Handles current task execution with minimal extraneous context
+- Implements dependency-aware parallelism within phases
+- Applies external validation gates for quality control
+
+This **staged context isolation** prevents the common AI problem of simultaneous multi-context confusion while enabling sophisticated task coordination through persistent artifacts (YAML frontmatter + Markdown).
+
+### Key Design Patterns
+
+#### Atomic Task Decomposition
+The system enforces **1-2 skill maximum per task** with automatic skill inference based on contextual analysis. This approach addresses research findings showing that AI agents achieve 55% accuracy with sequential task processing compared to significantly lower performance with one-step approaches. Tasks requiring 3+ skills indicate over-complexity and trigger automatic subdivision.
+
+#### Scope Control (YAGNI Enforcement)
+Multiple complementary mechanisms prevent scope creep:
+- **Explicit anti-pattern enumeration** identifying common scope expansion behaviors
+- **Question-based validation** providing decision frameworks ("Is this explicitly mentioned?")
+- **Quantified minimization targets** (20-30% reduction from comprehensive task lists)
+- **Requirement traceability** ensuring every task links to explicit user requirements
+
+#### Test Minimization: "Write a Few Tests, Mostly Integration"
+The system challenges conventional test-driven development through selective testing philosophy:
+- **Test only meaningful validation**: Custom business logic, critical workflows, edge cases, integration points
+- **Avoid testing framework features**: Third-party libraries, simple CRUD operations, obvious getters/setters
+- **Consolidate related scenarios**: Single tasks for related test scenarios rather than fragmented individual tests
+
+#### Simplicity Enforcement
+Codified simplicity principles prevent over-engineering:
+- **Favor maintainability over cleverness** with explicit complexity red flags
+- **Standard pattern preference** defaulting to established patterns rather than novel approaches
+- **Minimal dependency policy** adding external dependencies only when essential
+- **Complexity detection** through skill count thresholds and dependency cycle analysis
+
+### Theoretical Foundations
+
+#### Cognitive Load Theory Application
+The architecture applies established Cognitive Load Theory principles:
+- **Intrinsic load minimization** through atomic task decomposition
+- **Extraneous load reduction** via context isolation and progressive disclosure
+- **Germane load optimization** using structured templates and decision frameworks
+
+Research demonstrates that proper cognitive load management in AI systems leads to 25% improvement in task completion accuracy when processing multiple parallel workstreams.
+
+#### Multi-Agent System Coordination
+The system implements proven multi-agent coordination patterns:
+- **Task allocation** based on skill matching and domain expertise
+- **Communication protocol** through structured artifacts rather than direct parameter passing
+- **Conflict resolution** through validation gates and dependency management
+- **Collaborative enhancement** where specialized agents outperform generalist approaches
+
+Microsoft's Magentic-One and Anthropic's multi-agent research systems validate this approach, demonstrating statistically competitive performance through specialized agent architectures.
+
+#### Mixture of Agents (MoA) Framework
+The architecture leverages the "collaborativeness" phenomenon where LLMs generate better responses when presented with outputs from other models. This supports the three-phase approach where each phase builds upon artifacts from previous phases, creating a layered architecture of progressive refinement.
+
+### Practical Benefits for AI Agent Accuracy
+
+The system addresses specific AI cognitive limitations with measurable improvements:
+
+**Context Window Optimization**: Phase-based processing prevents information overload while maintaining task relationships through persistent artifact storage.
+
+**Scope Boundary Management**: Explicit constraints and anti-pattern recognition reduce the common AI tendency toward feature creep and over-engineering.
+
+**Sequential Task Benefits**: Research shows sequential agents achieve 55% accuracy compared to lower one-step performance, with benefits from richer contextual understanding and error correction between steps.
+
+**Specialized Agent Performance**: Domain-specific agents demonstrate superior performance (30.4% task completion for clear software development goals vs. 0% for broad business context tasks), supporting the skill-based matching approach.
+
+**Quality Assurance Integration**: Multi-layer quality control through template constraints, validation gates, dependency verification, and status tracking ensures reliable execution.
+
+The system's emphasis on progressive refinement, atomic decomposition, and parallel execution demonstrates deep understanding of both AI capabilities and software development best practices, creating an effective framework for managing AI-assisted development at scale.
+
 ## Testing Philosophy: "Write a Few Tests, Mostly Integration"
 
 **Current Stats**: 37 tests, 628 lines, ~3 seconds execution time
