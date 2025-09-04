@@ -1,3 +1,12 @@
+## 1.2.0 (2025-09-04)
+
+* feat: complete archive functionality implementation in templates ([a39461f](https://github.com/e0ipso/ai-task-manager/commit/a39461f))
+* feat: update create-plan template for archive-aware plan ID detection ([ae3c2b4](https://github.com/e0ipso/ai-task-manager/commit/ae3c2b4))
+* refactor: remove invalid archive integration tests ([0915531](https://github.com/e0ipso/ai-task-manager/commit/0915531))
+* test: add comprehensive integration tests for archive functionality ([b931742](https://github.com/e0ipso/ai-task-manager/commit/b931742))
+* docs: complete AI task management system documentation and analysis ([a451652](https://github.com/e0ipso/ai-task-manager/commit/a451652))
+* chore: add linting to pre-commit hook ([4f94e66](https://github.com/e0ipso/ai-task-manager/commit/4f94e66))
+
 ## <small>1.1.4 (2025-09-03)</small>
 
 * fix: improve task generation ([a428d29](https://github.com/e0ipso/ai-task-manager/commit/a428d29))
