@@ -95,7 +95,7 @@ The schema for this frontmatter is:
 
 **Auto-generate the next plan ID:**
 ```bash
-echo $(($(find .ai/task-manager/plans -name "plan-*.md" -exec grep "^id:" {} \; | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
+echo $(($(find .ai/task-manager/{plans,archive} -name "plan-*.md" -exec grep "^id:" {} \; 2>/dev/null | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
 ```
 
 **Key formatting:**
