@@ -23,7 +23,7 @@ task cannot be worked on (or completed) before some other task(s) are completed.
 
 To find a plan document from its ID use the following command (replace {planId} with the ID, like 06):
 ```shell
-find . -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?{planId}$" {} \;
+find .ai/task-manager/{plans,archive} -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?{planId}$" {} \;
 ```
 
 Plans, and tasks are stored as MarkDown files with a YAML front-matter. They are
@@ -34,7 +34,7 @@ Plans are organized as follows:
 ```
 .ai/
   task-manager/
-    plans/
+    plans/           # Active plans (work in progress)
       01--authentication-provider/
         plan-01--authentication-provider.md
         tasks/
@@ -43,6 +43,13 @@ Plans are organized as follows:
           03--this-example-task.md
           04--create-tests.md
           05--update-documentation.md
+    archive/         # Completed plans (successfully executed)
+      05--user-management/
+        plan-05--user-management.md
+        tasks/
+          01--create-user-model.md
+          02--implement-crud-operations.md
+          03--add-validation.md
 ```
 
 Note how in the `.ai/task-manager/plans/` folder we have a sub-folder per plan.
@@ -52,3 +59,18 @@ document has a name following the pattern `plan-[ID]--[plan-short-name].md`.
 Finally, all tasks are under a `tasks` sub-folder. Each task has a name 
 according to the pattern `[incremental-ID]--[task-short-name].md`. IDs for tasks
 are auto-incremental within a plan. Each plan starts their tasks' IDs from 01.
+
+## Plan Lifecycle and Archive System
+
+Plans follow a lifecycle that maintains workspace organization:
+
+1. **Active Plans**: When created, plans are placed in the `plans/` directory where they remain while being worked on.
+
+2. **Completed Plans**: Upon successful execution of a blueprint (via `/tasks:execute-blueprint`), the entire plan directory is automatically moved from `plans/` to `archive/`.
+
+3. **Archive Directory**: The `archive/` directory serves as permanent storage for completed work. This separation keeps the active workspace clean while preserving completed plans for reference.
+
+The archive system provides several benefits:
+- **Workspace Organization**: Active plans remain easily accessible while completed work doesn't clutter the workspace
+- **Historical Reference**: Completed plans and their tasks remain available for future reference or learning
+- **Automatic Management**: No manual intervention required - archival happens automatically upon successful completion

@@ -161,3 +161,50 @@ Upon blueprint completion respond with the following to the user:
 - **Resource awareness**: Balance agent allocation with system capabilities
 - **Early failure detection**: Monitor tasks actively to catch issues quickly
 - **Continuous improvement**: Note patterns for future blueprint optimization
+
+## Post-Execution Processing
+
+Upon successful completion of all phases and validation gates, perform the following additional steps:
+
+### 1. Execution Summary Generation
+
+Append an execution summary section to the plan document with the following format:
+
+```markdown
+## Execution Summary
+
+**Status**: ✅ Completed Successfully
+**Completed Date**: [YYYY-MM-DD]
+**Total Execution Time**: [duration]
+
+### Results
+[Brief summary of execution results and key deliverables]
+
+### Noteworthy Events
+[Highlight any unexpected events, challenges overcome, or significant findings during execution. If none occurred, state "No significant issues encountered."]
+
+### Final Validation
+✅ All validation gates passed
+✅ All tasks completed successfully
+```
+
+### 2. Plan Archival
+
+After successfully appending the execution summary:
+
+1. **Create archive directory if needed**:
+   ```bash
+   mkdir -p .ai/task-manager/archive
+   ```
+
+2. **Move completed plan to archive**:
+   ```bash
+   mv .ai/task-manager/plans/[plan-folder] .ai/task-manager/archive/
+   ```
+
+### Important Notes
+
+- **Only archive on complete success**: Archive operations should only occur when ALL phases are completed and ALL validation gates have passed
+- **Failed executions remain active**: Plans that fail execution or validation should remain in the `plans/` directory for debugging and potential re-execution
+- **Error handling**: If archival fails, log the error but do not fail the overall execution - the implementation work is complete
+- **Preserve structure**: The entire plan folder (including all tasks and subdirectories) should be moved as-is to maintain referential integrity
