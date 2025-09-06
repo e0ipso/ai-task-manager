@@ -79,8 +79,8 @@ Before starting execution check if you are in the `main` branch. If so, create a
 
 ### Agent Selection Guidelines
 
-#### Available Claude Code Sub-Agents
-Analyze the sub-agents available under `.claude/agents`. If none are available
+#### Available Task-Specific Agents
+Analyze the task-specific agents available in your current assistant's agents directory. If none are available
 or the available ones do not match the task's requirements, then use a generic
 agent.
 
