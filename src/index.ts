@@ -64,8 +64,8 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Show success message with created directories
     await logger.success('🎉 AI Task Manager initialized successfully!');
 
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md')}`);
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md')}`);
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER.md')}`);
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md')}`);
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
       await logger.info(
@@ -124,12 +124,12 @@ export async function init(options: InitOptions): Promise<CommandResult> {
 async function copyCommonTemplates(baseDir: string): Promise<void> {
   const templates = [
     {
-      source: getTemplatePath('ai-task-manager/TASK_MANAGER_INFO.md'),
-      dest: resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md'),
+      source: getTemplatePath('ai-task-manager/config/TASK_MANAGER.md'),
+      dest: resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER.md'),
     },
     {
-      source: getTemplatePath('ai-task-manager/VALIDATION_GATES.md'),
-      dest: resolvePath(baseDir, '.ai/task-manager/VALIDATION_GATES.md'),
+      source: getTemplatePath('ai-task-manager/config/hooks/POST_PHASE.md'),
+      dest: resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md'),
     },
   ];
 
@@ -161,13 +161,13 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
   await logger.debug(`🎨 Using ${templateFormat} template format for ${assistant} assistant`);
 
   // Copy assistant-specific command templates with appropriate format
-  const commandTemplateNames = await getMarkdownTemplateNames('commands/tasks');
+  const commandTemplateNames = await getMarkdownTemplateNames('assistant/commands/tasks');
 
   for (const templateName of commandTemplateNames) {
     const templateFile = `${templateName}.${templateFormat}`;
 
     // Always read from the MD template source (DRY principle)
-    const mdSourcePath = getTemplatePath(`commands/tasks/${templateName}.md`);
+    const mdSourcePath = getTemplatePath(`assistant/commands/tasks/${templateName}.md`);
     const destPath = resolvePath(baseDir, `.${assistant}/commands/tasks/${templateFile}`);
 
     // Check if MD source template exists
@@ -242,8 +242,8 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
   console.log('│                                                            │');
   console.log('│  🔧 Review and tweak these files to match your project:    │');
-  console.log('│  • .ai/task-manager/TASK_MANAGER_INFO.md                   │');
-  console.log('│  • .ai/task-manager/VALIDATION_GATES.md                    │');
+  console.log('│  • .ai/task-manager/TASK_MANAGER.md                   │');
+  console.log('│  • .ai/task-manager/POST_PHASE.md                    │');
   console.log('│                                                            │');
   console.log(`└${thinSeparator}┘`);
   console.log('');

@@ -43,7 +43,7 @@ This project implements a hierarchical task management system for AI-assisted de
 - **Plans**: Comprehensive documents breaking down work orders into structured approaches
 - **Tasks**: Atomic units with dependencies and specific skill requirements
 
-Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/tasks:execute-blueprint`) to guide users through the hierarchy. All artifacts are Markdown files with YAML front-matter under `.ai/task-manager/`. See `TASK_MANAGER_INFO.md` and `VALIDATION_GATES.md` for specifications.
+Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/tasks:execute-blueprint`) to guide users through the hierarchy. All artifacts are Markdown files with YAML front-matter under `.ai/task-manager/`. See `TASK_MANAGER.md` and `POST_PHASE.md` for specifications.
 
 ## Code Architecture
 
@@ -98,8 +98,13 @@ Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/t
 project/
 ├── .ai/task-manager/           # Shared project configuration
 │   ├── plans/                  # Generated plans with task subdirectories
-│   ├── TASK_MANAGER_INFO.md    # Project context (user-editable)
-│   └── VALIDATION_GATES.md     # Quality criteria (user-editable)
+│   ├── config/
+│       ├── TASK_MANAGER.md    # Project context (user-editable)
+│       └── hooks/
+│           └── POST_PHASE.md  # Quality criteria (user-editable)
+│   └── templates/              # Project-specific templates
+│       ├── PLAN_TEMPLATE.md    # Customizable plan template
+│       └── TASK_TEMPLATE.md    # Customizable task template
 ├── .claude/commands/tasks/     # Claude commands (Markdown format)
 │   ├── create-plan.md
 │   ├── execute-blueprint.md
@@ -109,6 +114,49 @@ project/
     ├── execute-blueprint.toml
     └── generate-tasks.toml
 ```
+
+## Customizing Plan and Task Templates
+
+### Template Structure
+
+**Plan Template Sections:**
+- YAML Frontmatter (id, summary, created)
+- Original Work Order
+- Plan Clarifications
+- Executive Summary
+- Context
+- Technical Implementation Approach
+- Risk Considerations
+- Success Criteria
+- Resource Requirements
+
+**Task Template Sections:**
+- YAML Frontmatter (id, group, dependencies, status, created, skills)
+- Objective
+- Skills Required
+- Acceptance Criteria
+- Technical Requirements
+- Input Dependencies
+- Output Artifacts
+- Implementation Notes
+
+### Modification Guidelines
+
+1. **Source Templates:**
+   - Located in `/workspace/templates/ai-task-manager/templates/`
+   - Modify `PLAN_TEMPLATE.md` and `TASK_TEMPLATE.md`
+
+2. **Customization Limits:**
+   - Maintain YAML frontmatter structure
+   - Keep core sections intact
+   - Add project-specific sections as needed
+   - Avoid removing critical metadata fields
+
+3. **Best Practices:**
+   - Add context-specific guidance
+   - Include project-specific validation criteria
+   - Create sections that capture unique workflow requirements
+   - Keep templates concise and focused
 
 **Workflow**: Plans are created in `.ai/task-manager/plans/`, then broken into tasks within subdirectories. Each assistant uses its native command format while accessing shared project files.
 
