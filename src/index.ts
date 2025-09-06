@@ -68,14 +68,16 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md')}`);
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
+      // Open Code uses 'command' (singular) instead of 'commands' (plural)
+      const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
       await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/commands/tasks/create-plan.${templateFormat}`)}`
+        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/create-plan.${templateFormat}`)}`
       );
       await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/commands/tasks/execute-blueprint.${templateFormat}`)}`
+        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/execute-blueprint.${templateFormat}`)}`
       );
       await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/commands/tasks/generate-tasks.${templateFormat}`)}`
+        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/generate-tasks.${templateFormat}`)}`
       );
     }
 
@@ -151,7 +153,9 @@ async function copyCommonTemplates(baseDir: string): Promise<void> {
  */
 async function createAssistantStructure(assistant: Assistant, baseDir: string): Promise<void> {
   // Create assistant directory structure
-  const tasksDir = resolvePath(baseDir, `.${assistant}/commands/tasks`);
+  // Open Code uses 'command' (singular) instead of 'commands' (plural)
+  const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
+  const tasksDir = resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks`);
 
   await ensureDir(tasksDir);
   await logger.debug(`🏗️ Created directory structure for ${assistant} in ${tasksDir}`);
@@ -168,7 +172,7 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
     // Always read from the MD template source (DRY principle)
     const mdSourcePath = getTemplatePath(`assistant/commands/tasks/${templateName}.md`);
-    const destPath = resolvePath(baseDir, `.${assistant}/commands/tasks/${templateFile}`);
+    const destPath = resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/${templateFile}`);
 
     // Check if MD source template exists
     if (!(await exists(mdSourcePath))) {
@@ -206,21 +210,25 @@ export async function getInitInfo(baseDir?: string): Promise<{
   hasAiTaskManager: boolean;
   hasClaudeConfig: boolean;
   hasGeminiConfig: boolean;
+  hasOpencodeConfig: boolean;
   assistants: Assistant[];
 }> {
   const targetDir = baseDir || '.';
   const hasAiTaskManager = await exists(resolvePath(targetDir, '.ai/task-manager'));
   const hasClaudeConfig = await exists(resolvePath(targetDir, '.claude/commands/tasks'));
   const hasGeminiConfig = await exists(resolvePath(targetDir, '.gemini/commands/tasks'));
+  const hasOpencodeConfig = await exists(resolvePath(targetDir, '.opencode/command/tasks'));
 
   const assistants: Assistant[] = [];
   if (hasClaudeConfig) assistants.push('claude');
   if (hasGeminiConfig) assistants.push('gemini');
+  if (hasOpencodeConfig) assistants.push('opencode');
 
   return {
     hasAiTaskManager,
     hasClaudeConfig,
     hasGeminiConfig,
+    hasOpencodeConfig,
     assistants,
   };
 }
