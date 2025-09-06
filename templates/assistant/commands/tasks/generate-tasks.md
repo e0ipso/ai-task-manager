@@ -120,6 +120,185 @@ Tests that verify custom business logic, critical paths, and edge cases specific
 7. **Minimize test tasks**: Combine related testing scenarios, avoid testing framework functionality
 8. Be very detailed with the "Implementation Notes". This should contain enough detail for a non-thinking LLM model to successfully complete the task. Put these instructions in a collapsible field `<details>`.
 
+#### Step 1.5: Complexity Analysis and Refinement
+After initial task creation, evaluate each task for complexity and apply recursive decomposition where needed.
+
+**1.5.1: Complexity Scoring**
+
+For each task, assess complexity across five dimensions using a 1-10 scale:
+
+<details>
+<summary><strong>Complexity Scoring Rubrics (Click to expand)</strong></summary>
+
+**Technical Depth (1-10)**
+- 1-2: Basic operations, no specialized knowledge (e.g., "Change button text")
+- 3-4: Single technology, well-documented patterns (e.g., "Add email validation")
+- 5-6: 2-3 technologies, some integration complexity (e.g., "JWT authentication")
+- 7-8: Multiple complex technologies, advanced patterns (e.g., "Real-time WebSocket communication")
+- 9-10: Cutting-edge technologies, novel implementations (e.g., "Custom compiler optimization")
+
+**Decision Complexity (1-10)**
+- 1-2: No decisions, follow existing patterns (e.g., "Duplicate component with different props")
+- 3-4: 1-2 minor decisions with clear best practices (e.g., "Choose input type for phone field")
+- 5-6: Several decisions with trade-offs (e.g., "Design user preferences storage")
+- 7-8: Many interdependent decisions, architectural impact (e.g., "Design notification system architecture")
+- 9-10: Complex decision trees, novel solutions required (e.g., "Design fault-tolerant distributed pipeline")
+
+**Integration Points (1-10)**
+- 1-2: Single file, no external dependencies (e.g., "Add validation function to utils")
+- 3-4: 2-3 files in same module (e.g., "Add method to service class with tests")
+- 5-6: Multiple modules, some external APIs (e.g., "Add Stripe payment processing")
+- 7-8: Many systems, complex data flow (e.g., "User analytics with database, Redis, external tracking")
+- 9-10: Extensive system modifications (e.g., "Migrate REST to GraphQL across 15+ services")
+
+**Scope Breadth (1-10)**
+- 1-2: Single atomic action (e.g., "Fix spelling error in message")
+- 3-4: Small feature, clear boundaries (e.g., "Add password strength indicator")
+- 5-6: Complete feature with multiple functions (e.g., "User profile editing with image upload")
+- 7-8: Major feature, multiple workflows (e.g., "Comprehensive order management system")
+- 9-10: Multiple major features, entire subsystem (e.g., "Complete multi-tenant SaaS platform")
+
+**Uncertainty Level (1-10)**
+- 1-2: Crystal clear requirements (e.g., "Add required field validation")
+- 3-4: Minor ambiguities, standard solutions (e.g., "Style component to match design system")
+- 5-6: Some clarification needed (e.g., "Optimize page load time - no specific target")
+- 7-8: Significant unknowns, research required (e.g., "Real-time features - latency requirements TBD")
+- 9-10: Major unknowns, experimental solutions (e.g., "Evaluate AI-powered feature feasibility")
+
+**Composite Score Calculation**
+Apply weighted maximum formula:
+```
+Composite Score = MAX(
+  Technical Depth × 1.0,
+  Decision Complexity × 0.9,
+  Integration Points × 0.8,
+  Scope Breadth × 0.7,
+  Uncertainty Level × 1.1
+)
+```
+
+</details>
+
+**1.5.2: Decomposition Decision Matrix**
+
+Apply decomposition based on complexity scores:
+- **Composite Score ≥ 6**: Consider decomposition
+- **Any dimension ≥ 8**: Mandatory decomposition  
+- **Multiple dimensions ≥ 6**: High decomposition candidate
+
+<details>
+<summary><strong>Decomposition Patterns (Click to expand)</strong></summary>
+
+**Pattern Selection Matrix:**
+
+| Primary Driver | Pattern | Strategy |
+|----------------|---------|----------|
+| Technical Depth | Technology Layering | Split by technology/framework boundaries |
+| Decision Complexity | Decision-Implementation Split | Separate decision-making from implementation |
+| Integration Points | Integration Isolation | Isolate core functionality from integration concerns |
+| Scope Breadth | Functional Decomposition | Split by functional or user story boundaries |
+| Uncertainty | Research-Implementation Split | Separate research/clarification from execution |
+
+**Technology Layering Pattern:**
+```
+Original: [Multi-technology task]
+→ Task A: [Technology 1 components]
+→ Task B: [Technology 2 components]  
+→ Task C: [Integration between technologies]
+→ Task D: [Cross-technology testing]
+```
+
+**Decision-Implementation Split Pattern:**
+```
+Original: [High-decision task]
+→ Task A: Research and analyze options
+→ Task B: Document decision rationale
+→ Task C: Implement core functionality
+→ Task D: Implement secondary features
+```
+
+**Integration Isolation Pattern:**
+```
+Original: [Multi-integration task]
+→ Task A: Implement core feature in isolation
+→ Task B: Integration with System 1
+→ Task C: Integration with System 2
+→ Task D: Error handling and fallback
+→ Task E: End-to-end integration testing
+```
+
+**Functional Decomposition Pattern:**
+```
+Original: [Broad feature task]
+→ Task A: [User workflow 1]
+→ Task B: [User workflow 2]
+→ Task C: [Shared/common functionality]
+→ Task D: [Integration validation]
+```
+
+**Research-Implementation Split Pattern:**
+```
+Original: [High-uncertainty task]
+→ Task A: Research and prototype unknowns
+→ Task B: Document findings and approach
+→ Task C: Implement solution
+→ Task D: Validate against requirements
+```
+
+</details>
+
+**1.5.3: Recursive Decomposition Process**
+
+For tasks requiring decomposition:
+
+1. **Apply AIDVR Process**:
+   - **A**ssess: Confirm decomposition need and feasibility
+   - **I**dentify: Map components and natural breakpoints
+   - **D**ecompose: Select and apply appropriate pattern
+   - **V**alidate: Ensure subtasks meet quality criteria
+   - **R**econstruct: Rebuild dependency relationships
+
+2. **Validation Criteria for Decomposed Tasks**:
+   - Each subtask complexity score ≤ 5 (target ≤ 4)
+   - All original requirements covered
+   - Dependencies clearly defined and acyclic
+   - Skills required per subtask ≤ 2
+   - Clear acceptance criteria for each subtask
+
+3. **Re-iteration Requirements**:
+   - If any subtask still scores >5, repeat decomposition
+   - Maximum 3 decomposition iterations to prevent over-granularization
+   - Document decomposition rationale for complex cases
+
+<details>
+<summary><strong>Decomposition Stop Conditions (Click to expand)</strong></summary>
+
+**DO NOT decompose further if any condition is met:**
+
+1. **Atomic Boundary**: Task cannot be meaningfully split without losing coherence
+2. **Skill Coherence**: Would create tasks requiring <1 skill or fragmented knowledge  
+3. **Overhead Burden**: Decomposition creates more coordination than execution benefit
+4. **Resource Fragmentation**: Subtasks would compete for same constrained resources
+5. **Time Granularity**: Subtasks would each take <2 hours (too granular for planning)
+
+**Quality Assurance Checklist:**
+- [ ] Coverage: All original requirements covered by subtasks
+- [ ] Coherence: Each subtask has clear, single purpose  
+- [ ] Completeness: Dependencies explicitly defined and achievable
+- [ ] Consistency: Task complexity reduced without losing functionality
+- [ ] Clarity: Each subtask has measurable acceptance criteria
+- [ ] Coordination: Integration plan exists for subtask outputs
+
+</details>
+
+**1.5.4: Complexity Documentation**
+
+For each task (original or decomposed), document:
+- Individual dimension scores (Technical, Decision, Integration, Scope, Uncertainty)
+- Composite complexity score  
+- Decomposition rationale (if applied)
+- Skills required (inferred from complexity analysis)
+
 #### Step 2: Dependency Analysis
 For each task, identify:
 - **Hard dependencies**: Tasks that MUST complete before this can start
@@ -147,6 +326,9 @@ dependencies: []  # List of task IDs, e.g., [2, 3]
 status: "pending"  # pending | in-progress | completed | needs-clarification
 created: "2024-01-15"
 skills: ["react-components", "authentication"]  # Technical skills required for this task
+# Optional: Include complexity scores for high-complexity tasks or decomposition tracking
+# complexity_score: 4.2  # Composite complexity score (only if >4 or decomposed)
+# complexity_notes: "Decomposed from original task due to high technical depth"
 ---
 ```
 
@@ -190,6 +372,16 @@ The schema for this frontmatter is:
       },
       "minItems": 1,
       "uniqueItems": true
+    },
+    "complexity_score": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Optional: Composite complexity score (include only if >4 or for decomposed tasks)"
+    },
+    "complexity_notes": {
+      "type": "string",
+      "description": "Optional: Rationale for complexity score or decomposition decisions"
     }
   },
   "additionalProperties": false
@@ -290,6 +482,10 @@ If the command fails or returns unexpected results:
 Before finalizing, ensure:
 - [ ] Each task has 1-2 appropriate technical skills assigned
 - [ ] Skills are automatically inferred from task objectives and technical requirements
+- [ ] **Complexity Analysis Complete**: All tasks assessed using 5-dimension scoring
+- [ ] **Decomposition Applied**: Tasks with composite score ≥6 have been decomposed or justified
+- [ ] **Final Task Complexity**: All final tasks have composite score ≤5 (target ≤4)
+- [ ] **Decomposition Quality**: Any decomposed tasks meet quality assurance criteria
 - [ ] All dependencies form an acyclic graph
 - [ ] Task IDs are unique and sequential
 - [ ] Groups are consistent and meaningful
