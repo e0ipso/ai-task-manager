@@ -1,7 +1,7 @@
 # Task Manager General Information
 
 This document contains important information that is common to all the /task:*
-commands for Claude Code.
+commands for AI assistants.
 
 ## Types of Documents
 
