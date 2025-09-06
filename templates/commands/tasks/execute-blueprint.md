@@ -79,8 +79,8 @@ Select agents based on:
 
 Update the list of tasks from the plan document to add the status of each task
 and phase. Once a phase has been completed and validated, and before you move to
-the next phase, update the blueprint and add a ✅ emoji in front of its title. 
-Add ✔️ emoji in front of all the tasks in that phase, and update their status to 
+the next phase, update the blueprint and add a ✅ emoji in front of its title.
+Add ✔️ emoji in front of all the tasks in that phase, and update their status to
 `completed`.
 
 #### Task Status Updates

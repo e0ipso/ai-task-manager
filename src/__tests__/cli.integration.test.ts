@@ -1,6 +1,6 @@
 /**
  * CLI Integration Tests - Consolidated Edition
- * 
+ *
  * Focused integration tests covering all critical CLI workflows with minimal mocking.
  * Tests real file system operations and CLI command execution in temporary directories.
  * Covers 8 core scenarios: basic functionality, single/multiple assistant init, path resolution,
@@ -38,7 +38,7 @@ describe('CLI Integration Tests - Consolidated', () => {
 
   const executeCommand = (command: string): { stdout: string; stderr: string; exitCode: number } => {
     try {
-      const stdout = execSync(command, { 
+      const stdout = execSync(command, {
         encoding: 'utf8',
         cwd: testDir,
         stdio: ['pipe', 'pipe', 'pipe']

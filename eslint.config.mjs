@@ -32,8 +32,8 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       'prettier/prettier': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_', 
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
         destructuredArrayIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
@@ -80,8 +80,8 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       'prettier/prettier': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_', 
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
         destructuredArrayIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
