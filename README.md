@@ -3,11 +3,11 @@
 [![npm version](https://img.shields.io/npm/v/@e0ipso/ai-task-manager.svg)](https://www.npmjs.com/package/@e0ipso/ai-task-manager)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-AI-powered task management CLI tool to improve your context. It supports multiple coding assistants including Claude and Gemini for comprehensive development workflow integration.
+AI-powered task management CLI tool to improve your context. It supports multiple coding assistants including Claude, Gemini, and Open Code for comprehensive development workflow integration.
 
 ## ✨ Features
 
-- 🤝 **Multi-Assistant Support**: Configure support for Claude, and Gemini
+- 🤝 **Multi-Assistant Support**: Configure support for Claude, Gemini, and Open Code
 - 📋 **Template System**: Built-in templates for different project types (basic, development, research)
 
 ## 💰 Intelligent Token Usage
@@ -41,6 +41,7 @@ AI Task Manager supports multiple coding assistants. You **must** specify which 
 
 - 🎭 **Claude**: Anthropic's Claude AI assistant
 - 💎 **Gemini**: Google's Gemini AI assistant
+- 📝 **Open Code**: Open source code assistant
 
 The `--destination-directory` flag allows you to specify an alternative directory for the workspace. By default, the workspace is initialized in the current working directory.
 
@@ -51,8 +52,13 @@ npx @e0ipso/ai-task-manager init --assistants claude
 # Gemini only
 npx @e0ipso/ai-task-manager init --assistants gemini
 
-# Both Claude and Gemini
+# Open Code only
+npx @e0ipso/ai-task-manager init --assistants opencode
+
+# Multiple assistants
 npx @e0ipso/ai-task-manager init --assistants claude,gemini
+npx @e0ipso/ai-task-manager init --assistants claude,opencode
+npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
 ```
 
 If the script detects that any of the folders it needs to create already exist it merge the folder structures, but it will overwrite the files in them.
@@ -64,22 +70,28 @@ When you initialize with assistant selection, the following directory structure 
 ```
 project-root/
 ├── .ai/
-│   └── task-manager/              # Claude-specific files (if selected)
+│   └── task-manager/              # Shared configuration files
 │       ├── plans
 │       ├── TASK_MANAGER.md   # General information to operate the task manager
 │       └── POST_PHASE.md    # Validation gates for phase completion
-├── .claude/
+├── .claude/                       # Claude files (if selected)
 │   └── commands/                  # Custom slash commands for Claude
 │       └── tasks/
 │           ├── create-plan.md
 │           ├── execute-blueprint.md
 │           └── generate-tasks.md
-├── .gemini/
+├── .gemini/                       # Gemini files (if selected)
 │   └── commands/                  # Custom slash commands for Gemini
 │       └── tasks/
 │           ├── create-plan.toml
 │           ├── execute-blueprint.toml
 │           └── generate-tasks.toml
+├── .opencode/                     # Open Code files (if selected)
+│   └── commands/                  # Custom slash commands for Open Code
+│       └── tasks/
+│           ├── create-plan.md
+│           ├── execute-blueprint.md
+│           └── generate-tasks.md
 └── project files...
 ```
 
