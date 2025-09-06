@@ -1,3 +1,9 @@
+## <small>1.2.1 (2025-09-06)</small>
+
+* docs: update README.md ([2c9a88a](https://github.com/e0ipso/ai-task-manager/commit/2c9a88a))
+* fix: improve plan generation ([109fcfb](https://github.com/e0ipso/ai-task-manager/commit/109fcfb))
+* fix: refine task generation and execution ([47f5157](https://github.com/e0ipso/ai-task-manager/commit/47f5157))
+
 ## 1.2.0 (2025-09-04)
 
 * feat: complete archive functionality implementation in templates ([a39461f](https://github.com/e0ipso/ai-task-manager/commit/a39461f))
