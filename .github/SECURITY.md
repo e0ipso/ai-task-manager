@@ -12,7 +12,7 @@ The CI/CD pipeline includes automated dependency vulnerability scanning using np
 
 - **Frequency**: Every pull request and release
 - **Scope**: All production and development dependencies
-- **Thresholds**: 
+- **Thresholds**:
   - ❌ **Critical vulnerabilities**: Block PR merge
   - ❌ **High vulnerabilities**: Block PR merge
   - ⚠️ **Moderate vulnerabilities**: Warning, no block

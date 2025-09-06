@@ -5,17 +5,17 @@ commands for Claude Code.
 
 ## Types of Documents
 
-Work orders (abbreviated as WO) are complex prompts for programming, 
+Work orders (abbreviated as WO) are complex prompts for programming,
 organizational, or management tasks created by a user. Work orders are
-independent of each other and cannot share any context. By definition 
+independent of each other and cannot share any context. By definition
 different work orders can be worked on independently.
 
 Each work order has plan associated to it. The plan is a comprehensive document
 highlighting all the aspects of the work necessary to accomplish the goals from
 the work order.
 
-Each plan will be broken into tasks. Each task is a logical unit of work that 
-has a single purpose, and is solved using a single skill. All tasks exist as 
+Each plan will be broken into tasks. Each task is a logical unit of work that
+has a single purpose, and is solved using a single skill. All tasks exist as
 part of a plan. Tasks can have dependencies on other tasks. This happens when a
 task cannot be worked on (or completed) before some other task(s) are completed.
 
@@ -53,10 +53,10 @@ Plans are organized as follows:
 ```
 
 Note how in the `.ai/task-manager/plans/` folder we have a sub-folder per plan.
-Each sub-folder will contain the plan document and has a name following a naming 
-pattern `[ID]--[plan-short-name]`. Where the ID is auto-incremental. The plan 
-document has a name following the pattern `plan-[ID]--[plan-short-name].md`. 
-Finally, all tasks are under a `tasks` sub-folder. Each task has a name 
+Each sub-folder will contain the plan document and has a name following a naming
+pattern `[ID]--[plan-short-name]`. Where the ID is auto-incremental. The plan
+document has a name following the pattern `plan-[ID]--[plan-short-name].md`.
+Finally, all tasks are under a `tasks` sub-folder. Each task has a name
 according to the pattern `[incremental-ID]--[task-short-name].md`. IDs for tasks
 are auto-incremental within a plan. Each plan starts their tasks' IDs from 01.
 

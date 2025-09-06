@@ -40,7 +40,7 @@ npx . init --assistants gemini --destination-directory /tmp/test
 This project implements a hierarchical task management system for AI-assisted development:
 
 - **Work Orders**: Independent complex prompts for programming tasks
-- **Plans**: Comprehensive documents breaking down work orders into structured approaches  
+- **Plans**: Comprehensive documents breaking down work orders into structured approaches
 - **Tasks**: Atomic units with dependencies and specific skill requirements
 
 Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/tasks:execute-blueprint`) to guide users through the hierarchy. All artifacts are Markdown files with YAML front-matter under `.ai/task-manager/`. See `TASK_MANAGER_INFO.md` and `VALIDATION_GATES.md` for specifications.
@@ -127,7 +127,7 @@ The system's core innovation lies in its **three-phase progressive refinement st
 - Implements mandatory clarification gates to prevent assumption-based planning
 - Uses broad analysis with open-ended questions to establish comprehensive requirements
 
-**Phase 2: generate-tasks** - Decomposition and dependency mapping  
+**Phase 2: generate-tasks** - Decomposition and dependency mapping
 - Concentrates on breaking down complexity without execution details
 - Applies strict minimization rules (20-30% reduction target) and atomic decomposition
 - Creates dependency graphs and skill-based task assignment

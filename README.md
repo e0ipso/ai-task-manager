@@ -29,7 +29,7 @@ The `--destination-directory` flag allows you to specify an alternative director
 # Claude only
 npx @e0ipso/ai-task-manager init --assistants claude
 
-# Gemini only  
+# Gemini only
 npx @e0ipso/ai-task-manager init --assistants gemini
 
 # Both Claude and Gemini
