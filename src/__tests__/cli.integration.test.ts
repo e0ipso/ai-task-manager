@@ -78,8 +78,8 @@ describe('CLI Integration Tests - Consolidated', () => {
     }
 
     // Common template files
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/TASK_MANAGER_INFO.md'))).toBe(true);
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/VALIDATION_GATES.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/TASK_MANAGER.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/POST_PHASE.md'))).toBe(true);
   };
 
   const verifyFileContent = async (assistants: string[], customDir?: string): Promise<void> => {
@@ -256,12 +256,12 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify common template files
       const taskManagerInfo = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/TASK_MANAGER_INFO.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/TASK_MANAGER.md'), 'utf8'
       );
       expect(taskManagerInfo).toContain('# Task Manager General Information');
 
       const validationGates = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/VALIDATION_GATES.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/POST_PHASE.md'), 'utf8'
       );
       expect(validationGates).toContain('Ensure that:');
 

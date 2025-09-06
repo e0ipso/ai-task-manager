@@ -66,8 +66,8 @@ project-root/
 ├── .ai/
 │   └── task-manager/              # Claude-specific files (if selected)
 │       ├── plans
-│       ├── TASK_MANAGER_INFO.md   # General information to operate the task manager
-│       └── VALIDATION_GATES.md    # Validation gates for phase completion
+│       ├── TASK_MANAGER.md   # General information to operate the task manager
+│       └── POST_PHASE.md    # Validation gates for phase completion
 ├── .claude/
 │   └── commands/                  # Custom slash commands for Claude
 │       └── tasks/
@@ -87,7 +87,7 @@ project-root/
 
 ### 📋 One-time Setup
 
-Review and tweak the `.ai/task-manager/TASK_MANAGER_INFO.md` and `.ai/task-manager/VALIDATION_GATES.md`. These files are yours to edit and should reflect your project's tech stack and goals.
+Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/config/hooks/POST_PHASE.md`. These files are yours to edit and should reflect your project's tech stack and goals.
 
 ### 🔄 Day-to-day Workflow
 

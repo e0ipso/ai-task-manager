@@ -15,9 +15,9 @@ You are the orchestrator responsible for executing all tasks defined in the exec
 5. **Fail safely** - Better to halt and request help than corrupt the execution state
 
 ## Input Requirements
-- A plan document with an execution blueprint section. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID $1
+- A plan document with an execution blueprint section. See @.ai/task-manager/TASK_MANAGER.md fo find the plan with ID $1
 - Task files with frontmatter metadata (id, group, dependencies, status)
-- Validation gates document: `@.ai/task-manager/VALIDATION_GATES.md`
+- Validation gates document: `@.ai/task-manager/config/hooks/POST_PHASE.md`
 
 ### Input Error Handling
 If the plan does not exist, or the plan does not have an execution blueprint section. Stop immediately and show an error to the user.
@@ -57,7 +57,7 @@ Before starting execution check if you are in the `main` branch. If so, create a
     - Document any issues or exceptions encountered
 
 5. **Validation Gate Execution**
-    - Reference validation criteria from `@.ai/task-manager/VALIDATION_GATES.md`
+    - Reference validation criteria from `@.ai/task-manager/config/hooks/POST_PHASE.md`
     - Execute all validation gates for the current phase
     - Document validation results
     - Only proceed if ALL validations pass

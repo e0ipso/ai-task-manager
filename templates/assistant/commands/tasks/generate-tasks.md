@@ -5,14 +5,14 @@ description: Generate tasks to implement the plan with the provided ID.
 # Comprehensive Task List Creation
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
-Include @.ai/task-manager/TASK_MANAGER_INFO.md for the directory structure of tasks.
+Include @.ai/task-manager/TASK_MANAGER.md for the directory structure of tasks.
 
 ## Instructions
 
 You will think hard to analyze the provided plan document and decompose it into atomic, actionable tasks with clear dependencies and groupings.
 
 ### Input
-- A plan document. See @.ai/task-manager/TASK_MANAGER_INFO.md fo find the plan with ID $1
+- A plan document. See @.ai/task-manager/TASK_MANAGER.md fo find the plan with ID $1
 - The plan contains high-level objectives and implementation steps
 
 ### Input Error Handling
@@ -118,6 +118,7 @@ Tests that verify custom business logic, critical paths, and edge cases specific
 5. Ensure no task requires multiple skill sets
 6. Verify each task has clear inputs and outputs
 7. **Minimize test tasks**: Combine related testing scenarios, avoid testing framework functionality
+8. Be very detailed with the "Implementation Notes". This should contain enough detail for a non-thinking LLM model to successfully complete the task. Put these instructions in a collapsible field `<details>`.
 
 #### Step 2: Dependency Analysis
 For each task, identify:
@@ -196,32 +197,8 @@ The schema for this frontmatter is:
 ```
 
 ##### Task Body Structure
-```markdown
-## Objective
-[Clear statement of what this task accomplishes]
 
-## Skills Required
-[Reference to the skills listed in frontmatter - these should align with the technical work needed]
-
-## Acceptance Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-Use your internal TODO tool to track these and keep on track.
-
-## Technical Requirements
-[Specific technical details, APIs, libraries, etc. - use this to infer appropriate skills]
-
-## Input Dependencies
-[What artifacts/code from other tasks are needed]
-
-## Output Artifacts
-[What this task produces for other tasks to consume]
-
-## Implementation Notes
-[Any helpful context or suggestions, including skill-specific guidance]
-```
+Use the task template in @.ai/task-manager/config/templates/TASK_TEMPLATE.md
 
 ### Task ID Generation
 
@@ -367,7 +344,7 @@ The execution blueprint organizes tasks into sequential phases where:
 ## Execution Blueprint
 
 **Validation Gates:**
-- Reference: `@.ai/task-manager/VALIDATION_GATES.md`
+- Reference: `@.ai/task-manager/config/hooks/POST_PHASE.md`
 
 ### Phase 1: [Descriptive Phase Name]
 **Parallel Tasks:**
@@ -396,7 +373,7 @@ The execution blueprint organizes tasks into sequential phases where:
 
 #### Phase Transition Rules
 1. All tasks in the current phase must have status: "completed"
-2. All validation gates defined in `@.ai/task-manager/VALIDATION_GATES.md` for the current phase must pass
+2. All validation gates defined in `@.ai/task-manager/config/hooks/POST_PHASE.md` for the current phase must pass
 3. No task in a future phase can begin until these conditions are met
 
 #### Blueprint Verification
