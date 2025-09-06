@@ -32,7 +32,9 @@ npm run prepublishOnly        # Pre-publish build (auto-runs on publish)
 ```bash
 # After building, test CLI locally:
 node dist/cli.js init --assistants claude
+node dist/cli.js init --assistants opencode
 npx . init --assistants gemini --destination-directory /tmp/test
+npx . init --assistants claude,opencode,gemini --destination-directory /tmp/test
 ```
 
 ## Task Manager Conceptual Model
@@ -57,7 +59,7 @@ Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/t
 
 **Main Implementation (`src/index.ts`)**
 - `init()` function: main business logic for project initialization
-- Creates directory structures: `.ai/task-manager/`, `.claude/`, `.gemini/`
+- Creates directory structures: `.ai/task-manager/`, `.claude/`, `.gemini/`, `.opencode/`
 - Template processing workflow: reads Markdown templates, converts to appropriate format
 - Assistant-specific directory creation and template copying
 
@@ -68,7 +70,7 @@ Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/t
 - Path utilities: `resolvePath()`, cross-platform path handling
 
 **Type System (`src/types.ts`)**
-- Core types: `Assistant` ('claude' | 'gemini'), `TemplateFormat` ('md' | 'toml')
+- Core types: `Assistant` ('claude' | 'gemini' | 'opencode'), `TemplateFormat` ('md' | 'toml')
 - Custom error classes: `FileSystemError`, `ConfigError`, etc.
 - Interface definitions for options, configs, and results
 
@@ -83,8 +85,8 @@ Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/t
 1. Read Markdown template from `templates/`
 2. Parse frontmatter (YAML) and body content
 3. For Gemini: convert to TOML format with escaped content
-4. For Claude: use Markdown as-is
-5. Write to assistant-specific directory (`.claude/` or `.gemini/`)
+4. For Claude and Open Code: use Markdown as-is
+5. Write to assistant-specific directory (`.claude/`, `.gemini/`, or `.opencode/`)
 
 **Variable Transformations (MD→TOML)**
 - `$ARGUMENTS` → `{{args}}`
@@ -109,10 +111,14 @@ project/
 │   ├── create-plan.md
 │   ├── execute-blueprint.md
 │   └── generate-tasks.md
-└── .gemini/commands/tasks/     # Gemini commands (TOML format)
-    ├── create-plan.toml
-    ├── execute-blueprint.toml
-    └── generate-tasks.toml
+├── .gemini/commands/tasks/     # Gemini commands (TOML format)
+│   ├── create-plan.toml
+│   ├── execute-blueprint.toml
+│   └── generate-tasks.toml
+└── .opencode/commands/tasks/   # Open Code commands (Markdown format)
+    ├── create-plan.md
+    ├── execute-blueprint.md
+    └── generate-tasks.md
 ```
 
 ## Customizing Plan and Task Templates
@@ -282,8 +288,8 @@ The system's emphasis on progressive refinement, atomic decomposition, and paral
 ### Template Development
 1. Create/edit Markdown templates in `templates/commands/tasks/`
 2. Use standard frontmatter format for metadata
-3. Test variable substitution for both formats
-4. Verify both Claude (.md) and Gemini (.toml) outputs
+3. Test variable substitution for all formats
+4. Verify Claude (.md), Gemini (.toml), and Open Code (.md) outputs
 
 ### Error Handling
 - Use custom error classes from `src/types.ts`

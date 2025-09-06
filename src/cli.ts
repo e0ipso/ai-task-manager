@@ -20,7 +20,7 @@ program
   .description('Initialize a new AI task management project')
   .requiredOption(
     '--assistants <value>',
-    'Comma-separated list of assistants to configure (claude,gemini)'
+    'Comma-separated list of assistants to configure (claude,gemini,opencode)'
   )
   .option(
     '--destination-directory <path>',
