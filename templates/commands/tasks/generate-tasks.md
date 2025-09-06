@@ -40,7 +40,6 @@ Each task must be:
 - **Single-purpose**: One clear deliverable or outcome
 - **Atomic**: Cannot be meaningfully split further
 - **Skill-specific**: Executable by a single skill agent (examples below)
-- **Time-bounded**: Completable in a reasonable timeframe by a skilled developer
 - **Verifiable**: Has clear completion criteria
 
 #### Skill Selection and Technical Requirements
