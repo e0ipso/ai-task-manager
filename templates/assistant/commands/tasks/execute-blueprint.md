@@ -33,7 +33,17 @@ Before starting execution check if you are in the `main` branch. If so, create a
 1. **Phase Initialization**
     - Identify current phase from the execution blueprint
     - List all tasks scheduled for parallel execution in this phase
-    - Verify all task dependencies from previous phases are marked "completed"
+    - **Validate Task Dependencies**: For each task in the current phase, use the dependency checking script:
+        ```bash
+        # For each task in current phase
+        for TASK_ID in $PHASE_TASKS; do
+            if ! @templates/ai-task-manager/config/scripts/check-task-dependencies.sh "$1" "$TASK_ID"; then
+                echo "ERROR: Task $TASK_ID has unresolved dependencies - cannot proceed with phase execution"
+                echo "Please resolve dependencies before continuing with blueprint execution"
+                exit 1
+            fi
+        done
+        ```
     - Confirm no tasks are marked "needs-clarification"
     - If any phases are marked as completed, verify they are actually completed and continue from the next phase.
 
