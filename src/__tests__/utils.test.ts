@@ -11,6 +11,7 @@ import {
   convertMdToToml,
   parseFrontmatter,
   escapeTomlString,
+  getTemplateFormat,
 } from '../utils';
 import { Assistant } from '../types';
 
@@ -24,6 +25,8 @@ describe('Critical Utils Business Logic', () => {
     it('should parse multiple assistants with normalization', () => {
       expect(parseAssistants('claude,gemini')).toEqual(['claude', 'gemini']);
       expect(parseAssistants(' Claude , GEMINI ')).toEqual(['claude', 'gemini']);
+      expect(parseAssistants('claude,gemini,opencode')).toEqual(['claude', 'gemini', 'opencode']);
+      expect(parseAssistants(' OPENCODE ')).toEqual(['opencode']);
     });
 
     it('should remove duplicates and empty entries', () => {
@@ -38,10 +41,10 @@ describe('Critical Utils Business Logic', () => {
 
     it('should reject invalid assistants', () => {
       expect(() => parseAssistants('invalid')).toThrow(
-        'Invalid assistant(s): invalid. Valid options are: claude, gemini'
+        'Invalid assistant(s): invalid. Valid options are: claude, gemini, opencode'
       );
       expect(() => parseAssistants('claude,invalid,unknown')).toThrow(
-        'Invalid assistant(s): invalid, unknown. Valid options are: claude, gemini'
+        'Invalid assistant(s): invalid, unknown. Valid options are: claude, gemini, opencode'
       );
     });
   });
@@ -50,6 +53,8 @@ describe('Critical Utils Business Logic', () => {
     it('should accept valid assistants', () => {
       expect(() => validateAssistants(['claude'])).not.toThrow();
       expect(() => validateAssistants(['claude', 'gemini'])).not.toThrow();
+      expect(() => validateAssistants(['opencode'])).not.toThrow();
+      expect(() => validateAssistants(['claude', 'gemini', 'opencode'])).not.toThrow();
     });
 
     it('should reject empty array', () => {
@@ -58,7 +63,7 @@ describe('Critical Utils Business Logic', () => {
 
     it('should reject invalid assistants', () => {
       expect(() => validateAssistants(['invalid' as Assistant])).toThrow(
-        'Invalid assistant: invalid. Supported assistants: claude, gemini'
+        'Invalid assistant: invalid. Supported assistants: claude, gemini, opencode'
       );
     });
   });
@@ -235,6 +240,21 @@ Variables: $ARGUMENTS, $1, $2, $3`;
       expect(result).toContain('{{args}} but not $ARGUMENTS123');
       expect(result).toContain('{{plan_id}} but not $12');
       expect(result).toContain('Variables: {{args}}, {{plan_id}}, {{param2}}, {{param3}}');
+    });
+  });
+
+  describe('getTemplateFormat', () => {
+    it('should return correct template format for each assistant', () => {
+      expect(getTemplateFormat('claude')).toBe('md');
+      expect(getTemplateFormat('gemini')).toBe('toml');
+      expect(getTemplateFormat('opencode')).toBe('md');
+    });
+
+    it('should map opencode to markdown format like claude', () => {
+      const claudeFormat = getTemplateFormat('claude');
+      const opencodeFormat = getTemplateFormat('opencode');
+      expect(opencodeFormat).toBe(claudeFormat);
+      expect(opencodeFormat).toBe('md');
     });
   });
 });

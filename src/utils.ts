@@ -137,7 +137,7 @@ export async function readJsonFile<T = unknown>(filePath: string): Promise<T> {
  * @throws Error if invalid assistant names are provided
  */
 export function parseAssistants(value: string): Assistant[] {
-  const validAssistants: Assistant[] = ['claude', 'gemini'];
+  const validAssistants: Assistant[] = ['claude', 'gemini', 'opencode'];
 
   if (!value.trim()) {
     throw new Error('Assistants parameter cannot be empty');
@@ -169,7 +169,7 @@ export function parseAssistants(value: string): Assistant[] {
  * @throws Error if any assistant is invalid or array is empty
  */
 export function validateAssistants(assistants: Assistant[]): void {
-  const validAssistants: Assistant[] = ['claude', 'gemini'];
+  const validAssistants: Assistant[] = ['claude', 'gemini', 'opencode'];
 
   if (assistants.length === 0) {
     throw new Error('At least one assistant must be specified');
@@ -243,7 +243,7 @@ export function getExtension(filePath: string): string {
 /**
  * Get the template format for a specific assistant
  * @param assistant - The assistant type
- * @returns The template format to use ('md' for Claude, 'toml' for Gemini)
+ * @returns The template format to use ('md' for Claude/Open Code, 'toml' for Gemini)
  */
 export function getTemplateFormat(assistant: Assistant): TemplateFormat {
   switch (assistant) {
@@ -251,6 +251,8 @@ export function getTemplateFormat(assistant: Assistant): TemplateFormat {
       return 'md';
     case 'gemini':
       return 'toml';
+    case 'opencode':
+      return 'md';
     default:
       // This should never happen due to type safety, but adding for completeness
       throw new Error(`Unknown assistant type: ${assistant}`);
