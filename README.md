@@ -10,6 +10,25 @@ AI-powered task management CLI tool to improve your context. It supports multipl
 - 🤝 **Multi-Assistant Support**: Configure support for Claude, and Gemini
 - 📋 **Template System**: Built-in templates for different project types (basic, development, research)
 
+## 💰 Intelligent Token Usage
+
+**One of the key benefits of this project is dramatically reducing AI costs by using the right model for the right task.**
+
+The AI Task Manager leverages a **staged refinement approach** that maximizes the value of expensive, high-capability models while delegating execution to faster, cheaper models:
+
+### 🧠 Use Premium Models for Complex Analysis
+- **Planning Phase** (`/tasks:create-plan`): Deploy your most capable models (Claude Opus, GPT-5, etc.) for deep requirement analysis, architecture decisions, and strategic planning
+- **Task Generation** (`/tasks:generate-tasks`): Leverage advanced reasoning for complex decomposition, dependency mapping, and scope optimization
+
+### ⚡ Use Fast Models for Execution
+- **Blueprint Execution** (`/tasks:execute-blueprint`): Switch to faster, cost-effective models (Gemini 2.0 Flash, Claude Haiku) for task execution
+- **Individual Tasks**: Sub-agents can also choose to use simpler models since most complexity is resolved during planning
+
+### 💡 Why This Works
+The heavy cognitive lifting happens during plan creation and task generation. By the time you reach execution, the blueprint documents are detailed and specific enough that simpler models can reliably implement them. This approach can **reduce your AI costs** and be **significantly faster** compared to using premium models for all phases.
+
+_The more complex your project, the greater the savings._
+
 ## 🚀 Quick Start
 
 ### 🏗️ Initialize a New Workspace
