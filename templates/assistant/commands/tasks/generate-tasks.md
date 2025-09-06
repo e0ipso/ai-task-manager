@@ -258,46 +258,192 @@ For tasks requiring decomposition:
    - **V**alidate: Ensure subtasks meet quality criteria
    - **R**econstruct: Rebuild dependency relationships
 
-2. **Validation Criteria for Decomposed Tasks**:
+2. **Iteration Controls and Safety Limits**:
+
+<details>
+<summary><strong>Decomposition Safety Controls (Click to expand)</strong></summary>
+
+**Maximum Iteration Limits:**
+- **Hard Limit**: Maximum 3 decomposition rounds per original task
+- **Escalation Path**: If task remains >5 after max iterations:
+  1. Document complexity justification in `complexity_notes`
+  2. Mark task as `status: "needs-clarification"` 
+  3. Include escalation note: "Task complexity remains high after maximum decomposition attempts"
+
+**Minimum Viability Threshold:**
+- **No Decomposition Below Score 3**: Tasks with composite score ≤3 MUST NOT be decomposed
+- **Atomic Task Protection**: Do not decompose if task would create subtasks <2 hours work
+- **Meaningfulness Check**: Each subtask must have distinct deliverables from parent task
+
+**Quality Gates Per Iteration:**
+- **Scope Preservation**: Verify decomposed tasks collectively match original task scope
+- **Skill Reduction**: Confirm subtask skills ≤ 2 and more focused than parent
+- **Dependency Clarity**: Ensure subtask relationships are explicit and logical
+
+</details>
+
+3. **Validation Criteria for Decomposed Tasks**:
    - Each subtask complexity score ≤ 5 (target ≤ 4)
-   - All original requirements covered
+   - All original requirements covered by subtask collective
    - Dependencies clearly defined and acyclic
    - Skills required per subtask ≤ 2
    - Clear acceptance criteria for each subtask
+   - **Minimum Complexity**: No subtask with composite score <2 (indicates over-decomposition)
 
-3. **Re-iteration Requirements**:
-   - If any subtask still scores >5, repeat decomposition
-   - Maximum 3 decomposition iterations to prevent over-granularization
-   - Document decomposition rationale for complex cases
+4. **Dependency Validation During Decomposition**:
+
+<details>
+<summary><strong>Dependency Integrity Controls (Click to expand)</strong></summary>
+
+**Circular Dependency Detection:**
+- After each decomposition round, validate no circular dependencies exist
+- Check algorithm: For each task, ensure it cannot reach itself through its dependency chain
+- **Auto-correction**: If circular dependency detected, identify minimum edge to break
+
+**Orphaned Task Prevention:**
+- Verify all subtasks have clear path to completion
+- Ensure dependencies reference valid, achievable tasks
+- **Validation**: Every dependency ID must reference an existing or planned task
+
+**Dependency Logic Validation:**
+- Confirm subtask dependencies make logical sense (B cannot start before A)
+- Check that decomposed dependencies align with original task relationships
+- **Reconstruction Check**: Verify parent task dependencies correctly distribute to subtasks
+
+**Error Handling for Dependency Issues:**
+- **Circular Dependencies**: Log cycle, mark tasks as "needs-clarification"
+- **Missing Dependencies**: Document assumptions, create placeholder tasks if needed
+- **Logic Conflicts**: Flag for manual review, provide suggested resolution
+
+</details>
+
+5. **Re-iteration Requirements with Enhanced Controls**:
+   - If any subtask still scores >5, repeat decomposition (unless at iteration limit)
+   - **Iteration Tracking**: Document which tasks have been decomposed and how many times
+   - **Convergence Monitoring**: If complexity scores don't decrease after iteration, stop and escalate
+   - **Progress Validation**: Each iteration must meaningfully reduce complexity or task scope
 
 <details>
 <summary><strong>Decomposition Stop Conditions (Click to expand)</strong></summary>
 
-**DO NOT decompose further if any condition is met:**
+**MANDATORY STOP CONDITIONS - DO NOT decompose further if any condition is met:**
 
 1. **Atomic Boundary**: Task cannot be meaningfully split without losing coherence
 2. **Skill Coherence**: Would create tasks requiring <1 skill or fragmented knowledge  
 3. **Overhead Burden**: Decomposition creates more coordination than execution benefit
 4. **Resource Fragmentation**: Subtasks would compete for same constrained resources
 5. **Time Granularity**: Subtasks would each take <2 hours (too granular for planning)
+6. **Iteration Limit Reached**: Already performed 3 decomposition rounds on this task
+7. **Minimum Complexity Threshold**: Task complexity score ≤3 (do not decompose simple tasks)
+8. **Convergence Failure**: Previous decomposition round did not meaningfully reduce complexity
 
-**Quality Assurance Checklist:**
-- [ ] Coverage: All original requirements covered by subtasks
-- [ ] Coherence: Each subtask has clear, single purpose  
-- [ ] Completeness: Dependencies explicitly defined and achievable
-- [ ] Consistency: Task complexity reduced without losing functionality
-- [ ] Clarity: Each subtask has measurable acceptance criteria
-- [ ] Coordination: Integration plan exists for subtask outputs
+**Complexity Score Consistency Validation:**
+- [ ] **Score Reduction**: Each subtask has lower composite score than original parent
+- [ ] **Logical Scoring**: Individual dimension scores align with task descriptions
+- [ ] **Score Sum Check**: Total complexity of subtasks ≈ original task complexity (±20% acceptable)
+- [ ] **Skill-Complexity Alignment**: Tasks requiring 1 skill should score lower than multi-skill tasks
+- [ ] **Uncertainty Consistency**: High uncertainty scores only when requirements genuinely unclear
+
+**Enhanced Quality Assurance Checklist:**
+- [ ] **Coverage**: All original requirements covered by subtask collective
+- [ ] **Coherence**: Each subtask has clear, single purpose  
+- [ ] **Completeness**: Dependencies explicitly defined and achievable
+- [ ] **Consistency**: Task complexity reduced without losing functionality
+- [ ] **Clarity**: Each subtask has measurable acceptance criteria
+- [ ] **Coordination**: Integration plan exists for subtask outputs
+- [ ] **Complexity Validation**: All subtasks meet minimum viable complexity threshold (≥2)
+- [ ] **Iteration Tracking**: Decomposition history documented in `complexity_notes`
+- [ ] **Dependency Integrity**: No circular dependencies or orphaned tasks introduced
+- [ ] **Escalation Ready**: High-complexity tasks have clear escalation documentation
 
 </details>
 
-**1.5.4: Complexity Documentation**
+**1.5.4: Complexity Documentation and Error Handling**
 
 For each task (original or decomposed), document:
 - Individual dimension scores (Technical, Decision, Integration, Scope, Uncertainty)
 - Composite complexity score  
 - Decomposition rationale (if applied)
 - Skills required (inferred from complexity analysis)
+- **Iteration history**: Number of decomposition rounds applied
+- **Validation status**: Whether task passed all consistency checks
+
+**Error Handling Procedures for Edge Cases:**
+
+<details>
+<summary><strong>Comprehensive Error Handling Guide (Click to expand)</strong></summary>
+
+**1. Infinite Decomposition Loop Prevention:**
+- **Detection**: Task complexity not decreasing after 2 iterations
+- **Action**: Stop decomposition, mark as `needs-clarification`
+- **Documentation**: "Task shows decomposition resistance - manual review required"
+- **Escalation**: Flag for senior architect review
+
+**2. Circular Dependency Detection:**
+- **Detection Algorithm**: After creating/updating dependencies, trace each task's dependency chain
+- **Validation Rule**: If Task A's dependency chain includes Task A, circular dependency exists
+- **Resolution Steps**:
+  1. Identify the shortest cycle in dependency graph
+  2. Remove the least critical dependency edge to break cycle
+  3. Document decision in affected task's `complexity_notes`
+  4. Mark affected tasks for review: `status: "needs-clarification"`
+
+**3. Over-Decomposition Protection:**
+- **Detection**: Subtask with composite score <2 or requiring <2 hours work
+- **Action**: Merge back with parent or sibling task
+- **Validation**: Ensure merged task still meets complexity limits (≤5)
+- **Documentation**: Note merger rationale in `complexity_notes`
+
+**4. Orphaned Task Recovery:**
+- **Detection**: Task has dependencies that don't exist or are unachievable
+- **Resolution Options**:
+  1. Create missing dependency as new task (if scope allows)
+  2. Modify task to remove dependency requirement
+  3. Mark as `needs-clarification` with detailed dependency issue description
+- **Documentation**: "Dependency validation failed - see notes for resolution options"
+
+**5. Scope Creep During Decomposition:**
+- **Detection**: Subtasks collectively exceed original task scope
+- **Prevention**: Before finalizing decomposition, validate scope preservation
+- **Correction**: Remove out-of-scope elements or merge overscoped subtasks
+- **Documentation**: "Scope validation applied - removed non-essential elements"
+
+**6. Skill Assignment Conflicts:**
+- **Detection**: Task requires >2 skills or conflicting skill domains
+- **Resolution**: Decompose along skill boundaries or reassign skills based on primary deliverable
+- **Validation**: Final task should align with 1-2 coherent skills
+- **Fallback**: Mark complex skill requirements as `needs-clarification`
+
+**7. Quality Gate Failures:**
+- **Consistency Check Failure**: Scores don't align with task descriptions
+  - Action: Re-score using rubrics, document assumptions
+  - Escalation: Mark for manual validation if scores remain inconsistent
+- **Dependency Logic Failure**: Dependencies don't make logical sense
+  - Action: Review and correct dependency relationships
+  - Documentation: Note logic corrections in `complexity_notes`
+
+**8. Manual Intervention Triggers:**
+Mark task as `needs-clarification` and stop processing if:
+- Complexity remains >7 after maximum decomposition attempts
+- Circular dependencies cannot be automatically resolved
+- Task scope is fundamentally unclear or contradictory
+- Required skills exceed available agent capabilities
+- Dependencies require external resources not in project scope
+
+</details>
+
+**Iteration Tracking Documentation Format:**
+When documenting decomposed tasks, include in `complexity_notes`:
+```
+Original complexity: 8.2 → Decomposition Round 1 → Subtasks: [4.1, 3.8, 4.5] → Final validation: PASSED
+```
+
+**Quality Checkpoint Requirements:**
+Before proceeding to Step 2 (Dependency Analysis), verify:
+- [ ] All tasks have composite complexity ≤5 or are properly escalated
+- [ ] No unresolved error conditions remain
+- [ ] Decomposition iterations documented for auditing
+- [ ] All validation checkpoints completed successfully
 
 #### Step 2: Dependency Analysis
 For each task, identify:
@@ -480,21 +626,45 @@ If the command fails or returns unexpected results:
 
 ### Validation Checklist
 Before finalizing, ensure:
+
+**Core Task Requirements:**
 - [ ] Each task has 1-2 appropriate technical skills assigned
 - [ ] Skills are automatically inferred from task objectives and technical requirements
-- [ ] **Complexity Analysis Complete**: All tasks assessed using 5-dimension scoring
-- [ ] **Decomposition Applied**: Tasks with composite score ≥6 have been decomposed or justified
-- [ ] **Final Task Complexity**: All final tasks have composite score ≤5 (target ≤4)
-- [ ] **Decomposition Quality**: Any decomposed tasks meet quality assurance criteria
 - [ ] All dependencies form an acyclic graph
 - [ ] Task IDs are unique and sequential
 - [ ] Groups are consistent and meaningful
 - [ ] Every **explicitly stated** task from the plan is covered
 - [ ] No redundant or overlapping tasks
-- [ ] **Minimization applied**: Each task is absolutely necessary
-- [ ] **Test tasks are meaningful**: Focus on business logic, not framework functionality
-- [ ] **No gold-plating**: Only plan requirements are addressed
-- [ ] Total task count represents minimum viable implementation
+
+**Complexity Analysis & Controls:**
+- [ ] **Complexity Analysis Complete**: All tasks assessed using 5-dimension scoring
+- [ ] **Decomposition Applied**: Tasks with composite score ≥6 have been decomposed or justified
+- [ ] **Final Task Complexity**: All final tasks have composite score ≤5 (target ≤4)
+- [ ] **Iteration Limits Respected**: No task exceeded 3 decomposition rounds
+- [ ] **Minimum Viability**: No tasks decomposed below complexity threshold of 3
+- [ ] **Quality Gates Passed**: All decomposed tasks meet enhanced quality criteria
+- [ ] **Dependency Integrity**: No circular dependencies or orphaned tasks exist
+- [ ] **Error Handling Complete**: All edge cases resolved or escalated appropriately
+
+**Complexity Documentation Requirements:**
+- [ ] **Complexity Scores Documented**: Individual dimension scores recorded for complex tasks
+- [ ] **Decomposition History**: Iteration tracking included in `complexity_notes` for decomposed tasks
+- [ ] **Validation Status**: All tasks marked with appropriate validation outcomes
+- [ ] **Escalation Documentation**: High-complexity tasks have clear escalation notes
+- [ ] **Consistency Validated**: Complexity scores align with task descriptions and skills
+
+**Scope & Quality Control:**
+- [ ] **Minimization Applied**: Each task is absolutely necessary (20-30% reduction target)
+- [ ] **Test Tasks are Meaningful**: Focus on business logic, not framework functionality
+- [ ] **No Gold-plating**: Only plan requirements are addressed
+- [ ] **Total Task Count**: Represents minimum viable implementation
+- [ ] **Scope Preservation**: Decomposed tasks collectively match original requirements
+
+**System Reliability:**
+- [ ] **Error Conditions Resolved**: No unresolved error states remain
+- [ ] **Manual Intervention Flagged**: Complex edge cases properly escalated
+- [ ] **Quality Checkpoints**: All validation gates completed successfully
+- [ ] **Dependency Graph Validated**: Full dependency analysis confirms acyclic, logical relationships
 
 ### Error Handling
 If the plan lacks sufficient detail:
