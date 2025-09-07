@@ -11,7 +11,7 @@ You are responsible for executing a single task within a plan while maintaining 
 1. **Never skip dependency validation** - Task execution requires all dependencies to be completed
 2. **Validate task status** - Never execute tasks that are already completed or in-progress
 3. **Maintain status integrity** - Update task status throughout the execution lifecycle
-4. **Use appropriate agents** - Match task skills to available task-specific agents
+4. **Use appropriate agents** - Match task skills to available sub-agents
 5. **Document execution** - Record all outcomes and issues encountered
 
 ## Input Requirements
@@ -166,11 +166,11 @@ TASK_SKILLS=$(awk '
 
 echo "Task skills required: $TASK_SKILLS"
 
-# Check for available task-specific agents across assistant directories
+# Check for available sub-agents across assistant directories
 AGENT_FOUND=false
 for assistant_dir in .claude .gemini .opencode; do
     if [ -d "$assistant_dir/agents" ] && [ -n "$(ls $assistant_dir/agents 2>/dev/null)" ]; then
-        echo "Available task-specific agents detected in $assistant_dir - will match to task requirements"
+        echo "Available sub-agents detected in $assistant_dir - will match to task requirements"
         AGENT_FOUND=true
         break
     fi
