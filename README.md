@@ -3,7 +3,60 @@
 [![npm version](https://img.shields.io/npm/v/@e0ipso/ai-task-manager.svg)](https://www.npmjs.com/package/@e0ipso/ai-task-manager)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-AI-powered task management CLI tool to improve your context. It supports multiple coding assistants including Claude, Gemini, and Open Code for comprehensive development workflow integration.
+## 🔥 **Use Your Existing AI Subscription**
+
+**Unlike Aider, Taskmaster, and Cursor**, AI Task Manager works **within** your existing AI subscription interfaces (Claude Pro/Max, Gemini, etc.). This is NOT another AI agent that requires API keys - it creates slash commands that run inside your AI tools you already pay for.
+
+### 🏗️ **How This Actually Works**
+
+This tool creates **custom slash commands** (like `/tasks:create-plan`, `/tasks:generate-tasks`) that integrate directly into:
+- **Claude Code**: Works with your Claude Pro/Max subscription via [claude.ai/code](https://claude.ai/code) 
+- **Gemini CLI**: Uses your existing Gemini subscription
+- **Open Code**: Leverages your preferred open-source setup
+
+### 💰 **Billing Model Comparison**
+
+| Tool  | Additional API Costs | Total for Subscription Users |
+|------|---------------------|------------------------------|
+| **AI Task Manager**  | **$0** | **$0** (uses existing subscription) |
+| **Plandex Cloud**  | Included credits | *$45/month* |
+| **Plandex (BYOK)**  | Unpredictable (API usage) | *Unpredictable costs* |
+| **Claude Task Master** | Unpredictable (API usage) | *Unpredictable costs* |
+| **Conductor Tasks**  | Unpredictable (API usage) | *Unpredictable costs* |
+| **Shrimp Task Manager**  | Unpredictable (API usage) | *Unpredictable costs* |
+
+<details>
+<summary>📋 More Details</summary>
+
+| Tool | Stars | Type | Key Features | Documentation |
+|------|-------|------|--------------|---------------|
+| **AI Task Manager** | New | Task Management System | ✅ Plans→Tasks→Execution workflow<br>✅ Native slash commands<br>✅ No API keys needed | This README |
+| **[Plandex](https://github.com/plandex-ai/plandex)** | 14k+ | AI Coding Agent | ✅ Handles 2M token context<br>✅ Multi-file editing<br>⚠️ Terminal-based (not in IDE) | [Docs](https://docs.plandex.ai/) |
+| **[Claude Task Master](https://github.com/eyaltoledano/claude-task-master)** | 4.2k+ | Task Management  | ✅ PRD→Tasks workflow<br>✅ MCP integration<br>⚠️ Requires API keys | [Tutorial](https://github.com/eyaltoledano/claude-task-master/blob/main/docs/tutorial.md) |
+| **[Conductor Tasks](https://github.com/hridaya423/conductor-tasks)** | 38 | Visual Task Manager  | ✅ Kanban boards<br>✅ Dependency trees<br>⚠️ Requires API keys | [GitHub](https://github.com/hridaya423/conductor-tasks) |
+| **[Shrimp Task Manager](https://github.com/cjo4m06/mcp-shrimp-task-manager)** | 70+ | Chain-of-Thought Tasks  | ✅ Chain-of-thought focus<br>✅ Persistent memory<br>⚠️ Requires API keys | [Docs](https://github.com/cjo4m06/mcp-shrimp-task-manager/tree/main/docs) |
+
+</details>
+
+### ⚡ **Predictable Costs**
+
+Because this works within your existing AI interface:
+- **No surprise API bills** - you already know what your AI subscription costs
+- **No rate limiting issues** - uses your subscription's limits
+- **No API key management** - just type slash commands
+- **Full model access** - get the latest models as soon as they're available in your subscription
+
+AI-powered task management that creates structured workflows within your existing AI subscriptions. Supports Claude Code, Gemini CLI, and Open Code through custom slash commands.
+
+### 🎯 Key Differentiators
+
+**1. Zero Additional Costs**: AI Task Manager is the **only tool** that works within your existing AI subscriptions (Claude Pro/Max, Gemini, etc.) without any API fees or additional subscriptions.
+
+**2. Native Integration**: Unlike terminal-based tools (Plandex) or MCP servers requiring complex setup, AI Task Manager creates simple slash commands that work directly in your AI interface (claude.ai/code, Gemini CLI, etc.).
+
+**3. Complete Workflow**: Full planning → task generation → execution workflow, matching enterprise tools like Claude Task Master but without the API key requirement.
+
+**4. Predictable Costs**: No surprise API bills. You already know what your AI subscription costs - there's nothing extra to pay.
 
 ## ✨ Features
 
