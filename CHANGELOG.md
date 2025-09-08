@@ -1,3 +1,11 @@
+## 1.5.0 (2025-09-08)
+
+* feat: implement Node.js dependency checker script ([4ddbb4d](https://github.com/e0ipso/ai-task-manager/commit/4ddbb4d))
+* feat: update template references to Node.js dependency checker ([cc3a100](https://github.com/e0ipso/ai-task-manager/commit/cc3a100))
+* feat: use JS script ([16ad1bc](https://github.com/e0ipso/ai-task-manager/commit/16ad1bc))
+* chore: fix output boxes ([307a510](https://github.com/e0ipso/ai-task-manager/commit/307a510))
+* chore: remove bash dependency checker script ([8c7fef9](https://github.com/e0ipso/ai-task-manager/commit/8c7fef9))
+
 ## 1.4.0 (2025-09-08)
 
 * feat: simplify copy code ([e0192f7](https://github.com/e0ipso/ai-task-manager/commit/e0192f7))
