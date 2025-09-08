@@ -50,6 +50,7 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Create .ai/task-manager structure
     await logger.info('📁 Creating .ai/task-manager directory structure...');
     await ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
+    await ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
 
     // Copy common templates to .ai/task-manager
     await logger.info('📋 Copying common template files...');
@@ -66,6 +67,9 @@ export async function init(options: InitOptions): Promise<CommandResult> {
 
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER.md')}`);
     await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md')}`);
+    await logger.info(
+      `  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md')}`
+    );
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
       // Open Code uses 'command' (singular) instead of 'commands' (plural)
@@ -132,6 +136,10 @@ async function copyCommonTemplates(baseDir: string): Promise<void> {
     {
       source: getTemplatePath('ai-task-manager/config/hooks/POST_PHASE.md'),
       dest: resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md'),
+    },
+    {
+      source: getTemplatePath('ai-task-manager/config/hooks/POST_TASK_GENERATION_ALL.md'),
+      dest: resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md'),
     },
   ];
 
