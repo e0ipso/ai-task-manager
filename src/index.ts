@@ -246,52 +246,48 @@ export async function getInitInfo(baseDir?: string): Promise<{
  * Display formatted workflow help text to guide users after successful installation
  */
 async function displayWorkflowHelp(): Promise<void> {
-  const separator = '═'.repeat(60);
-  const thinSeparator = '─'.repeat(60);
-  const chalk = await logger.getChalk();
+  const width = 60;
+  const separator = '═'.repeat(width);
+  const thinSeparator = '─'.repeat(width);
 
   console.log('');
   console.log(`╔${separator}╗`);
-  console.log(`║${' '.repeat(18)}🚀 SUGGESTED WORKFLOW 🚀${' '.repeat(18)}║`);
+  console.log(`║${' '.repeat(22)}SUGGESTED WORKFLOW${' '.repeat(20)}║`);
   console.log(`╚${separator}╝`);
   console.log('');
 
-  console.log(`┌─ 📋 ONE-TIME SETUP ${thinSeparator.slice(20)}┐`);
-  console.log('│                                                            │');
-  console.log('│  🔧 Review and tweak these files to match your project:    │');
-  console.log('│  • .ai/task-manager/TASK_MANAGER.md                   │');
-  console.log('│  • .ai/task-manager/POST_PHASE.md                    │');
-  console.log('│                                                            │');
+  console.log(`┌─ ONE-TIME SETUP ${thinSeparator.slice(17)}┐`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  Review and tweak AI Task Manager config prompts to match  │`);
+  console.log(`│  your project:${' '.repeat(45)}│`);
+  console.log(`│    • .ai/task-manager/config/${' '.repeat(30)}│`);
+  console.log(`│${' '.repeat(width)}│`);
   console.log(`└${thinSeparator}┘`);
   console.log('');
 
-  console.log(`┌─ 🔄 DAY-TO-DAY WORKFLOW ${thinSeparator.slice(25)}┐`);
-  console.log('│                                                            │');
-  console.log('│  1   Create a plan:                                        │');
-  const createPlanCmd =
-    chalk?.cyan('/tasks:create-plan Create an authentication...') || '/tasks:create-plan';
-  console.log(`│      ${createPlanCmd}        │`);
-  console.log('│                                                            │');
-  console.log('│  2   Provide additional context if the assistant needs it  │');
-  console.log('│                                                            │');
-  console.log("│  3   ⚠️ MANUALLY REVIEW THE PLAN (don't skip this!)       │");
-  console.log('│      📂 Find it in: .ai/task-manager/plans/01--*/plan-*.md │');
-  console.log('│                                                            │');
-  console.log('│  4   Create the tasks for the plan:                        │');
-  const generateTasksCmd = chalk?.magenta('/tasks:generate-tasks 1') || '/tasks:generate-tasks';
-  console.log(`│      ${generateTasksCmd}                               │`);
-  console.log('│                                                            │');
-  console.log('│  5   ⚠️ REVIEW THE TASKS LIST (avoid scope creep!)        │');
-  console.log('│      📁 Find them in: .ai/task-manager/plans/01--*/tasks/  │');
-  console.log('│                                                            │');
-  console.log('│  6   Execute the tasks:                                    │');
-  const executeCmd = chalk?.green('/tasks:execute-blueprint 1') || '/tasks:execute-blueprint';
-  console.log(`│      ${executeCmd}                            │`);
-  console.log('│                                                            │');
-  console.log('│  7   🧪 Review the implementation and generated tests      │');
-  console.log('│                                                            │');
+  console.log(`┌─ DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  1) Create a plan:${' '.repeat(41)}│`);
+  console.log(`│      /tasks:create-plan Create an authentication...${' '.repeat(8)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  2) Provide additional context if the assistant needs it${' '.repeat(3)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  3) MANUALLY REVIEW THE PLAN (don't skip this!)${' '.repeat(12)}│`);
+  console.log(`│      Find it in: .ai/task-manager/plans/01--*/plan-*.md${' '.repeat(4)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  4) Create the tasks for the plan:${' '.repeat(25)}│`);
+  console.log(`│      /tasks:generate-tasks 1${' '.repeat(31)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  5) REVIEW THE TASKS LIST (avoid scope creep!)${' '.repeat(13)}│`);
+  console.log(`│      Find them in: .ai/task-manager/plans/01--*/tasks/${' '.repeat(5)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  6) Execute the tasks:${' '.repeat(37)}│`);
+  console.log(`│      /tasks:execute-blueprint 1${' '.repeat(28)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  7) Review the implementation and generated tests${' '.repeat(10)}│`);
+  console.log(`│${' '.repeat(width)}│`);
   console.log(`└${thinSeparator}┘`);
   console.log('');
-  console.log('💡 Pro tip: The manual review steps are crucial for success!');
+  console.log('Pro tip: The manual review steps are crucial for success!');
   console.log('');
 }
