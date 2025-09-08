@@ -16,7 +16,7 @@ You are responsible for executing a single task within a plan while maintaining 
 
 ## Input Requirements
 - Plan ID: $1 (required)
-- Task ID: $2 (required)  
+- Task ID: $2 (required)
 - Task management directory structure: `@.ai/task-manager/`
 - Dependency checking script: `@templates/ai-task-manager/config/scripts/check-task-dependencies.sh`
 
@@ -87,7 +87,7 @@ Check current task status to ensure it can be executed:
 # Extract current status from task frontmatter
 CURRENT_STATUS=$(awk '
     /^---$/ { if (++delim == 2) exit }
-    /^status:/ { 
+    /^status:/ {
         gsub(/^status:[ \t]*/, "")
         gsub(/^["'\'']/, "")
         gsub(/["'\'']$/, "")
@@ -144,7 +144,7 @@ Read task skills and select appropriate task-specific agent:
 # Extract skills from task frontmatter
 TASK_SKILLS=$(awk '
     /^---$/ { if (++delim == 2) exit }
-    /^skills:/ { 
+    /^skills:/ {
         in_skills = 1
         # Check if skills are on the same line
         if (match($0, /\[.*\]/)) {
@@ -191,7 +191,7 @@ echo "Updating task status to in-progress..."
 # Create temporary file with updated status
 TEMP_FILE=$(mktemp)
 awk '
-    /^---$/ { 
+    /^---$/ {
         if (++delim == 1) {
             print
             next
@@ -201,9 +201,9 @@ awk '
             next
         }
     }
-    /^status:/ && delim == 1 { 
+    /^status:/ && delim == 1 {
         print "status: \"in-progress\""
-        next 
+        next
     }
     { print }
 ' "$TASK_FILE" > "$TEMP_FILE"
@@ -220,7 +220,7 @@ Deploy the task using the Task tool with full context:
 
 **Task Deployment**: Use your internal Task tool to execute the task with the following context:
 - Task file path: `$TASK_FILE`
-- Plan directory: `$PLAN_DIR` 
+- Plan directory: `$PLAN_DIR`
 - Required skills: `$TASK_SKILLS`
 - Agent selection: Based on skills analysis or general-purpose agent
 
@@ -236,7 +236,7 @@ After task completion, update the status based on execution outcome:
 ```bash
 TEMP_FILE=$(mktemp)
 awk '
-    /^---$/ { 
+    /^---$/ {
         if (++delim == 1) {
             print
             next
@@ -246,9 +246,9 @@ awk '
             next
         }
     }
-    /^status:/ && delim == 1 { 
+    /^status:/ && delim == 1 {
         print "status: \"completed\""
-        next 
+        next
     }
     { print }
 ' "$TASK_FILE" > "$TEMP_FILE"
@@ -270,7 +270,7 @@ echo "Task execution failed - updating status..."
 
 TEMP_FILE=$(mktemp)
 awk '
-    /^---$/ { 
+    /^---$/ {
         if (++delim == 1) {
             print
             next
@@ -280,9 +280,9 @@ awk '
             next
         }
     }
-    /^status:/ && delim == 1 { 
+    /^status:/ && delim == 1 {
         print "status: \"failed\""
-        next 
+        next
     }
     { print }
 ' "$TASK_FILE" > "$TEMP_FILE"
@@ -312,7 +312,7 @@ exit 1
 This command integrates with the existing task management system by:
 - Using established plan and task location patterns
 - Leveraging the dependency checking script for validation
-- Following status management conventions 
+- Following status management conventions
 - Maintaining compatibility with execute-blueprint workflows
 - Preserving task isolation and dependency order
 

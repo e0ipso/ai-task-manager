@@ -5,21 +5,47 @@
  * Handles initialization of new AI task management projects
  */
 
-import { InitOptions, Assistant, FileSystemError, CommandResult } from './types';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import { InitOptions, Assistant, CommandResult } from './types';
 import * as logger from './logger';
 import {
   parseAssistants,
   validateAssistants,
-  ensureDir,
-  copyTemplate,
-  getTemplatePath,
-  exists,
-  resolvePath,
   getTemplateFormat,
   readAndProcessTemplate,
   writeProcessedTemplate,
-  getMarkdownTemplateNames,
 } from './utils';
+
+/**
+ * Get the absolute path to a template file
+ */
+function getTemplatePath(templateFile: string): string {
+  return path.join(__dirname, '..', 'templates', templateFile);
+}
+
+/**
+ * Resolve path segments relative to a base directory with cross-platform compatibility
+ */
+function resolvePath(baseDir: string | undefined, ...segments: string[]): string {
+  const base = baseDir || '.';
+  const validSegments = segments.filter(
+    segment => segment !== null && segment !== undefined && segment !== ''
+  );
+  return path.resolve(base, ...validSegments);
+}
+
+/**
+ * Check if a file or directory exists
+ */
+async function exists(filepath: string): Promise<boolean> {
+  try {
+    await fs.access(filepath);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Initialize a new AI Task Manager project
@@ -49,8 +75,8 @@ export async function init(options: InitOptions): Promise<CommandResult> {
 
     // Create .ai/task-manager structure
     await logger.info('📁 Creating .ai/task-manager directory structure...');
-    await ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
-    await ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
+    await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
+    await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
 
     // Copy common templates to .ai/task-manager
     await logger.info('📋 Copying common template files...');
@@ -65,8 +91,8 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Show success message with created directories
     await logger.success('🎉 AI Task Manager initialized successfully!');
 
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER.md')}`);
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md')}`);
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/TASK_MANAGER.md')}`);
+    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md')}`);
     await logger.info(
       `  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md')}`
     );
@@ -94,32 +120,14 @@ export async function init(options: InitOptions): Promise<CommandResult> {
       data: { assistants },
     };
   } catch (error) {
-    let errorMessage: string;
-    let errorInstance: Error;
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      errorInstance = error;
-      if (
-        error.message.includes('Invalid assistant') ||
-        error.message.includes('Assistants parameter')
-      ) {
-        await logger.error(`Configuration Error: ${error.message}`);
-      } else if (error instanceof FileSystemError) {
-        await logger.error(`File System Error: ${error.message}`);
-      } else {
-        await logger.error(`Initialization failed: ${error.message}`);
-      }
-    } else {
-      errorMessage = 'Initialization failed with unknown error';
-      errorInstance = new Error(String(error));
-      await logger.error(errorMessage);
-    }
+    const errorMessage =
+      error instanceof Error ? error.message : 'Initialization failed with unknown error';
+    await logger.error(`Initialization failed: ${errorMessage}`);
 
     return {
       success: false,
       message: errorMessage,
-      error: errorInstance,
+      error: error instanceof Error ? error : new Error(String(error)),
     };
   }
 }
@@ -128,78 +136,71 @@ export async function init(options: InitOptions): Promise<CommandResult> {
  * Copy common template files to .ai/task-manager directory
  */
 async function copyCommonTemplates(baseDir: string): Promise<void> {
-  const templates = [
-    {
-      source: getTemplatePath('ai-task-manager/config/TASK_MANAGER.md'),
-      dest: resolvePath(baseDir, '.ai/task-manager/TASK_MANAGER.md'),
-    },
-    {
-      source: getTemplatePath('ai-task-manager/config/hooks/POST_PHASE.md'),
-      dest: resolvePath(baseDir, '.ai/task-manager/POST_PHASE.md'),
-    },
-    {
-      source: getTemplatePath('ai-task-manager/config/hooks/POST_TASK_GENERATION_ALL.md'),
-      dest: resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md'),
-    },
-  ];
+  const sourceDir = getTemplatePath('ai-task-manager');
+  const destDir = resolvePath(baseDir, '.ai/task-manager');
 
-  for (const template of templates) {
-    // Check if source template exists
-    if (!(await exists(template.source))) {
-      throw new FileSystemError(`Template file not found: ${template.source}`, {
-        templatePath: template.source,
-      });
-    }
-
-    await copyTemplate(template.source, template.dest);
-    await logger.debug(`📤 Copied ${template.source} to ${template.dest}`);
+  // Check if source template directory exists
+  if (!(await exists(sourceDir))) {
+    throw new Error(`Template directory not found: ${sourceDir}`);
   }
+
+  // Copy entire directory structure exactly as-is
+  await fs.copy(sourceDir, destDir);
+  await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
 }
 
 /**
  * Create directory structure and copy templates for a specific assistant
  */
 async function createAssistantStructure(assistant: Assistant, baseDir: string): Promise<void> {
-  // Create assistant directory structure
-  // Open Code uses 'command' (singular) instead of 'commands' (plural)
-  const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
-  const tasksDir = resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks`);
+  const sourceDir = getTemplatePath('assistant');
+  const assistantDir = resolvePath(baseDir, `.${assistant}`);
 
-  await ensureDir(tasksDir);
-  await logger.debug(`🏗️ Created directory structure for ${assistant} in ${tasksDir}`);
+  // Check if source template directory exists
+  if (!(await exists(sourceDir))) {
+    throw new Error(`Template directory not found: ${sourceDir}`);
+  }
+
+  // Copy entire template directory structure
+  await fs.copy(sourceDir, assistantDir);
+  await logger.debug(`📤 Copied ${sourceDir} to ${assistantDir}`);
+
+  // OpenCode uses 'command' (singular) instead of 'commands' (plural)
+  if (assistant === 'opencode') {
+    const commandsDir = resolvePath(assistantDir, 'commands');
+    const commandDir = resolvePath(assistantDir, 'command');
+
+    if (await exists(commandsDir)) {
+      await fs.move(commandsDir, commandDir);
+      await logger.debug(`📁 Renamed 'commands' to 'command' for ${assistant}`);
+    }
+  }
 
   // Determine template format based on assistant type
   const templateFormat = getTemplateFormat(assistant);
   await logger.debug(`🎨 Using ${templateFormat} template format for ${assistant} assistant`);
 
-  // Copy assistant-specific command templates with appropriate format
-  const commandTemplateNames = await getMarkdownTemplateNames('assistant/commands/tasks');
+  // If target format is different from source (md), process files in place
+  if (templateFormat !== 'md') {
+    const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
+    const tasksDir = resolvePath(assistantDir, `${commandsPath}/tasks`);
+    const files = await fs.readdir(tasksDir);
 
-  for (const templateName of commandTemplateNames) {
-    const templateFile = `${templateName}.${templateFormat}`;
+    for (const file of files.filter(f => f.endsWith('.md'))) {
+      const mdPath = resolvePath(tasksDir, file);
+      const newPath = resolvePath(tasksDir, file.replace('.md', `.${templateFormat}`));
 
-    // Always read from the MD template source (DRY principle)
-    const mdSourcePath = getTemplatePath(`assistant/commands/tasks/${templateName}.md`);
-    const destPath = resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/${templateFile}`);
+      // Read and process the template
+      const processedContent = await readAndProcessTemplate(mdPath, templateFormat);
 
-    // Check if MD source template exists
-    if (!(await exists(mdSourcePath))) {
-      throw new FileSystemError(`Command template not found: ${mdSourcePath}`, {
-        templatePath: mdSourcePath,
-        assistant,
-        templateFormat,
-      });
+      // Write processed content to new file
+      await writeProcessedTemplate(processedContent, newPath);
+
+      // Remove original .md file
+      await fs.remove(mdPath);
+
+      await logger.debug(`⚡ Converted ${file} to ${templateFormat} format for ${assistant}`);
     }
-
-    // Read and process the template based on target format
-    const processedContent = await readAndProcessTemplate(mdSourcePath, templateFormat);
-
-    // Write the processed content to destination
-    await writeProcessedTemplate(processedContent, destPath);
-
-    await logger.debug(
-      `⚡ Processed ${templateName}.md and created ${templateFile} for ${assistant} at ${destPath}`
-    );
   }
 }
 
