@@ -1,3 +1,22 @@
+## 1.3.0 (2025-09-08)
+
+* feat: add Open Code assistant validation support ([9804172](https://github.com/e0ipso/ai-task-manager/commit/9804172))
+* feat: allow executing a single task ([1f4af0a](https://github.com/e0ipso/ai-task-manager/commit/1f4af0a))
+* feat: drop worktrees ([e60b156](https://github.com/e0ipso/ai-task-manager/commit/e60b156))
+* feat: implement Open Code directory structure creation ([30ed09b](https://github.com/e0ipso/ai-task-manager/commit/30ed09b))
+* feat: make templates assistant-agnostic ([23c1247](https://github.com/e0ipso/ai-task-manager/commit/23c1247))
+* feat: move prompting to hook ([a2a38f1](https://github.com/e0ipso/ai-task-manager/commit/a2a38f1))
+* feat: reorganize file locations ([188cc2b](https://github.com/e0ipso/ai-task-manager/commit/188cc2b))
+* feat(task-complexity): add validation and iteration controls ([a915992](https://github.com/e0ipso/ai-task-manager/commit/a915992))
+* feat(task-complexity): complete comprehensive testing and validation ([c578821](https://github.com/e0ipso/ai-task-manager/commit/c578821))
+* feat(task-complexity): create systematic task decomposition strategies ([f2b91df](https://github.com/e0ipso/ai-task-manager/commit/f2b91df))
+* feat(task-complexity): design multi-dimensional complexity scoring algorithm ([4012c74](https://github.com/e0ipso/ai-task-manager/commit/4012c74))
+* feat(task-complexity): integrate complexity analysis into generate-tasks template ([ac2d85b](https://github.com/e0ipso/ai-task-manager/commit/ac2d85b))
+* fix: recover sub-agent wording ([155fa29](https://github.com/e0ipso/ai-task-manager/commit/155fa29))
+* docs: emphasize how cheap this is ([17ec7a0](https://github.com/e0ipso/ai-task-manager/commit/17ec7a0))
+* docs: update documentation for Open Code assistant support ([b89af34](https://github.com/e0ipso/ai-task-manager/commit/b89af34))
+* test: add comprehensive Open Code integration tests ([e7333b0](https://github.com/e0ipso/ai-task-manager/commit/e7333b0))
+
 ## <small>1.2.1 (2025-09-06)</small>
 
 * docs: update README.md ([2c9a88a](https://github.com/e0ipso/ai-task-manager/commit/2c9a88a))
