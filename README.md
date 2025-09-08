@@ -10,7 +10,7 @@
 ### 🏗️ **How This Actually Works**
 
 This tool creates **custom slash commands** (like `/tasks:create-plan`, `/tasks:generate-tasks`) that integrate directly into:
-- **Claude Code**: Works with your Claude Pro/Max subscription via [claude.ai/code](https://claude.ai/code) 
+- **Claude Code**: Works with your Claude Pro/Max subscription via [claude.ai/code](https://claude.ai/code)
 - **Gemini CLI**: Uses your existing Gemini subscription
 - **Open Code**: Leverages your preferred open-source setup
 

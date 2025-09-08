@@ -80,8 +80,8 @@ describe('CLI Integration Tests - Consolidated', () => {
     }
 
     // Common template files
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/TASK_MANAGER.md'))).toBe(true);
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/POST_PHASE.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/TASK_MANAGER.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md'))).toBe(true);
   };
 
   const verifyFileContent = async (assistants: string[], customDir?: string): Promise<void> => {
@@ -360,12 +360,12 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify common template files
       const taskManagerInfo = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/TASK_MANAGER.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/config/TASK_MANAGER.md'), 'utf8'
       );
       expect(taskManagerInfo).toContain('# Task Manager General Information');
 
       const validationGates = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/POST_PHASE.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/config/hooks/POST_PHASE.md'), 'utf8'
       );
       expect(validationGates).toContain('Ensure that:');
 
@@ -418,13 +418,13 @@ describe('CLI Integration Tests - Consolidated', () => {
       for (const template of templates) {
         const opencodeTemplatePath = path.join(testDir, `.opencode/command/tasks/${template}.md`);
         const claudeTemplatePath = path.join(testDir, `.claude/commands/tasks/${template}.md`);
-        
+
         expect(await fs.pathExists(opencodeTemplatePath)).toBe(true);
         expect(await fs.pathExists(claudeTemplatePath)).toBe(true);
 
         const opencodeContent = await fs.readFile(opencodeTemplatePath, 'utf8');
         const claudeContent = await fs.readFile(claudeTemplatePath, 'utf8');
-        
+
         // Both should be identical (Markdown format)
         expect(opencodeContent).toBe(claudeContent);
         expect(opencodeContent).toContain('---'); // YAML frontmatter

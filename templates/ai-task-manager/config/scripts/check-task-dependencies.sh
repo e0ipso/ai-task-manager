@@ -73,7 +73,7 @@ echo ""
 # Using awk to parse YAML frontmatter
 DEPENDENCIES=$(awk '
     /^---$/ { if (++delim == 2) exit }
-    /^dependencies:/ { 
+    /^dependencies:/ {
         dep_section = 1
         # Check if dependencies are on the same line
         if (match($0, /\[.*\]/)) {
@@ -118,7 +118,7 @@ echo ""
 for DEP_ID in $DEPENDENCIES; do
     # Find dependency task file
     DEP_FILE=""
-    
+
     # Try exact match first
     if [ -f "${PLAN_DIR}/tasks/${DEP_ID}--"*.md ]; then
         DEP_FILE=$(ls "${PLAN_DIR}/tasks/${DEP_ID}--"*.md 2>/dev/null | head -1)
@@ -134,18 +134,18 @@ for DEP_ID in $DEPENDENCIES; do
             DEP_FILE=$(ls "${PLAN_DIR}/tasks/0${UNPADDED_DEP}--"*.md 2>/dev/null | head -1)
         fi
     fi
-    
+
     if [ -z "$DEP_FILE" ] || [ ! -f "$DEP_FILE" ]; then
         print_error "Dependency task ${DEP_ID} not found"
         ALL_RESOLVED=false
         UNRESOLVED_DEPS="${UNRESOLVED_DEPS}${DEP_ID} (not found)\n"
         continue
     fi
-    
+
     # Extract status from dependency task
     STATUS=$(awk '
         /^---$/ { if (++delim == 2) exit }
-        /^status:/ { 
+        /^status:/ {
             gsub(/^status:[ \t]*/, "")
             gsub(/^["'\'']/, "")
             gsub(/["'\'']$/, "")
@@ -153,7 +153,7 @@ for DEP_ID in $DEPENDENCIES; do
             exit
         }
     ' "$DEP_FILE")
-    
+
     # Check if status is completed
     if [ "$STATUS" = "completed" ]; then
         print_success "Task ${DEP_ID} - Status: completed ✓"

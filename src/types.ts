@@ -196,60 +196,6 @@ export interface ProjectConfig {
 }
 
 /**
- * Error types for better error handling
- */
-export class TaskManagerError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = 'TaskManagerError';
-  }
-}
-
-/**
- * Configuration validation error
- */
-export class ConfigError extends TaskManagerError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'CONFIG_ERROR', details);
-    this.name = 'ConfigError';
-  }
-}
-
-/**
- * Task operation error
- */
-export class TaskError extends TaskManagerError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'TASK_ERROR', details);
-    this.name = 'TaskError';
-  }
-}
-
-/**
- * Assistant integration error
- */
-export class AssistantError extends TaskManagerError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'ASSISTANT_ERROR', details);
-    this.name = 'AssistantError';
-  }
-}
-
-/**
- * File system operation error
- */
-export class FileSystemError extends TaskManagerError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'FILESYSTEM_ERROR', details);
-    this.name = 'FileSystemError';
-  }
-}
-
-/**
  * Validation result interface
  */
 export interface ValidationResult {
