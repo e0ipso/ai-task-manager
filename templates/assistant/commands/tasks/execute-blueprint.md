@@ -37,7 +37,7 @@ Before starting execution check if you are in the `main` branch. If so, create a
         ```bash
         # For each task in current phase
         for TASK_ID in $PHASE_TASKS; do
-            if ! @templates/ai-task-manager/config/scripts/check-task-dependencies.sh "$1" "$TASK_ID"; then
+            if ! node @templates/ai-task-manager/config/scripts/check-task-dependencies.js "$1" "$TASK_ID"; then
                 echo "ERROR: Task $TASK_ID has unresolved dependencies - cannot proceed with phase execution"
                 echo "Please resolve dependencies before continuing with blueprint execution"
                 exit 1
