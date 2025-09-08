@@ -18,7 +18,7 @@ You are responsible for executing a single task within a plan while maintaining 
 - Plan ID: $1 (required)
 - Task ID: $2 (required)
 - Task management directory structure: `@.ai/task-manager/`
-- Dependency checking script: `@templates/ai-task-manager/config/scripts/check-task-dependencies.js`
+- Dependency checking script: `.ai/task-manager/config/scripts/check-task-dependencies.js`
 
 ### Input Validation
 
@@ -125,7 +125,7 @@ Use the dependency checking script to validate all dependencies:
 
 ```bash
 # Call the dependency checking script
-if ! node @templates/ai-task-manager/config/scripts/check-task-dependencies.js "$PLAN_ID" "$TASK_ID"; then
+if ! node .ai/task-manager/config/scripts/check-task-dependencies.js "$PLAN_ID" "$TASK_ID"; then
     echo ""
     echo "Task execution blocked by unresolved dependencies."
     echo "Please complete the required dependencies first."
