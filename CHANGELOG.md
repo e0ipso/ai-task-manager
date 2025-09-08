@@ -1,3 +1,10 @@
+## 1.4.0 (2025-09-08)
+
+* feat: simplify copy code ([e0192f7](https://github.com/e0ipso/ai-task-manager/commit/e0192f7))
+* feat(task-quality): implement POST_TASK_CREATION hook for enhanced task validation ([17dbb20](https://github.com/e0ipso/ai-task-manager/commit/17dbb20))
+* Merge branch 'task-quality-validation-agent' ([90d4269](https://github.com/e0ipso/ai-task-manager/commit/90d4269))
+* fix: copy all hooks ([b1525d9](https://github.com/e0ipso/ai-task-manager/commit/b1525d9))
+
 ## 1.3.0 (2025-09-08)
 
 * feat: add Open Code assistant validation support ([9804172](https://github.com/e0ipso/ai-task-manager/commit/9804172))
