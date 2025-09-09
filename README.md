@@ -180,12 +180,4 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 
 ## 📄 License
 
-⚖️ **Proprietary Software with Revocation Rights.**
-
-This software is free to use, run, and operate for any lawful purposes. The
-author can revoke the license to use it at any time and by any reason. A license
-revocation notice may be provided through:
-
-- 📧 Direct communication to known users
-- 📢 Public announcement on the project repository
-- 📝 Update to the LICENSE file
+⚖️ **Open Source MIT License**
