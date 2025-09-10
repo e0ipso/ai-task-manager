@@ -1,3 +1,8 @@
+## 1.6.0 (2025-09-10)
+
+* feat: use internal Todo tool ([de9839b](https://github.com/e0ipso/ai-task-manager/commit/de9839b))
+* chore: update LICENSE to make it Open Source ([8609126](https://github.com/e0ipso/ai-task-manager/commit/8609126))
+
 ## 1.5.0 (2025-09-08)
 
 * feat: implement Node.js dependency checker script ([4ddbb4d](https://github.com/e0ipso/ai-task-manager/commit/4ddbb4d))
