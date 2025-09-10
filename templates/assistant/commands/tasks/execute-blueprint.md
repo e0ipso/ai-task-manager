@@ -24,9 +24,22 @@ If the plan does not exist, or the plan does not have an execution blueprint sec
 
 ## Execution Process
 
+Use your internal Todo task tool to track the execution of all phases, and the final update of the plan with the summary. Example:
+
+- [ ] Create feature branch from the main branch.
+- [ ] Phase 1: Execute 1 task(s) in parallel.
+- [ ] Execute POST_PHASE.md hook after Phase 1.
+- [ ] Phase 2: Execute 3 task(s) in parallel.
+- [ ] Execute POST_PHASE.md hook after Phase 2.
+- [ ] Phase 3: Execute 1 task(s) in parallel.
+- [ ] Execute POST_PHASE.md hook after Phase 3.
+- [ ] Update the Plan 7 with execution summary, and the archive it.
+
 ### Phase Pre-Execution
 
 Before starting execution check if you are in the `main` branch. If so, create a git branch to work on this blueprint use the plan name for the branch name.
+
+If there are unstaged changes in the `main` branch, do not create a feature branch.
 
 ### Phase Execution Workflow
 

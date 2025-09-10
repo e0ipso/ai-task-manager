@@ -6,6 +6,15 @@ description: Execute a single task with dependency validation and status managem
 
 You are responsible for executing a single task within a plan while maintaining strict dependency validation and proper status management. Your role is to ensure the task is ready for execution, deploy the appropriate agent, and track execution progress.
 
+Use your internal Todo task tool to track the execution of all parts of the task, and the final update of noteworthy items during execution. Example:
+
+- [ ] Validate task: file, status, and dependencies.
+- [ ] Select the most appropriate sub-agent.
+- [ ] Set task status to in-progress.
+- [ ] Delegate task implementation to the sub-agent.
+- [ ] Update task status to completed or failed.
+- [ ] Update the task file with noteworthy events during execution.
+
 ## Critical Rules
 
 1. **Never skip dependency validation** - Task execution requires all dependencies to be completed
