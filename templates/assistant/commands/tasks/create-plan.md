@@ -20,6 +20,15 @@ If no user input is provided stop immediately and show an error message to the u
 
 ### Process
 
+Use your internal Todo task tool to track the plan generation. Example:
+
+- [ ] User input and context analysis
+- [ ] Clarification questions
+- [ ] Plan generation: Executive Summary
+- [ ] Plan generation: Detailed Steps
+- [ ] Plan generation: Risk Considerations
+- [ ] Plan generation: Success Metrics
+
 #### Step 1: Context Analysis
 Before creating any plan, analyze the user's request for:
 - **Objective**: What is the end goal?
@@ -35,15 +44,17 @@ If any critical context is missing:
 2. Ask targeted follow-up questions grouped by category
 3. Wait for user responses before proceeding to planning
 4. Frame questions clearly with examples when helpful
-5. Be extra cautious. Users miss important context very often. Extract it from them
+5. Be extra cautious. Users miss important context very often. Don't hesitate to ask for clarifications.
 
 Example clarifying questions:
-- "What is your primary goal with [specific aspect]?"
-- "Do you have any existing [resources/code/infrastructure] I should consider?"
-- "What is your timeline for completing this?"
-- "Are there specific constraints I should account for?"
-- "Do you want me to write tests for this?"
-- "Are there other systems, projects, or modules that perform a similar task?"
+- "Q: What is your primary goal with [specific aspect]?"
+- "Q: Do you have any existing [resources/code/infrastructure] I should consider?"
+- "Q: What is your timeline for completing this?"
+- "Q: Are there specific constraints I should account for?"
+- "Q: Do you want me to write tests for this?"
+- "Q: Are there other systems, projects, or modules that perform a similar task?"
+
+Try to answer your own questions first by inspecting the codebase, docs, and assistant documents like CLAUDE.md, GEMINI.md, AGENTS.md ...
 
 #### Step 3: Plan Generation
 Only after confirming sufficient context, create a plan that includes:
@@ -54,14 +65,7 @@ Only after confirming sufficient context, create a plan that includes:
 
 Remember that a plan needs to be reviewed by a human. Be concise and to the point. Also, include mermaid diagrams to illustrate the plan.
 
-### Important Notes
-- Never generate a partial or assumed plan without adequate context
-- Prioritize accuracy over speed
-- Consider both technical and non-technical aspects
-- Adapt the plan format based on the task type (development, design, research, etc.)
-- DO NOT create or list any tasks or phases during the plan creation. This will be done in a later step. Stick to writing the PRD (Project Requirements Document).
-
-### Scope Control Guidelines
+##### Scope Control Guidelines
 **Critical: Implement ONLY what is explicitly requested**
 
 - **Minimal Viable Implementation**: Build exactly what the user asked for, nothing more
@@ -79,7 +83,7 @@ Remember that a plan needs to be reviewed by a human. Be concise and to the poin
 
 **When in doubt, ask**: "Is this feature explicitly mentioned in the user's request?"
 
-### Simplicity Principles
+##### Simplicity Principles
 **Favor maintainability over cleverness**
 
 - **Simple Solutions First**: Choose the most straightforward approach that meets requirements
@@ -91,23 +95,23 @@ Remember that a plan needs to be reviewed by a human. Be concise and to the poin
 
 **Remember**: A working simple solution is better than a complex "perfect" one.
 
-### Output Format
+##### Output Format
 Structure your response as follows:
 - If context is insufficient: List specific clarifying questions
 - If context is sufficient: Provide the comprehensive plan using the structure above. Use the information in @TASK_MANAGER.md for the directory structure and additional information about plans.
 
 Outside the plan document, be **extremely** concise. Just tell the user that you are done, and instruct them to review the plan document.
 
-#### Plan Template
+###### Plan Template
 
 Use the template in @.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
-#### Patterns to Avoid
+###### Patterns to Avoid
 Do not include the following in your plan output.
 - Avoid time estimations
 - Avoid task lists and mentions of phases (those are things we'll introduce later)
 
-#### Frontmatter Structure
+###### Frontmatter Structure
 
 Example:
 ```yaml
@@ -141,6 +145,13 @@ The schema for this frontmatter is:
   "additionalProperties": false
 }
 ```
+
+### Critical Notes
+- Never generate a partial or assumed plan without adequate context
+- Prioritize accuracy over speed
+- Consider both technical and non-technical aspects
+- Use the plan template in .ai/task-manager/config/templates/PLAN_TEMPLATE.md
+- DO NOT create or list any tasks or phases during the plan creation. This will be done in a later step. Stick to writing the PRD (Project Requirements Document).
 
 ### Plan ID Generation
 
