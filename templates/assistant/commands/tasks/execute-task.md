@@ -150,44 +150,7 @@ echo "✓ All dependencies resolved - proceeding with execution"
 Read task skills and select appropriate task-specific agent:
 
 ```bash
-# Extract skills from task frontmatter
-TASK_SKILLS=$(awk '
-    /^---$/ { if (++delim == 2) exit }
-    /^skills:/ {
-        in_skills = 1
-        # Check if skills are on the same line
-        if (match($0, /\[.*\]/)) {
-            gsub(/^skills:[ \t]*\[/, "")
-            gsub(/\].*$/, "")
-            gsub(/[ \t]/, "")
-            print
-            in_skills = 0
-        }
-        next
-    }
-    in_skills && /^[^ ]/ { in_skills = 0 }
-    in_skills && /^[ \t]*-/ {
-        gsub(/^[ \t]*-[ \t]*/, "")
-        gsub(/^"/, ""); gsub(/"$/, "")
-        print
-    }
-' "$TASK_FILE" | tr ',' '\n' | sed 's/^[ \t]*//;s/[ \t]*$//' | grep -v '^$')
-
-echo "Task skills required: $TASK_SKILLS"
-
-# Check for available sub-agents across assistant directories
-AGENT_FOUND=false
-for assistant_dir in .claude .gemini .opencode; do
-    if [ -d "$assistant_dir/agents" ] && [ -n "$(ls $assistant_dir/agents 2>/dev/null)" ]; then
-        echo "Available sub-agents detected in $assistant_dir - will match to task requirements"
-        AGENT_FOUND=true
-        break
-    fi
-done
-
-if [ "$AGENT_FOUND" = false ]; then
-    echo "Using general-purpose agent for task execution"
-fi
+Read and execute @.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 ```
 
 ### 6. Status Update to In-Progress
@@ -271,37 +234,7 @@ echo "You can now execute dependent tasks or continue with the full blueprint ex
 
 ## Error Handling
 
-If task execution fails:
-
-```bash
-# On execution failure, update status to failed
-echo "Task execution failed - updating status..."
-
-TEMP_FILE=$(mktemp)
-awk '
-    /^---$/ {
-        if (++delim == 1) {
-            print
-            next
-        } else if (delim == 2) {
-            print "status: \"failed\""
-            print
-            next
-        }
-    }
-    /^status:/ && delim == 1 {
-        print "status: \"failed\""
-        next
-    }
-    { print }
-' "$TASK_FILE" > "$TEMP_FILE"
-
-mv "$TEMP_FILE" "$TASK_FILE"
-
-echo "Task ${TASK_ID} marked as failed"
-echo "Check the task requirements and try again"
-exit 1
-```
+Read and execute @.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ## Usage Examples
 

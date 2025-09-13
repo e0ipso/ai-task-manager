@@ -29,32 +29,7 @@ Use your internal Todo task tool to track the plan generation. Example:
 - [ ] Plan generation: Risk Considerations
 - [ ] Plan generation: Success Metrics
 
-#### Step 1: Context Analysis
-Before creating any plan, analyze the user's request for:
-- **Objective**: What is the end goal?
-- **Scope**: What are the boundaries and constraints?
-- **Resources**: What tools, budget, or team are available?
-- **Success Criteria**: How will success be measured?
-- **Dependencies**: What prerequisites or blockers exist?
-- **Technical Requirements**: What technologies or skills are needed?
-
-#### Step 2: Clarification Phase
-If any critical context is missing:
-1. Identify specific gaps in the information provided
-2. Ask targeted follow-up questions grouped by category
-3. Wait for user responses before proceeding to planning
-4. Frame questions clearly with examples when helpful
-5. Be extra cautious. Users miss important context very often. Don't hesitate to ask for clarifications.
-
-Example clarifying questions:
-- "Q: What is your primary goal with [specific aspect]?"
-- "Q: Do you have any existing [resources/code/infrastructure] I should consider?"
-- "Q: What is your timeline for completing this?"
-- "Q: Are there specific constraints I should account for?"
-- "Q: Do you want me to write tests for this?"
-- "Q: Are there other systems, projects, or modules that perform a similar task?"
-
-Try to answer your own questions first by inspecting the codebase, docs, and assistant documents like CLAUDE.md, GEMINI.md, AGENTS.md ...
+Read and execute @.ai/task-manager/config/hooks/POST_PLAN.md
 
 #### Step 3: Plan Generation
 Only after confirming sufficient context, create a plan that includes:
