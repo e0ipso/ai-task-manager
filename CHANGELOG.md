@@ -1,3 +1,7 @@
+## 1.7.0 (2025-09-15)
+
+* feat: switch to Just the Docs theme with native Mermaid support ([f04d64d](https://github.com/e0ipso/ai-task-manager/commit/f04d64d))
+
 ## <small>1.6.2 (2025-09-15)</small>
 
 * fix: improve Mermaid diagram rendering with proper DOM manipulation ([9ef1816](https://github.com/e0ipso/ai-task-manager/commit/9ef1816))
