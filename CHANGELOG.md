@@ -1,3 +1,7 @@
+## <small>1.7.1 (2025-09-15)</small>
+
+* fix: make directory structure diagram more mobile-friendly ([0ef6b45](https://github.com/e0ipso/ai-task-manager/commit/0ef6b45))
+
 ## 1.7.0 (2025-09-15)
 
 * feat: switch to Just the Docs theme with native Mermaid support ([f04d64d](https://github.com/e0ipso/ai-task-manager/commit/f04d64d))
