@@ -1,3 +1,9 @@
+## <small>1.6.1 (2025-09-15)</small>
+
+* fix: correct site URLs and add Mermaid diagram support ([cdd4b5e](https://github.com/e0ipso/ai-task-manager/commit/cdd4b5e))
+* Documentation Site: Strategic Diagrams & Automated Deployment (#2) ([6e387af](https://github.com/e0ipso/ai-task-manager/commit/6e387af)), closes [#2](https://github.com/e0ipso/ai-task-manager/issues/2)
+* docs: be less intense about the money ([62b07c2](https://github.com/e0ipso/ai-task-manager/commit/62b07c2))
+
 ## 1.6.0 (2025-09-10)
 
 * feat: use internal Todo tool ([de9839b](https://github.com/e0ipso/ai-task-manager/commit/de9839b))
