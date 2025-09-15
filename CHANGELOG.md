@@ -1,3 +1,7 @@
+## <small>1.8.1 (2025-09-15)</small>
+
+* fix: refactor command functionality into reusable hooks (#1) ([c7fa766](https://github.com/e0ipso/ai-task-manager/commit/c7fa766)), closes [#1](https://github.com/e0ipso/ai-task-manager/issues/1)
+
 ## 1.8.0 (2025-09-15)
 
 * feat: comprehensive documentation restructure with README streamlining ([bac6978](https://github.com/e0ipso/ai-task-manager/commit/bac6978))
