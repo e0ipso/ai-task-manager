@@ -19,10 +19,12 @@ mermaid:
 nav_sort: case_sensitive
 
 # Repository link in header
-gh_edit_repository: https://github.com/e0ipso/ai-task-manager
-gh_edit_branch: main
-gh_edit_link: true
-gh_edit_link_text: "View on GitHub"
+aux_links:
+  "View on GitHub":
+    - "https://github.com/e0ipso/ai-task-manager"
+
+# Make aux links open in a new tab
+aux_links_new_tab: true
 
 # SEO and social media
 author: e0ipso
