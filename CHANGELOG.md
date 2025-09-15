@@ -1,3 +1,25 @@
+## 1.8.0 (2025-09-15)
+
+* feat: comprehensive documentation restructure with README streamlining ([bac6978](https://github.com/e0ipso/ai-task-manager/commit/bac6978))
+
+## <small>1.7.1 (2025-09-15)</small>
+
+* fix: make directory structure diagram more mobile-friendly ([0ef6b45](https://github.com/e0ipso/ai-task-manager/commit/0ef6b45))
+
+## 1.7.0 (2025-09-15)
+
+* feat: switch to Just the Docs theme with native Mermaid support ([f04d64d](https://github.com/e0ipso/ai-task-manager/commit/f04d64d))
+
+## <small>1.6.2 (2025-09-15)</small>
+
+* fix: improve Mermaid diagram rendering with proper DOM manipulation ([9ef1816](https://github.com/e0ipso/ai-task-manager/commit/9ef1816))
+
+## <small>1.6.1 (2025-09-15)</small>
+
+* fix: correct site URLs and add Mermaid diagram support ([cdd4b5e](https://github.com/e0ipso/ai-task-manager/commit/cdd4b5e))
+* Documentation Site: Strategic Diagrams & Automated Deployment (#2) ([6e387af](https://github.com/e0ipso/ai-task-manager/commit/6e387af)), closes [#2](https://github.com/e0ipso/ai-task-manager/issues/2)
+* docs: be less intense about the money ([62b07c2](https://github.com/e0ipso/ai-task-manager/commit/62b07c2))
+
 ## 1.6.0 (2025-09-10)
 
 * feat: use internal Todo tool ([de9839b](https://github.com/e0ipso/ai-task-manager/commit/de9839b))
