@@ -1,0 +1,50 @@
+title: AI Task Manager Documentation
+description: Transform chaotic AI prompts into structured, executable workflows
+url: https://e0ipso.github.io/ai-task-manager
+baseurl: ""
+
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
+theme: minima
+
+# SEO and social media
+author: e0ipso
+twitter:
+  username: e0ipso
+logo: /assets/logo.png
+
+# Mermaid support
+mermaid:
+  enable: true
+
+# Navigation
+header_pages:
+  - index.md
+
+# Collections
+collections:
+  pages:
+    output: true
+    permalink: /:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+      
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
