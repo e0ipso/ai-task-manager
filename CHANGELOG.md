@@ -1,3 +1,7 @@
+## <small>1.6.2 (2025-09-15)</small>
+
+* fix: improve Mermaid diagram rendering with proper DOM manipulation ([9ef1816](https://github.com/e0ipso/ai-task-manager/commit/9ef1816))
+
 ## <small>1.6.1 (2025-09-15)</small>
 
 * fix: correct site URLs and add Mermaid diagram support ([cdd4b5e](https://github.com/e0ipso/ai-task-manager/commit/cdd4b5e))
