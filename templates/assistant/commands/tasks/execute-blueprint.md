@@ -37,36 +37,16 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 
 ### Phase Pre-Execution
 
-Before starting execution check if you are in the `main` branch. If so, create a git branch to work on this blueprint use the plan name for the branch name.
-
-If there are unstaged changes in the `main` branch, do not create a feature branch.
+Read and execute @.ai/task-manager/config/hooks/PRE_PHASE.md
 
 ### Phase Execution Workflow
 
 1. **Phase Initialization**
     - Identify current phase from the execution blueprint
     - List all tasks scheduled for parallel execution in this phase
-    - **Validate Task Dependencies**: For each task in the current phase, use the dependency checking script:
-        ```bash
-        # For each task in current phase
-        for TASK_ID in $PHASE_TASKS; do
-            if ! node .ai/task-manager/config/scripts/check-task-dependencies.js "$1" "$TASK_ID"; then
-                echo "ERROR: Task $TASK_ID has unresolved dependencies - cannot proceed with phase execution"
-                echo "Please resolve dependencies before continuing with blueprint execution"
-                exit 1
-            fi
-        done
-        ```
-    - Confirm no tasks are marked "needs-clarification"
-    - If any phases are marked as completed, verify they are actually completed and continue from the next phase.
 
 2. **Agent Selection and Task Assignment**
-    - For each task in the current phase:
-        - Read task frontmatter to extract the `skills` property (array of technical skills)
-        - Analyze task requirements and technical domain from description
-        - Match task skills against available sub-agent capabilities
-        - Select the most appropriate sub-agent (if any are available). If no sub-agent is appropriate, use the general-purpose one.
-        - Consider task-specific requirements from the task document
+Read and execute @.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 3. **Parallel Execution**
     - Deploy all selected agents simultaneously using your internal Task tool
@@ -90,20 +70,6 @@ If there are unstaged changes in the `main` branch, do not create a feature bran
     - Initialize next phase
     - Repeat process until all phases are complete
 
-### Agent Selection Guidelines
-
-#### Available Sub-Agents
-Analyze the sub-agents available in your current assistant's agents directory. If none are available
-or the available ones do not match the task's requirements, then use a generic
-agent.
-
-#### Matching Criteria
-Select agents based on:
-1. **Primary skill match**: Task technical requirements from the `skills` array in task frontmatter
-2. **Domain expertise**: Specific frameworks or libraries mentioned in task descriptions
-3. **Task complexity**: Senior vs. junior agent capabilities
-4. **Resource efficiency**: Avoid over-provisioning for simple tasks
-
 ### Execution Monitoring
 
 #### Progress Tracking
@@ -124,13 +90,7 @@ Valid status transitions:
 ### Error Handling
 
 #### Validation Gate Failures
-If validation gates fail:
-1. Document which specific validations failed
-2. Identify which tasks may have caused the failure
-3. Generate remediation plan
-4. Re-execute affected tasks after fixes
-5. Re-run validation gates
-6. If errors persist, escalate to the user
+Read and execute @.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ### Output Requirements
 
