@@ -76,31 +76,27 @@ npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
 The tool generates this organized structure:
 
 ```mermaid
-graph TD
-    A[project-root/] --> B[.ai/task-manager/]
-    A --> C[.claude/commands/tasks/]
-    A --> D[.gemini/commands/tasks/]
-    A --> E[.opencode/commands/tasks/]
+flowchart TD
+    A[🗂️ project-root/] --> B[📁 .ai/task-manager/]
+    B --> B1[📋 plans/]
+    B --> B2[⚙️ config/]
     
-    B --> B1[plans/ - Generated project plans]
-    B --> B2[config/ - Project context & validation]
+    A --> C[🤖 Assistant Commands:]
+    C --> C1[📝 .claude/commands/tasks/]
+    C --> D1[💎 .gemini/commands/tasks/] 
+    C --> E1[🔓 .opencode/commands/tasks/]
     
-    C --> C1[create-plan.md]
-    C --> C2[generate-tasks.md] 
-    C --> C3[execute-blueprint.md]
-    
-    D --> D1[create-plan.toml]
-    D --> D2[generate-tasks.toml]
-    D --> D3[execute-blueprint.toml]
-    
-    E --> E1[create-plan.md]
-    E --> E2[generate-tasks.md]
-    E --> E3[execute-blueprint.md]
+    C1 --> C2[create-plan.md<br/>generate-tasks.md<br/>execute-blueprint.md]
+    D1 --> D2[create-plan.toml<br/>generate-tasks.toml<br/>execute-blueprint.toml]
+    E1 --> E2[create-plan.md<br/>generate-tasks.md<br/>execute-blueprint.md]
     
     style B fill:#e8f5e8
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#e3f2fd
+    style C1 fill:#fff3e0
+    style D1 fill:#f3e5f5 
+    style E1 fill:#e3f2fd
+    style C2 fill:#fff3e0
+    style D2 fill:#f3e5f5
+    style E2 fill:#e3f2fd
 ```
 
 ### Supported Assistants
