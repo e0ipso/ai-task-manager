@@ -1,3 +1,7 @@
+## 1.8.0 (2025-09-15)
+
+* feat: comprehensive documentation restructure with README streamlining ([bac6978](https://github.com/e0ipso/ai-task-manager/commit/bac6978))
+
 ## <small>1.7.1 (2025-09-15)</small>
 
 * fix: make directory structure diagram more mobile-friendly ([0ef6b45](https://github.com/e0ipso/ai-task-manager/commit/0ef6b45))
