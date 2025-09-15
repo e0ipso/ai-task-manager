@@ -1,42 +1,38 @@
-title: AI Task Manager Documentation
+title: AI Task Manager
 description: Transform chaotic AI prompts into structured, executable workflows
 url: https://mateuaguilo.com
 baseurl: "/ai-task-manager"
 
-markdown: kramdown
-highlighter: rouge
-plugins:
-  - jekyll-sitemap
-  - jekyll-feed
+# Just the Docs theme configuration
+remote_theme: just-the-docs/just-the-docs
 
-theme: minima
+# Theme settings
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+# Mermaid support (built into Just the Docs)
+mermaid:
+  version: "10.6.1"
+
+# Navigation
+nav_sort: case_sensitive
 
 # SEO and social media
 author: e0ipso
 twitter:
   username: e0ipso
-logo: /assets/logo.png
 
-# Mermaid support
-mermaid:
-  enable: true
+# Jekyll plugins
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
 
-# Navigation
-header_pages:
-  - index.md
-
-# Collections
-collections:
-  pages:
-    output: true
-    permalink: /:name/
-
-# Defaults
-defaults:
-  - scope:
-      path: ""
-    values:
-      layout: "default"
+# Markdown processing
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  syntax_highlighter: rouge
       
 # Exclude from processing
 exclude:
