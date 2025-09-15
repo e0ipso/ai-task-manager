@@ -1,3 +1,10 @@
+---
+layout: default
+title: Home
+nav_order: 1
+description: "Transform chaotic AI prompts into structured, executable workflows"
+---
+
 # 🤖 AI Task Manager
 
 **Transform chaotic AI prompts into structured, executable workflows.**
