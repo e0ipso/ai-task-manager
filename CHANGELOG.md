@@ -1,3 +1,9 @@
+## <small>1.8.2 (2025-09-17)</small>
+
+* fix: plan ID generation duplicate issue (#3) ([fa1474d](https://github.com/e0ipso/ai-task-manager/commit/fa1474d)), closes [#3](https://github.com/e0ipso/ai-task-manager/issues/3)
+* docs: add link to GH in the header ([de4c8cf](https://github.com/e0ipso/ai-task-manager/commit/de4c8cf))
+* docs: fix GitHub repository link in docs header ([ed954f0](https://github.com/e0ipso/ai-task-manager/commit/ed954f0))
+
 ## <small>1.8.1 (2025-09-15)</small>
 
 * fix: refactor command functionality into reusable hooks (#1) ([c7fa766](https://github.com/e0ipso/ai-task-manager/commit/c7fa766)), closes [#1](https://github.com/e0ipso/ai-task-manager/issues/1)
