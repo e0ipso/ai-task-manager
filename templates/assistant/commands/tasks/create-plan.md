@@ -132,11 +132,11 @@ The schema for this frontmatter is:
 
 **Auto-generate the next plan ID:**
 ```bash
-echo $(($(find .ai/task-manager/{plans,archive} -name "plan-[0-9]*--*.md" -exec grep "^id:" {} \; 2>/dev/null | sed 's/id: *//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
+echo $(($(find .ai/task-manager/{plans,archive} -name "plan-[0-9]*--*.md" -exec grep "^id: *[0-9][0-9]* *$" {} \; 2>/dev/null | sed 's/.*id: *//' | sed 's/ *$//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
 ```
 
 **Key formatting:**
 - **Front-matter**: Use numeric values (`id: 7`)
 - **Directory names**: Use zero-padded strings (`07--plan-name`)
 
-This command reads `id:` values from existing plan front-matter as the source of truth. Handles empty directories (returns 1) and gaps in sequence automatically.
+This command validates and reads `id:` values from existing plan front-matter as the source of truth, filtering out malformed or non-numeric IDs. Handles empty directories (returns 1), gaps in sequence, and malformed frontmatter automatically.
