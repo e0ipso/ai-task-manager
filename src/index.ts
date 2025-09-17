@@ -273,7 +273,7 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`│  2) Provide additional context if the assistant needs it${' '.repeat(3)}│`);
   console.log(`│${' '.repeat(width)}│`);
   console.log(`│  3) MANUALLY REVIEW THE PLAN (don't skip this!)${' '.repeat(12)}│`);
-  console.log(`│      Find it in: .ai/task-manager/plans/01--*/plan-*.md${' '.repeat(4)}│`);
+  console.log(`│      Find it in: .ai/task-manager/plans/01--*/plan-[0-9]*--*.md${' '.repeat(4)}│`);
   console.log(`│${' '.repeat(width)}│`);
   console.log(`│  4) Create the tasks for the plan:${' '.repeat(25)}│`);
   console.log(`│      /tasks:generate-tasks 1${' '.repeat(31)}│`);
