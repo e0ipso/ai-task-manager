@@ -132,7 +132,7 @@ The schema for this frontmatter is:
 
 **Auto-generate the next plan ID:**
 ```bash
-echo $(($(find .ai/task-manager/{plans,archive} -name "plan-[0-9]*--*.md" 2>/dev/null -exec grep "^id:[[:space:]]*[0-9]" {} \; 2>/dev/null | sed -E "s/^[[:space:]]*id:[[:space:]]*([0-9]+)[[:space:]]*.*/\1/" 2>/dev/null | sort -n 2>/dev/null | tail -1 2>/dev/null | { read id; echo "${id:-0}"; }) + 1))
+echo $(($(find .ai/task-manager/{plans,archive} -name "plan-[0-9]*--*.md" 2>/dev/null -exec sh -c 'grep -m1 "^[[:space:]]*id:[[:space:]]*[0-9][0-9]*[[:space:]]*$" "$1" 2>/dev/null || echo "id: 0"' _ {} \; | sed -E "s/^[[:space:]]*id:[[:space:]]*([0-9]+)[[:space:]]*$/\1/" | awk 'BEGIN{max=0} {if($1+0>max) max=$1+0} END{print max}') + 1))
 ```
 
 **Key formatting:**
