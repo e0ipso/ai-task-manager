@@ -1,3 +1,7 @@
+## <small>1.8.3 (2025-09-23)</small>
+
+* fix: improve ID generation process ([e43f3c1](https://github.com/e0ipso/ai-task-manager/commit/e43f3c1))
+
 ## <small>1.8.2 (2025-09-17)</small>
 
 * fix: plan ID generation duplicate issue (#3) ([fa1474d](https://github.com/e0ipso/ai-task-manager/commit/fa1474d)), closes [#3](https://github.com/e0ipso/ai-task-manager/issues/3)
