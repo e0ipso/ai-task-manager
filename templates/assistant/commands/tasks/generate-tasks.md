@@ -220,18 +220,18 @@ When creating tasks, you need to determine the next available task ID for the sp
 
 #### Command
 ```bash
-PLAN_ID=$1; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id: *[0-9][0-9]* *$" {} \; 2>/dev/null | sed 's/.*id: *//' | sed 's/ *$//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
+node .ai/task-manager/config/scripts/get-next-task-id.js $1
 ```
 
 #### How It Works
-1. **Finds task files** using the pattern `*.md` in the specific plan's tasks directory
-2. **Validates and extracts front-matter IDs** using grep to find `id:` lines with valid numeric values, filtering out malformed or string IDs
-3. **Strips the `id:` prefix and whitespace** using sed to get clean numeric values only
-4. **Sorts numerically** to find the highest existing task ID
-5. **Handles empty results** by defaulting to 0 if no valid tasks exist
-6. **Adds 1** to get the next available task ID
+1. **Finds the plan directory** using pattern matching for plan ID directories
+2. **Scans task files** in the plan's tasks directory for `.md` files
+3. **Validates frontmatter IDs** by parsing YAML frontmatter and extracting numeric ID values
+4. **Finds maximum ID** by comparing all valid task IDs numerically
+5. **Handles edge cases** by gracefully handling missing directories, corrupted files, and parsing errors
+6. **Returns next ID** by incrementing the maximum found ID by 1
 
-This command reads the actual `id:` values from task front-matter, making it the definitive source of truth.
+This Node.js script provides robust error handling and reliable ID generation.
 
 #### Parameter Usage
 - `$1` is the plan ID parameter passed to this template
@@ -249,7 +249,7 @@ This command reads the actual `id:` values from task front-matter, making it the
 **Example 1: Plan 6 with existing tasks**
 ```bash
 # Command execution (plan ID = 6)
-PLAN_ID=6; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id: *[0-9][0-9]* *$" {} \; 2>/dev/null | sed 's/.*id: *//' | sed 's/ *$//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
+node .ai/task-manager/config/scripts/get-next-task-id.js 6
 # Output: 5 (if highest valid numeric task front-matter has id: 4)
 
 # Front-matter usage:
@@ -266,7 +266,7 @@ skills: ["api-endpoints", "database"]
 **Example 2: Plan 1 with no existing tasks**
 ```bash
 # Command execution (plan ID = 1)
-PLAN_ID=1; echo $(($(find .ai/task-manager/plans/$(printf "%02d" $PLAN_ID)--*/tasks -name "*.md" -exec grep "^id: *[0-9][0-9]* *$" {} \; 2>/dev/null | sed 's/.*id: *//' | sed 's/ *$//' | sort -n | tail -1 | sed 's/^$/0/') + 1))
+node .ai/task-manager/config/scripts/get-next-task-id.js 1
 # Output: 1 (empty tasks directory, no valid front-matter to read)
 
 # Front-matter usage:

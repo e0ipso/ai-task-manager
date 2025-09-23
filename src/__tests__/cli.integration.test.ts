@@ -36,24 +36,29 @@ describe('CLI Integration Tests - Consolidated', () => {
     await fs.remove(testDir);
   });
 
-  const executeCommand = (command: string): { stdout: string; stderr: string; exitCode: number } => {
+  const executeCommand = (
+    command: string
+  ): { stdout: string; stderr: string; exitCode: number } => {
     try {
       const stdout = execSync(command, {
         encoding: 'utf8',
         cwd: testDir,
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       });
       return { stdout, stderr: '', exitCode: 0 };
     } catch (error: any) {
       return {
         stdout: error.stdout?.toString() || '',
         stderr: error.stderr?.toString() || '',
-        exitCode: error.status || 1
+        exitCode: error.status || 1,
       };
     }
   };
 
-  const verifyDirectoryStructure = async (assistants: string[], customDir?: string): Promise<void> => {
+  const verifyDirectoryStructure = async (
+    assistants: string[],
+    customDir?: string
+  ): Promise<void> => {
     const baseDir = customDir ? path.join(testDir, customDir) : testDir;
 
     // Common directories
@@ -80,8 +85,12 @@ describe('CLI Integration Tests - Consolidated', () => {
     }
 
     // Common template files
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/TASK_MANAGER.md'))).toBe(true);
-    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/TASK_MANAGER.md'))).toBe(
+      true
+    );
+    expect(
+      await fs.pathExists(path.join(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md'))
+    ).toBe(true);
   };
 
   const verifyFileContent = async (assistants: string[], customDir?: string): Promise<void> => {
@@ -90,20 +99,23 @@ describe('CLI Integration Tests - Consolidated', () => {
     for (const assistant of assistants) {
       if (assistant === 'claude') {
         const createPlan = await fs.readFile(
-          path.join(baseDir, '.claude/commands/tasks/create-plan.md'), 'utf8'
+          path.join(baseDir, '.claude/commands/tasks/create-plan.md'),
+          'utf8'
         );
         expect(createPlan).toContain('$ARGUMENTS');
         expect(createPlan).toContain('---'); // YAML frontmatter
       } else if (assistant === 'gemini') {
         const createPlan = await fs.readFile(
-          path.join(baseDir, '.gemini/commands/tasks/create-plan.toml'), 'utf8'
+          path.join(baseDir, '.gemini/commands/tasks/create-plan.toml'),
+          'utf8'
         );
         expect(createPlan).toContain('{{args}}');
         expect(createPlan).toContain('[metadata]');
         expect(createPlan).toContain('[prompt]');
       } else if (assistant === 'opencode') {
         const createPlan = await fs.readFile(
-          path.join(baseDir, '.opencode/command/tasks/create-plan.md'), 'utf8'
+          path.join(baseDir, '.opencode/command/tasks/create-plan.md'),
+          'utf8'
         );
         expect(createPlan).toContain('$ARGUMENTS');
         expect(createPlan).toContain('---'); // YAML frontmatter
@@ -152,7 +164,10 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['gemini']);
 
       // Verify TOML-specific content structure
-      const createPlan = await fs.readFile(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 'utf8');
+      const createPlan = await fs.readFile(
+        path.join(testDir, '.gemini/commands/tasks/create-plan.toml'),
+        'utf8'
+      );
       expect(createPlan).toContain('content = """');
       expect(createPlan).toContain('argument-hint = "{{args}}"');
       expect(createPlan).not.toContain('$ARGUMENTS'); // Should be converted
@@ -167,7 +182,10 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['opencode']);
 
       // Verify Open Code preserves Markdown format (like Claude)
-      const createPlan = await fs.readFile(path.join(testDir, '.opencode/command/tasks/create-plan.md'), 'utf8');
+      const createPlan = await fs.readFile(
+        path.join(testDir, '.opencode/command/tasks/create-plan.md'),
+        'utf8'
+      );
       expect(createPlan).toContain('$ARGUMENTS'); // Should preserve original format
       expect(createPlan).toContain('---'); // YAML frontmatter
       expect(createPlan).toContain('argument-hint: [user-prompt]');
@@ -186,8 +204,12 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['claude', 'gemini']);
 
       // Verify no cross-contamination between formats
-      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.toml'))).toBe(false);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(false);
+      expect(
+        await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.toml'))
+      ).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(
+        false
+      );
     });
 
     it('should handle mixed assistants including opencode with correct format isolation', async () => {
@@ -199,14 +221,26 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['claude', 'opencode', 'gemini']);
 
       // Verify format isolation: each assistant gets its own format
-      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(testDir, '.opencode/command/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.md'))).toBe(
+        true
+      );
+      expect(
+        await fs.pathExists(path.join(testDir, '.opencode/command/tasks/create-plan.md'))
+      ).toBe(true);
+      expect(
+        await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'))
+      ).toBe(true);
 
       // Verify no cross-contamination
-      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.toml'))).toBe(false);
-      expect(await fs.pathExists(path.join(testDir, '.opencode/command/tasks/create-plan.toml'))).toBe(false);
-      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(false);
+      expect(
+        await fs.pathExists(path.join(testDir, '.claude/commands/tasks/create-plan.toml'))
+      ).toBe(false);
+      expect(
+        await fs.pathExists(path.join(testDir, '.opencode/command/tasks/create-plan.toml'))
+      ).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(
+        false
+      );
     });
 
     it('should handle opencode with other assistants and verify content integrity', async () => {
@@ -218,12 +252,18 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['opencode', 'gemini']);
 
       // Verify Open Code content format is preserved as Markdown
-      const opencodeContent = await fs.readFile(path.join(testDir, '.opencode/command/tasks/create-plan.md'), 'utf8');
+      const opencodeContent = await fs.readFile(
+        path.join(testDir, '.opencode/command/tasks/create-plan.md'),
+        'utf8'
+      );
       expect(opencodeContent).toContain('$ARGUMENTS');
       expect(opencodeContent).not.toContain('{{args}}');
 
       // Verify Gemini content format is converted to TOML
-      const geminiContent = await fs.readFile(path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 'utf8');
+      const geminiContent = await fs.readFile(
+        path.join(testDir, '.gemini/commands/tasks/create-plan.toml'),
+        'utf8'
+      );
       expect(geminiContent).toContain('{{args}}');
       expect(geminiContent).not.toContain('$ARGUMENTS');
     });
@@ -240,14 +280,18 @@ describe('CLI Integration Tests - Consolidated', () => {
       await fs.remove(path.join(testDir, '.gemini'));
 
       // Test duplicate handling
-      const duplicates = executeCommand(`node "${cliPath}" init --assistants claude,claude,gemini,gemini`);
+      const duplicates = executeCommand(
+        `node "${cliPath}" init --assistants claude,claude,gemini,gemini`
+      );
       expect(duplicates.exitCode).toBe(0);
       await verifyDirectoryStructure(['claude', 'gemini']);
     });
 
     it('should handle opencode with whitespace and duplicates', async () => {
       // Test whitespace handling with Open Code
-      const whitespace = executeCommand(`node "${cliPath}" init --assistants " opencode , claude "`);
+      const whitespace = executeCommand(
+        `node "${cliPath}" init --assistants " opencode , claude "`
+      );
       expect(whitespace.exitCode).toBe(0);
       await verifyDirectoryStructure(['opencode', 'claude']);
 
@@ -257,7 +301,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       await fs.remove(path.join(testDir, '.claude'));
 
       // Test duplicate handling with Open Code
-      const duplicates = executeCommand(`node "${cliPath}" init --assistants opencode,opencode,claude,opencode`);
+      const duplicates = executeCommand(
+        `node "${cliPath}" init --assistants opencode,opencode,claude,opencode`
+      );
       expect(duplicates.exitCode).toBe(0);
       await verifyDirectoryStructure(['opencode', 'claude']);
     });
@@ -266,7 +312,9 @@ describe('CLI Integration Tests - Consolidated', () => {
   describe('Path Resolution and Directory Handling', () => {
     it('should handle custom destination directories correctly', async () => {
       const customDir = 'custom-project';
-      const result = executeCommand(`node "${cliPath}" init --assistants claude --destination-directory ${customDir}`);
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude --destination-directory ${customDir}`
+      );
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('AI Task Manager initialized successfully!');
@@ -281,7 +329,9 @@ describe('CLI Integration Tests - Consolidated', () => {
 
     it('should handle opencode with custom destination directories', async () => {
       const customDir = 'opencode-project';
-      const result = executeCommand(`node "${cliPath}" init --assistants opencode --destination-directory ${customDir}`);
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants opencode --destination-directory ${customDir}`
+      );
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('AI Task Manager initialized successfully!');
@@ -306,19 +356,25 @@ describe('CLI Integration Tests - Consolidated', () => {
     it('should handle complex path scenarios', async () => {
       // Test nested paths
       const nestedDir = 'level1/level2/nested-project';
-      const nestedResult = executeCommand(`node "${cliPath}" init --assistants claude --destination-directory ${nestedDir}`);
+      const nestedResult = executeCommand(
+        `node "${cliPath}" init --assistants claude --destination-directory ${nestedDir}`
+      );
       expect(nestedResult.exitCode).toBe(0);
       await verifyDirectoryStructure(['claude'], nestedDir);
 
       // Test absolute paths
       const absoluteDir = path.join(testDir, 'absolute-project');
-      const absoluteResult = executeCommand(`node "${cliPath}" init --assistants gemini --destination-directory "${absoluteDir}"`);
+      const absoluteResult = executeCommand(
+        `node "${cliPath}" init --assistants gemini --destination-directory "${absoluteDir}"`
+      );
       expect(absoluteResult.exitCode).toBe(0);
       await verifyDirectoryStructure(['gemini'], 'absolute-project');
 
       // Test paths with spaces
       const spacedDir = 'project with spaces';
-      const spacedResult = executeCommand(`node "${cliPath}" init --assistants claude --destination-directory "${spacedDir}"`);
+      const spacedResult = executeCommand(
+        `node "${cliPath}" init --assistants claude --destination-directory "${spacedDir}"`
+      );
       expect(spacedResult.exitCode).toBe(0);
       await verifyDirectoryStructure(['claude'], spacedDir);
     });
@@ -340,7 +396,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(errorOutput).toMatch(/claude|gemini|opencode/);
 
       // Partially invalid assistants
-      const partiallyInvalid = executeCommand(`node "${cliPath}" init --assistants claude,invalid,gemini`);
+      const partiallyInvalid = executeCommand(
+        `node "${cliPath}" init --assistants claude,invalid,gemini`
+      );
       expect(partiallyInvalid.exitCode).toBe(1);
       const partialOutput = partiallyInvalid.stdout + partiallyInvalid.stderr;
       expect(partialOutput).toContain('Invalid assistant');
@@ -360,18 +418,21 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify common template files
       const taskManagerInfo = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/config/TASK_MANAGER.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/config/TASK_MANAGER.md'),
+        'utf8'
       );
       expect(taskManagerInfo).toContain('# Task Manager General Information');
 
       const validationGates = await fs.readFile(
-        path.join(testDir, '.ai/task-manager/config/hooks/POST_PHASE.md'), 'utf8'
+        path.join(testDir, '.ai/task-manager/config/hooks/POST_PHASE.md'),
+        'utf8'
       );
       expect(validationGates).toContain('Ensure that:');
 
       // Verify Claude MD template structure
       const claudeCreatePlan = await fs.readFile(
-        path.join(testDir, '.claude/commands/tasks/create-plan.md'), 'utf8'
+        path.join(testDir, '.claude/commands/tasks/create-plan.md'),
+        'utf8'
       );
       expect(claudeCreatePlan).toContain('---'); // YAML frontmatter
       expect(claudeCreatePlan).toContain('$ARGUMENTS');
@@ -379,7 +440,8 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify Gemini TOML template structure and conversion
       const geminiCreatePlan = await fs.readFile(
-        path.join(testDir, '.gemini/commands/tasks/create-plan.toml'), 'utf8'
+        path.join(testDir, '.gemini/commands/tasks/create-plan.toml'),
+        'utf8'
       );
       expect(geminiCreatePlan).toContain('[metadata]');
       expect(geminiCreatePlan).toContain('[prompt]');
@@ -401,7 +463,8 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify Open Code MD template structure (same format as Claude)
       const opencodeCreatePlan = await fs.readFile(
-        path.join(testDir, '.opencode/command/tasks/create-plan.md'), 'utf8'
+        path.join(testDir, '.opencode/command/tasks/create-plan.md'),
+        'utf8'
       );
       expect(opencodeCreatePlan).toContain('---'); // YAML frontmatter
       expect(opencodeCreatePlan).toContain('$ARGUMENTS');
@@ -409,7 +472,8 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       // Verify Open Code template is identical to Claude template (both Markdown)
       const claudeCreatePlan = await fs.readFile(
-        path.join(testDir, '.claude/commands/tasks/create-plan.md'), 'utf8'
+        path.join(testDir, '.claude/commands/tasks/create-plan.md'),
+        'utf8'
       );
       expect(opencodeCreatePlan).toBe(claudeCreatePlan);
 
@@ -450,7 +514,8 @@ describe('CLI Integration Tests - Consolidated', () => {
 
       const content = await fs.readFile(taskFile, 'utf8');
       expect(content.length).toBeGreaterThan(0);
-      expect(content).not.toMatch(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/); // No binary data
+      // eslint-disable-next-line no-control-regex
+      expect(content).not.toMatch(/[\0-\x08\x0B\x0C\x0E-\x1F\x7F]/); // No binary data
       expect(content).toMatch(/\n/); // Proper line endings
     });
   });
@@ -475,7 +540,9 @@ describe('CLI Integration Tests - Consolidated', () => {
 
     it('should handle filesystem permission scenarios gracefully', async () => {
       // Test with non-existent parent directory (should create it)
-      const result = executeCommand(`node "${cliPath}" init --assistants claude --destination-directory does-not-exist/child-dir`);
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude --destination-directory does-not-exist/child-dir`
+      );
       expect(result.exitCode).toBe(0);
 
       // Verify parent directories were created
@@ -489,7 +556,9 @@ describe('CLI Integration Tests - Consolidated', () => {
     it('should complete full workflow with all assistants and verify comprehensive functionality', async () => {
       // Test complete workflow: multiple assistants + custom directory + comprehensive verification
       const customDir = 'complete-test-project';
-      const result = executeCommand(`node "${cliPath}" init --assistants claude,gemini --destination-directory "${customDir}"`);
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude,gemini --destination-directory "${customDir}"`
+      );
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('AI Task Manager initialized successfully!');
@@ -501,19 +570,21 @@ describe('CLI Integration Tests - Consolidated', () => {
       const baseDir = path.join(testDir, customDir);
 
       // Verify template variable conversion works correctly across all files
-      const templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
       const variableTests = [
         { template: 'create-plan', claudeVar: '$ARGUMENTS', geminiVar: '{{args}}' },
         { template: 'execute-blueprint', claudeVar: '$1', geminiVar: '{{plan_id}}' },
-        { template: 'generate-tasks', claudeVar: '$1', geminiVar: '{{plan_id}}' }
+        { template: 'generate-tasks', claudeVar: '$1', geminiVar: '{{plan_id}}' },
       ];
 
       for (const test of variableTests) {
         const claudeContent = await fs.readFile(
-          path.join(baseDir, `.claude/commands/tasks/${test.template}.md`), 'utf8'
+          path.join(baseDir, `.claude/commands/tasks/${test.template}.md`),
+          'utf8'
         );
         const geminiContent = await fs.readFile(
-          path.join(baseDir, `.gemini/commands/tasks/${test.template}.toml`), 'utf8'
+          path.join(baseDir, `.gemini/commands/tasks/${test.template}.toml`),
+          'utf8'
         );
 
         expect(claudeContent).toContain(test.claudeVar);
@@ -530,7 +601,9 @@ describe('CLI Integration Tests - Consolidated', () => {
     it('should complete comprehensive workflow with all three assistants including opencode', async () => {
       // Test complete workflow with all assistants: claude, gemini, and opencode
       const customDir = 'all-assistants-project';
-      const result = executeCommand(`node "${cliPath}" init --assistants claude,opencode,gemini --destination-directory "${customDir}"`);
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude,opencode,gemini --destination-directory "${customDir}"`
+      );
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('AI Task Manager initialized successfully!');
@@ -542,23 +615,26 @@ describe('CLI Integration Tests - Consolidated', () => {
       const baseDir = path.join(testDir, customDir);
 
       // Verify template variable handling for all assistants
-      const templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
       const variableTests = [
         { template: 'create-plan', markdownVar: '$ARGUMENTS', tomlVar: '{{args}}' },
         { template: 'execute-blueprint', markdownVar: '$1', tomlVar: '{{plan_id}}' },
-        { template: 'generate-tasks', markdownVar: '$1', tomlVar: '{{plan_id}}' }
+        { template: 'generate-tasks', markdownVar: '$1', tomlVar: '{{plan_id}}' },
       ];
 
       for (const test of variableTests) {
         // Claude and Open Code should have identical Markdown format
         const claudeContent = await fs.readFile(
-          path.join(baseDir, `.claude/commands/tasks/${test.template}.md`), 'utf8'
+          path.join(baseDir, `.claude/commands/tasks/${test.template}.md`),
+          'utf8'
         );
         const opencodeContent = await fs.readFile(
-          path.join(baseDir, `.opencode/command/tasks/${test.template}.md`), 'utf8'
+          path.join(baseDir, `.opencode/command/tasks/${test.template}.md`),
+          'utf8'
         );
         const geminiContent = await fs.readFile(
-          path.join(baseDir, `.gemini/commands/tasks/${test.template}.toml`), 'utf8'
+          path.join(baseDir, `.gemini/commands/tasks/${test.template}.toml`),
+          'utf8'
         );
 
         // Claude and Open Code should be identical (both Markdown)
@@ -572,13 +648,25 @@ describe('CLI Integration Tests - Consolidated', () => {
       }
 
       // Verify proper format isolation: no cross-contamination
-      expect(await fs.pathExists(path.join(baseDir, '.claude/commands/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(baseDir, '.opencode/command/tasks/create-plan.md'))).toBe(true);
-      expect(await fs.pathExists(path.join(baseDir, '.gemini/commands/tasks/create-plan.toml'))).toBe(true);
+      expect(await fs.pathExists(path.join(baseDir, '.claude/commands/tasks/create-plan.md'))).toBe(
+        true
+      );
+      expect(
+        await fs.pathExists(path.join(baseDir, '.opencode/command/tasks/create-plan.md'))
+      ).toBe(true);
+      expect(
+        await fs.pathExists(path.join(baseDir, '.gemini/commands/tasks/create-plan.toml'))
+      ).toBe(true);
 
-      expect(await fs.pathExists(path.join(baseDir, '.claude/commands/tasks/create-plan.toml'))).toBe(false);
-      expect(await fs.pathExists(path.join(baseDir, '.opencode/command/tasks/create-plan.toml'))).toBe(false);
-      expect(await fs.pathExists(path.join(baseDir, '.gemini/commands/tasks/create-plan.md'))).toBe(false);
+      expect(
+        await fs.pathExists(path.join(baseDir, '.claude/commands/tasks/create-plan.toml'))
+      ).toBe(false);
+      expect(
+        await fs.pathExists(path.join(baseDir, '.opencode/command/tasks/create-plan.toml'))
+      ).toBe(false);
+      expect(await fs.pathExists(path.join(baseDir, '.gemini/commands/tasks/create-plan.md'))).toBe(
+        false
+      );
 
       // Verify no files were created in current directory
       expect(await fs.pathExists(path.join(testDir, '.ai'))).toBe(false);
