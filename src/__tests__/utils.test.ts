@@ -99,7 +99,7 @@ Body content here`;
       const result = parseFrontmatter(content);
       expect(result.frontmatter).toEqual({
         title: 'Test',
-        description: 'A test file'
+        description: 'A test file',
       });
       expect(result.body).toBe('Body content here');
     });
@@ -114,7 +114,7 @@ Body`;
       const result = parseFrontmatter(content);
       expect(result.frontmatter).toEqual({
         title: 'Quoted Title',
-        description: 'Single quoted'
+        description: 'Single quoted',
       });
     });
 
@@ -148,7 +148,7 @@ Body`;
       const result = parseFrontmatter(content);
       expect(result.frontmatter).toEqual({
         title: 'Test',
-        description: 'With empty line above'
+        description: 'With empty line above',
       });
     });
 
@@ -216,7 +216,9 @@ Newlines\nand\ttabs.`;
 
       const result = convertMdToToml(md);
       expect(result).toContain('title = "Title with \\"quotes\\" and \\\\backslashes"');
-      expect(result).toContain('Content with \\"quotes\\" and \\\\ backslashes\\nNewlines\\nand\\ttabs.');
+      expect(result).toContain(
+        'Content with \\"quotes\\" and \\\\ backslashes\\nNewlines\\nand\\ttabs.'
+      );
     });
 
     it('should handle content without frontmatter', () => {

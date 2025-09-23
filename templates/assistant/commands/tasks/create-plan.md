@@ -132,25 +132,25 @@ The schema for this frontmatter is:
 
 **Auto-generate the next plan ID:**
 ```bash
-echo $(($(find .ai/task-manager/{plans,archive} -name "plan-[0-9]*--*.md" 2>/dev/null -exec sh -c 'grep -m1 "^[[:space:]]*id:[[:space:]]*[0-9][0-9]*[[:space:]]*$" "$1" 2>/dev/null || echo "id: 0"' _ {} \; | sed -E "s/^[[:space:]]*id:[[:space:]]*([0-9]+)[[:space:]]*$/\1/" | awk 'BEGIN{max=0} {if($1+0>max) max=$1+0} END{print max}') + 1))
+node .ai/task-manager/config/scripts/get-next-plan-id.js
 ```
 
 **Key formatting:**
 - **Front-matter**: Use numeric values (`id: 7`)
 - **Directory names**: Use zero-padded strings (`07--plan-name`)
 
-This enhanced command provides robust plan ID generation with comprehensive error handling:
+This Node.js script provides robust plan ID generation with comprehensive error handling:
 
 **Features:**
-- **Flexible Whitespace Handling**: Supports various patterns: `id: 5`, `id:5`, `id:  15`, `id:	25` (tabs)
+- **Flexible Whitespace Handling**: Supports various frontmatter patterns
 - **Validation Layer**: Only processes files with valid numeric ID fields in YAML frontmatter
 - **Error Resilience**: Gracefully handles empty directories, corrupted files, and parsing failures
-- **Fallback Logic**: Returns ID 1 when no valid plans found, ensuring command never fails
-- **Robust Parsing**: Uses POSIX character classes for reliable whitespace matching across systems
+- **Fallback Logic**: Returns ID 1 when no valid plans found, ensuring script never fails
+- **Dual ID Detection**: Checks both filename patterns and frontmatter for maximum reliability
 
 **Handles Edge Cases:**
 - Empty plans/archive directories → Returns 1
 - Corrupted or malformed YAML frontmatter → Skips invalid files
 - Non-numeric ID values → Filters out automatically
-- Missing frontmatter → Ignored safely
-- File system errors → Suppressed with 2>/dev/null
+- Missing frontmatter → Uses filename fallback
+- File system errors → Gracefully handled
