@@ -1,3 +1,7 @@
+## <small>1.9.1 (2025-09-25)</small>
+
+* fix: use common js extension ([1641655](https://github.com/e0ipso/ai-task-manager/commit/1641655))
+
 ## 1.9.0 (2025-09-25)
 
 * docs: additional documentation ([0465f95](https://github.com/e0ipso/ai-task-manager/commit/0465f95))
