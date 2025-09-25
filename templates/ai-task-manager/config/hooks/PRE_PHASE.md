@@ -17,7 +17,7 @@ If there are unstaged changes in the `main` branch, do not create a feature bran
         ```bash
         # For each task in current phase
         for TASK_ID in $PHASE_TASKS; do
-            if ! node .ai/task-manager/config/scripts/check-task-dependencies.js "$1" "$TASK_ID"; then
+            if ! node .ai/task-manager/config/scripts/check-task-dependencies.cjs "$1" "$TASK_ID"; then
                 echo "ERROR: Task $TASK_ID has unresolved dependencies - cannot proceed with phase execution"
                 echo "Please resolve dependencies before continuing with blueprint execution"
                 exit 1

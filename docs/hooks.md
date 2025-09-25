@@ -40,7 +40,7 @@ The system includes 7 hooks located in `.ai/task-manager/config/hooks/`:
 **Key Functions**:
 - Git branch management (creates feature branch from main if on main branch)
 - Validates current repository state (checks for unstaged changes)
-- Task dependency validation using `check-task-dependencies.js` script
+- Task dependency validation using `check-task-dependencies.cjs` script
 - Confirms no tasks are marked "needs-clarification"
 - Verifies completed phases are actually complete
 
@@ -48,7 +48,7 @@ The system includes 7 hooks located in `.ai/task-manager/config/hooks/`:
 ```bash
 # Dependency checking logic from the hook
 for TASK_ID in $PHASE_TASKS; do
-    if ! node .ai/task-manager/config/scripts/check-task-dependencies.js "$1" "$TASK_ID"; then
+    if ! node .ai/task-manager/config/scripts/check-task-dependencies.cjs "$1" "$TASK_ID"; then
         echo "ERROR: Task $TASK_ID has unresolved dependencies"
         exit 1
     fi
