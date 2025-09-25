@@ -11,9 +11,27 @@ The AI Task Manager uses a hooks system to inject custom logic at specific point
 
 ## Available Hooks
 
-The system includes 6 hooks located in `.ai/task-manager/config/hooks/`:
+The system includes 7 hooks located in `.ai/task-manager/config/hooks/`:
 
-### 1. PRE_PHASE Hook
+### 1. PRE_PLAN Hook
+
+**File**: `PRE_PLAN.md`
+
+**Purpose**: Pre-planning guidance executed before creating a comprehensive plan.
+
+**Key Functions**:
+- **Scope Control Guidelines** - Enforces YAGNI principle and prevents feature creep
+- **Simplicity Principles** - Promotes maintainable, straightforward solutions
+- **Critical Validation** - Ensures adequate context before plan generation
+
+**Common Anti-Patterns to Avoid**:
+- Adding extra features "for completeness"
+- Creating infrastructure for future features not requested
+- Building abstractions when simple solutions suffice
+- Adding configuration options not specifically mentioned
+- Implementing excessive error handling beyond core requirements
+
+### 2. PRE_PHASE Hook
 
 **File**: `PRE_PHASE.md`
 
@@ -21,7 +39,7 @@ The system includes 6 hooks located in `.ai/task-manager/config/hooks/`:
 
 **Key Functions**:
 - Git branch management (creates feature branch from main if on main branch)
-- Validates current repository state (checks for unstaged changes)  
+- Validates current repository state (checks for unstaged changes)
 - Task dependency validation using `check-task-dependencies.js` script
 - Confirms no tasks are marked "needs-clarification"
 - Verifies completed phases are actually complete
@@ -37,75 +55,58 @@ for TASK_ID in $PHASE_TASKS; do
 done
 ```
 
-### 2. POST_PHASE Hook
+### 3. POST_PHASE Hook
 
 **File**: `POST_PHASE.md`
 
 **Purpose**: Validation gates executed after phase completion.
 
-**Current Implementation** (minimal):
+**Current Implementation**:
 - Ensure code passes linting requirements
-- Verify all tests are run locally and passing
 - Create descriptive commit using conventional commits format
 
-This is a simple hook that can be customized by users to add project-specific validation.
+**Execution Monitoring Features**:
+- **Progress Tracking** - Updates task status and adds completion emojis (✅ for phases, ✔️ for tasks)
+- **Task Status Updates** - Valid transitions between `pending`, `in-progress`, `completed`, and `failed`
+- Real-time blueprint updates with visual status indicators
 
-### 3. POST_PLAN Hook
+This hook can be customized by users to add project-specific validation.
+
+### 4. POST_PLAN Hook
 
 **File**: `POST_PLAN.md`
 
-**Purpose**: Plan validation and enhancement after initial plan creation.
+**Purpose**: Simplified plan validation after initial plan creation.
 
-**Key Functions**:
+**Current Implementation**: This hook now contains minimal validation and update procedures, as the main validation logic has been moved to the PRE_PLAN hook and the blueprint generation has been moved to POST_TASK_GENERATION_ALL.
 
-#### Context Analysis and Clarification
-- Analyzes user request for: objective, scope, resources, success criteria, dependencies, technical requirements
-- Asks targeted follow-up questions if critical context is missing
-- Attempts to answer questions by inspecting codebase and documentation first
-
-#### Plan Document Updates
-After task generation, updates the plan with:
-
-1. **Dependency Visualization** - Mermaid diagram showing task dependencies:
-```mermaid
-graph TD
-    001[Task 001: Database Schema] --> 002[Task 002: API Endpoints]
-    001 --> 003[Task 003: Data Models]
-```
-
-2. **Phase-Based Execution Blueprint** - Organizes tasks into sequential phases:
-   - Tasks within a phase execute in parallel
-   - Phases execute sequentially
-   - Includes validation gates reference
-
-### 4. POST_TASK_GENERATION_ALL Hook
+### 5. POST_TASK_GENERATION_ALL Hook
 
 **File**: `POST_TASK_GENERATION_ALL.md`
 
-**Purpose**: Task complexity analysis and refinement after all tasks are generated.
+**Purpose**: Task complexity analysis, refinement, and blueprint generation after all tasks are created.
 
-**Complexity Scoring Matrix**:
+**Main Functions**:
 
-| Dimension | 1-2 | 3-4 | 5-6 | 7-8 | 9-10 |
-|-----------|-----|-----|-----|-----|------|
-| **Technical** | Basic ops | Single tech | 2-3 techs | Multiple complex | Cutting-edge |
-| **Decision** | No decisions | 1-2 minor | Trade-offs | Interdependent | Novel solutions |
-| **Integration** | Single file | 2-3 files | Multi-module | Many systems | 15+ services |
-| **Scope** | Atomic action | Small feature | Complete feature | Major feature | Entire subsystem |
-| **Uncertainty** | Crystal clear | Minor ambiguity | Some clarification | Research required | Experimental |
+1. **Complexity Analysis & Refinement**
+   - Uses complexity scoring matrix (Technical, Decision, Integration, Scope, Uncertainty)
+   - Composite score formula: `MAX(Technical×1.0, Decision×0.9, Integration×0.8, Scope×0.7, Uncertainty×1.1)`
+   - Tasks with score ≥6 considered for decomposition
+   - Maximum 3 decomposition rounds per task
 
-**Composite Score Formula**: 
-```
-MAX(Technical×1.0, Decision×0.9, Integration×0.8, Scope×0.7, Uncertainty×1.1)
-```
+2. **Blueprint Generation** (moved from POST_PLAN)
+   - Creates dependency visualization using Mermaid diagrams
+   - Generates phase-based execution blueprint
+   - Organizes tasks into parallel execution phases
+   - Ensures acyclic dependency graph
 
-**Decomposition Rules**:
-- Tasks with composite score ≥6 should be considered for decomposition
-- Any dimension ≥8 requires mandatory decomposition
-- Maximum 3 decomposition rounds per task
-- Minimum 2-hour work per subtask
+**Blueprint Structure**:
+- Phase 1: All tasks with zero dependencies
+- Phase N: Tasks whose dependencies are satisfied by phases 1 through N-1
+- Maximizes parallel execution within each phase
+- References validation gates from POST_PHASE hook
 
-### 5. PRE_TASK_ASSIGNMENT Hook
+### 6. PRE_TASK_ASSIGNMENT Hook
 
 **File**: `PRE_TASK_ASSIGNMENT.md`
 
@@ -134,7 +135,7 @@ for assistant_dir in .claude .gemini .opencode; do
 done
 ```
 
-### 6. POST_ERROR_DETECTION Hook
+### 7. POST_ERROR_DETECTION Hook
 
 **File**: `POST_ERROR_DETECTION.md`
 
@@ -165,8 +166,13 @@ awk '
 
 The hooks are referenced and executed at specific points in the slash commands:
 
-1. **`/tasks:create-plan`** → Executes **POST_PLAN** hook for validation and clarification
-2. **`/tasks:generate-tasks`** → Executes **POST_TASK_GENERATION_ALL** for complexity analysis
+1. **`/tasks:create-plan`** → Executes:
+   - **PRE_PLAN** hook for scope control and simplicity guidelines
+   - **POST_PLAN** hook for minimal validation
+
+2. **`/tasks:generate-tasks`** → Executes:
+   - **POST_TASK_GENERATION_ALL** for complexity analysis and blueprint generation
+
 3. **`/tasks:execute-blueprint`** → Executes:
    - **PRE_PHASE** before each phase
    - **PRE_TASK_ASSIGNMENT** before assigning tasks
@@ -190,7 +196,7 @@ For example, you could enhance the `POST_PHASE.md` hook for a React project:
 Ensure that:
 
 - The code base is passing the linting requirements
-- All tests are run locally, and they are passing  
+- All tests are run locally, and they are passing
 - TypeScript compilation succeeds with no errors
 - Test coverage is above 80%
 - No high-severity npm audit vulnerabilities
