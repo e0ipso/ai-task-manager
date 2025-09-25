@@ -221,7 +221,7 @@ Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
 When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
 
 ```bash
-node .ai/task-manager/config/scripts/get-next-task-id.js $1
+node .ai/task-manager/config/scripts/get-next-task-id.cjs $1
 ```
 
 ### Validation Checklist

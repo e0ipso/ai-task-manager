@@ -122,7 +122,7 @@ The schema for this frontmatter is:
 
 **Auto-generate the next plan ID:**
 ```bash
-node .ai/task-manager/config/scripts/get-next-plan-id.js
+node .ai/task-manager/config/scripts/get-next-plan-id.cjs
 ```
 
 **Key formatting:**

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Script: check-task-dependencies.js
+ * Script: check-task-dependencies.cjs
  * Purpose: Check if a task has all of its dependencies resolved (completed)
- * Usage: node check-task-dependencies.js <plan-id> <task-id>
+ * Usage: node check-task-dependencies.cjs <plan-id> <task-id>
  * Returns: 0 if all dependencies are resolved, 1 if not
  */
 
@@ -216,8 +216,8 @@ const main = async () => {
     // Check arguments
     if (process.argv.length !== 4) {
         printError('Invalid number of arguments', chalk);
-        console.log('Usage: node check-task-dependencies.js <plan-id> <task-id>');
-        console.log('Example: node check-task-dependencies.js 16 03');
+        console.log('Usage: node check-task-dependencies.cjs <plan-id> <task-id>');
+        console.log('Example: node check-task-dependencies.cjs 16 03');
         process.exit(1);
     }
 
