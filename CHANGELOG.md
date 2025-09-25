@@ -1,3 +1,9 @@
+## 1.9.0 (2025-09-25)
+
+* docs: additional documentation ([0465f95](https://github.com/e0ipso/ai-task-manager/commit/0465f95))
+* feat: general refactor of hooks ([baa58ba](https://github.com/e0ipso/ai-task-manager/commit/baa58ba))
+* refactor(templates): integrate PRE_PLAN.md hook and remove redundant sections ([e043b50](https://github.com/e0ipso/ai-task-manager/commit/e043b50))
+
 ## <small>1.8.3 (2025-09-23)</small>
 
 * fix: improve ID generation process ([e43f3c1](https://github.com/e0ipso/ai-task-manager/commit/e43f3c1))
