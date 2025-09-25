@@ -41,7 +41,7 @@ markdown: kramdown
 highlighter: rouge
 kramdown:
   syntax_highlighter: rouge
-      
+
 # Exclude from processing
 exclude:
   - README.md

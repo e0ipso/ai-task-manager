@@ -17,7 +17,7 @@ let chalkInstance = null;
 // Initialize chalk instance dynamically
 async function initChalk() {
     if (chalkInstance) return chalkInstance;
-    
+
     try {
         const { default: chalk } = await import('chalk');
         chalkInstance = chalk;
@@ -25,7 +25,7 @@ async function initChalk() {
         // Chalk not available, will fall back to plain console output
         chalkInstance = null;
     }
-    
+
     return chalkInstance;
 }
 
@@ -65,7 +65,7 @@ const findPlanDirectory = (planId) => {
 // Function to find task file with padded/unpadded ID handling
 const findTaskFile = (planDir, taskId) => {
     const taskDir = path.join(planDir, 'tasks');
-    
+
     if (!fs.existsSync(taskDir)) {
         return null;
     }
@@ -76,7 +76,7 @@ const findTaskFile = (planDir, taskId) => {
         const regex = new RegExp(`^${taskId}--.*\\.md$`);
         return regex.test(file);
     });
-    
+
     if (files.length > 0) {
         return path.join(taskDir, files[0]);
     }
@@ -89,7 +89,7 @@ const findTaskFile = (planDir, taskId) => {
             const regex = new RegExp(`^${paddedTaskId}--.*\\.md$`);
             return regex.test(file);
         });
-        
+
         if (files.length > 0) {
             return path.join(taskDir, files[0]);
         }
@@ -103,7 +103,7 @@ const findTaskFile = (planDir, taskId) => {
             const regex = new RegExp(`^${unpaddedTaskId}--.*\\.md$`);
             return regex.test(file);
         });
-        
+
         if (files.length > 0) {
             return path.join(taskDir, files[0]);
         }
@@ -115,7 +115,7 @@ const findTaskFile = (planDir, taskId) => {
             const regex = new RegExp(`^${repaddedTaskId}--.*\\.md$`);
             return regex.test(file);
         });
-        
+
         if (files.length > 0) {
             return path.join(taskDir, files[0]);
         }
@@ -143,7 +143,7 @@ const parseFrontmatter = (content) => {
                 break;
             }
         }
-        
+
         if (inFrontmatter && !frontmatterEnd) {
             frontmatterLines.push(line);
         }
@@ -160,11 +160,11 @@ const extractDependencies = (frontmatter) => {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        
+
         // Check for dependencies line
         if (line.match(/^dependencies:/)) {
             inDependenciesSection = true;
-            
+
             // Check if dependencies are on the same line (array syntax)
             const arrayMatch = line.match(/\[(.*)\]/);
             if (arrayMatch) {
@@ -198,13 +198,13 @@ const extractDependencies = (frontmatter) => {
 // Function to extract status from frontmatter
 const extractStatus = (frontmatter) => {
     const lines = frontmatter.split('\n');
-    
+
     for (const line of lines) {
         if (line.match(/^status:/)) {
             return line.replace(/^status:[ \t]*/, '').replace(/^["']/, '').replace(/["']$/, '').trim();
         }
     }
-    
+
     return null;
 };
 
@@ -212,7 +212,7 @@ const extractStatus = (frontmatter) => {
 const main = async () => {
     // Initialize chalk
     const chalk = await initChalk();
-    
+
     // Check arguments
     if (process.argv.length !== 4) {
         printError('Invalid number of arguments', chalk);
@@ -226,7 +226,7 @@ const main = async () => {
 
     // Find the plan directory
     const planDir = findPlanDirectory(planId);
-    
+
     if (!planDir) {
         printError(`Plan with ID ${planId} not found`, chalk);
         process.exit(1);

@@ -28,7 +28,7 @@ Built-in templates for different project types:
 
 ### Command Templates
 - **create-plan**: Strategic planning and requirement analysis
-- **generate-tasks**: Task decomposition and dependency mapping  
+- **generate-tasks**: Task decomposition and dependency mapping
 - **execute-blueprint**: Implementation and execution workflows
 
 ## 🏗️ Workspace Management
@@ -55,11 +55,11 @@ flowchart TD
     B --> C[📋 Phase 2: Task Generation]
     C --> D[🚀 Phase 3: Execution]
     D --> E[✅ Quality Review]
-    
+
     B --> B1[Requirements Analysis<br/>Stakeholder Clarification<br/>Architecture Planning]
     C --> C1[Atomic Task Breakdown<br/>Dependency Mapping<br/>Resource Allocation]
     D --> D1[Parallel Execution<br/>Progress Tracking<br/>Validation Gates]
-    
+
     style A fill:#ffebee
     style E fill:#e8f5e8
     style B fill:#fff3e0

@@ -16,7 +16,7 @@ Unlike Plandex, Claude Task Master, and Conductor Tasks that require API keys wi
 ```bash
 # Initialize for your preferred AI assistant
 npx @e0ipso/ai-task-manager init --assistants claude
-npx @e0ipso/ai-task-manager init --assistants gemini  
+npx @e0ipso/ai-task-manager init --assistants gemini
 npx @e0ipso/ai-task-manager init --assistants opencode
 
 # Or configure multiple assistants
@@ -39,7 +39,7 @@ The documentation includes:
 ## 💡 Quick Workflow Preview
 
 1. **📝 Create a plan**: `/tasks:create-plan Create user authentication system`
-2. **📋 Generate tasks**: `/tasks:generate-tasks 1` 
+2. **📋 Generate tasks**: `/tasks:generate-tasks 1`
 3. **🚀 Execute blueprint**: `/tasks:execute-blueprint 1`
 
 ## 🤖 Supported Assistants
@@ -47,7 +47,7 @@ The documentation includes:
 | Assistant | Interface | Cost Model |
 |-----------|-----------|------------|
 | 🎭 **Claude** | [claude.ai/code](https://claude.ai/code) | Your existing subscription |
-| 💎 **Gemini** | Gemini CLI | Your existing subscription |  
+| 💎 **Gemini** | Gemini CLI | Your existing subscription |
 | 📝 **Open Code** | Open source | Free |
 
 ## 📄 License

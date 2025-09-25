@@ -23,7 +23,7 @@ Unlike projects such as **Plandex**, **Claude Task Master**, and **Conductor Tas
 This tool creates custom slash commands (like `/tasks:create-plan`, `/tasks:generate-tasks`) that integrate directly into:
 
 - **Claude Code**: Works with your Claude Pro/Max subscription via [claude.ai/code](https://claude.ai/code)
-- **Gemini CLI**: Uses your existing Gemini subscription  
+- **Gemini CLI**: Uses your existing Gemini subscription
 - **Open Code**: Leverages your preferred open-source setup
 
 ## The 3-Step Workflow
@@ -31,10 +31,10 @@ This tool creates custom slash commands (like `/tasks:create-plan`, `/tasks:gene
 ```mermaid
 flowchart LR
     A[Complex User Request] --> B[📝 create-plan]
-    B --> C[📋 generate-tasks]  
+    B --> C[📋 generate-tasks]
     C --> D[🚀 execute-blueprint]
     D --> E[Structured Implementation]
-    
+
     style A fill:#ffebee
     style E fill:#e8f5e8
     style B fill:#fff3e0
@@ -127,7 +127,7 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 | Assistant | Format | Interface | Cost Model |
 |-----------|--------|-----------|------------|
 | 🎭 **Claude** | Markdown | claude.ai/code | Subscription-based |
-| 💎 **Gemini** | TOML | Gemini CLI | Subscription-based |  
+| 💎 **Gemini** | TOML | Gemini CLI | Subscription-based |
 | 📝 **Open Code** | Markdown | Open source setup | Free |
 
 ## Usage Examples
@@ -137,7 +137,7 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 /tasks:create-plan Build user authentication with OAuth2 and JWT tokens
 ```
 
-### 2. Generate Tasks  
+### 2. Generate Tasks
 ```bash
 /tasks:generate-tasks 1
 ```
@@ -153,10 +153,10 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 flowchart LR
     A[Complex Project Requirements] --> B[AI Task Manager]
     B --> C[📋 Organized Execution]
-    B --> D[⏰ Time Savings]  
+    B --> D[⏰ Time Savings]
     B --> E[✅ Quality Assurance]
     B --> F[🔄 Consistent Process]
-    
+
     style A fill:#ffebee
     style B fill:#fff3e0
     style C fill:#e8f5e8
@@ -167,7 +167,7 @@ flowchart LR
 
 **Benefits:**
 - **Organized Execution**: Break complex projects into manageable, traceable tasks
-- **Time Savings**: Eliminate back-and-forth clarifications and rework  
+- **Time Savings**: Eliminate back-and-forth clarifications and rework
 - **Quality Assurance**: Built-in validation gates and success criteria
 - **Consistent Process**: Standardized workflow across all projects
 
@@ -176,7 +176,7 @@ flowchart LR
 **Q: Does this require API keys or additional costs?**
 A: No. It works within your existing Claude Pro, Gemini, or Open Code subscriptions.
 
-**Q: What file formats does it support?**  
+**Q: What file formats does it support?**
 A: Markdown for Claude/Open Code, TOML for Gemini. All converted automatically.
 
 **Q: Can I customize the workflow?**
