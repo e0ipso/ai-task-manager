@@ -5,14 +5,20 @@ description: Generate tasks to implement the plan with the provided ID.
 # Comprehensive Task List Creation
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
-Include @.ai/task-manager/TASK_MANAGER.md for the directory structure of tasks.
+Include /TASK_MANAGER.md for the directory structure of tasks.
 
 ## Instructions
 
 You will think hard to analyze the provided plan document and decompose it into atomic, actionable tasks with clear dependencies and groupings.
 
+Use your internal Todo task tool to track the following process:
+
+- [ ] Read and process plan $1
+- [ ] Use the Task Generation Process to create tasks according to the Task Creation Guidelines
+- [ ] Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+
 ### Input
-- A plan document. See @.ai/task-manager/TASK_MANAGER.md fo find the plan with ID $1
+- A plan document. See .ai/task-manager/config/TASK_MANAGER.md fo find the plan with ID $1
 - The plan contains high-level objectives and implementation steps
 
 ### Input Error Handling
@@ -108,7 +114,7 @@ Tests that verify custom business logic, critical paths, and edge cases specific
 - Avoid creating separate tasks for testing each CRUD operation individually
 - Question whether simple functions need dedicated test tasks
 
-### Process
+### Task Generation Process
 
 #### Step 1: Task Decomposition
 1. Read through the entire plan
@@ -131,11 +137,7 @@ Dependency Rule: Task B depends on Task A if:
 - B modifies code created by A
 - B tests functionality implemented in A
 
-#### Step 3: POST_TASK_GENERATION_ALL hook
-
-Read and run the @.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
-
-#### Step 4: Output Generation
+#### Step 3: Task Generation
 
 ##### Frontmatter Structure
 
@@ -212,95 +214,15 @@ The schema for this frontmatter is:
 
 ##### Task Body Structure
 
-Use the task template in @.ai/task-manager/config/templates/TASK_TEMPLATE.md
+Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
 
-### Task ID Generation
+##### Task ID Generation
 
 When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
 
-#### Command
 ```bash
 node .ai/task-manager/config/scripts/get-next-task-id.js $1
 ```
-
-#### How It Works
-1. **Finds the plan directory** using pattern matching for plan ID directories
-2. **Scans task files** in the plan's tasks directory for `.md` files
-3. **Validates frontmatter IDs** by parsing YAML frontmatter and extracting numeric ID values
-4. **Finds maximum ID** by comparing all valid task IDs numerically
-5. **Handles edge cases** by gracefully handling missing directories, corrupted files, and parsing errors
-6. **Returns next ID** by incrementing the maximum found ID by 1
-
-This Node.js script provides robust error handling and reliable ID generation.
-
-#### Parameter Usage
-- `$1` is the plan ID parameter passed to this template
-- The command accepts the raw plan ID (e.g., `6` for plan `06`)
-- It automatically handles zero-padding for directory lookup
-
-#### Front-matter vs Filename Format
-**IMPORTANT:** There is a distinction between numeric and zero-padded formats:
-
-- **Front-matter ID**: Use numeric values: `id: 3` (not `id: "03"`)
-- **Filename**: Use zero-padded format: `03--task-name.md`
-
-#### Usage Examples
-
-**Example 1: Plan 6 with existing tasks**
-```bash
-# Command execution (plan ID = 6)
-node .ai/task-manager/config/scripts/get-next-task-id.js 6
-# Output: 5 (if highest valid numeric task front-matter has id: 4)
-
-# Front-matter usage:
----
-id: 4
-group: "implementation"
-dependencies: [1, 2]
-status: "pending"
-created: "2024-01-15"
-skills: ["api-endpoints", "database"]
----
-```
-
-**Example 2: Plan 1 with no existing tasks**
-```bash
-# Command execution (plan ID = 1)
-node .ai/task-manager/config/scripts/get-next-task-id.js 1
-# Output: 1 (empty tasks directory, no valid front-matter to read)
-
-# Front-matter usage:
----
-id: 1
-group: "setup"
-dependencies: []
-status: "pending"
-created: "2024-01-15"
-skills: ["docker", "ci-cd"]
----
-```
-
-#### Edge Case Handling
-The command handles several edge cases automatically:
-- **Empty tasks directory**: Returns `1` as the first task ID
-- **Non-sequential task IDs**: Returns the maximum existing ID + 1
-- **Missing plan directory**: Returns `1` (graceful fallback)
-- **Mixed numbering**: Correctly finds the highest numeric ID regardless of gaps
-- **Malformed frontmatter**: Skips files with non-numeric, string, or missing ID fields
-- **Whitespace variations**: Handles extra spaces around ID values (e.g., `id:  5  `)
-
-#### Command Execution Context
-- Run this command from the repository root directory
-- The command works with the current file system state
-- It searches within the plan directory structure: `.ai/task-manager/plans/##--plan-name/tasks/`
-
-#### Manual Fallback
-If the command fails or returns unexpected results:
-1. Navigate to `.ai/task-manager/plans/##--plan-name/tasks/`
-2. List existing task files: `ls -1 *.md 2>/dev/null | sort`
-3. Identify the highest numbered task file
-4. Add 1 to get the next ID
-5. Use numeric format in front-matter, zero-padded format for filename
 
 ### Validation Checklist
 Before finalizing, ensure:
@@ -350,4 +272,6 @@ If the plan lacks sufficient detail:
 - Create placeholder tasks marked with `status: "needs-clarification"`
 - Document assumptions made
 
-Read and execute @.ai/task-manager/config/hooks/POST_PLAN.md
+#### Step 4: POST_TASK_GENERATION_ALL hook
+
+Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md

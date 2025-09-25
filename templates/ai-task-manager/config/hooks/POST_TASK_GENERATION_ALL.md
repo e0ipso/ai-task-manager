@@ -1,6 +1,11 @@
-[Post-task generation validation and refinement]
+# POST_TASK_GENERATION_ALL Hook
 
-## Step 3.1: Complexity Analysis & Refinement
+After all tasks have been generated use your internal Todo task to execute:
+
+- [ ] Complexity Analysis & Refinement
+- [ ] Update plan document with Blueprint information
+
+## Complexity Analysis & Refinement
 
 ### Complexity Scoring Matrix (1-10 scale)
 
@@ -94,3 +99,64 @@ Original: 8.2 → Round 1 → [4.1, 3.8, 4.5] → PASSED
 - No unresolved errors
 - Iterations documented
 - Validation complete
+
+## Update plan document with Blueprint information
+
+After creating all tasks with their dependencies, update the original plan document with two critical sections: a task dependency visualization and a phase-based execution blueprint.
+
+### Section 1: Dependency Visualization
+
+If any tasks have dependencies, create a Mermaid diagram showing the dependency graph:
+
+```mermaid
+graph TD
+    001[Task 001: Database Schema] --> 002[Task 002: API Endpoints]
+    001 --> 003[Task 003: Data Models]
+    002 --> 004[Task 004: Frontend Integration]
+    003 --> 004
+```
+
+Note: Ensure the graph is acyclic (no circular dependencies).
+
+### Section 2: Phase-Based Execution Blueprint
+
+#### Core Concept
+The execution blueprint organizes tasks into sequential phases where:
+- **Within a phase**: All tasks execute in parallel
+- **Between phases**: Execution is strictly sequential
+- **Phase progression**: Requires all tasks in current phase to complete AND validation gates to pass
+
+#### Phase Definition Rules
+1. **Phase 1**: Contains all tasks with zero dependencies
+2. **Phase N**: Contains tasks whose dependencies are ALL satisfied by tasks in phases 1 through N-1
+3. **Parallelism Priority**: Maximize the number of tasks that can run simultaneously in each phase
+4. **Completeness**: Every task must be assigned to exactly one phase
+
+#### Blueprint Structure
+
+Use the template in .ai/task-manager/config/templates/BLUEPRINT_TEMPLATE.md for the execution blueprint structure.
+
+### Validation Requirements
+
+#### Phase Transition Rules
+1. All tasks in the current phase must have status: "completed"
+2. All validation gates defined in `/config/hooks/POST_PHASE.md` for the current phase must pass
+3. No task in a future phase can begin until these conditions are met
+
+#### Blueprint Verification
+Before finalizing, ensure:
+- [ ] Every task appears in exactly one phase
+- [ ] No task appears in a phase before all its dependencies
+- [ ] Phase 1 contains only tasks with no dependencies
+- [ ] Each phase maximizes parallel execution opportunities
+- [ ] All phases reference their validation gates
+- [ ] The execution summary accurately reflects the blueprint
+
+### Important Notes
+
+### Error Handling
+
+If dependency analysis reveals issues:
+- **Circular dependencies**: Document the cycle and mark affected tasks for review
+- **Orphaned tasks**: Tasks that cannot be scheduled due to missing dependencies
+- **Ambiguous dependencies**: Note assumptions made and flag for clarification

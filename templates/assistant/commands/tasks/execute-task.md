@@ -26,7 +26,7 @@ Use your internal Todo task tool to track the execution of all parts of the task
 ## Input Requirements
 - Plan ID: $1 (required)
 - Task ID: $2 (required)
-- Task management directory structure: `@.ai/task-manager/`
+- Task management directory structure: `/`
 - Dependency checking script: `.ai/task-manager/config/scripts/check-task-dependencies.js`
 
 ### Input Validation
@@ -149,9 +149,7 @@ echo "✓ All dependencies resolved - proceeding with execution"
 
 Read task skills and select appropriate task-specific agent:
 
-```bash
-Read and execute @.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
-```
+Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 ### 6. Status Update to In-Progress
 
@@ -234,7 +232,7 @@ echo "You can now execute dependent tasks or continue with the full blueprint ex
 
 ## Error Handling
 
-Read and execute @.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
+Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ## Usage Examples
 
