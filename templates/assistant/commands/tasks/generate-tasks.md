@@ -2,7 +2,11 @@
 argument-hint: [plan-ID]
 description: Generate tasks to implement the plan with the provided ID.
 ---
+
 # Comprehensive Task List Creation
+
+Think harder and use tools.
+
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
 Include /TASK_MANAGER.md for the directory structure of tasks.
