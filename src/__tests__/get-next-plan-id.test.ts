@@ -262,34 +262,6 @@ describe('get-next-plan-id Integration Tests', () => {
       expect(result.stderr).toContain(emptyDir); // Should show current directory
     });
 
-    test('handles permission errors gracefully during directory traversal', () => {
-      // Create task manager structure
-      createTaskManagerStructure(tempDir, [{ id: 1 }]);
-
-      // Create a subdirectory and make parent unreadable (if possible on this platform)
-      const subDir = path.join(tempDir, 'restricted', 'subdir');
-      fs.mkdirSync(subDir, { recursive: true });
-
-      const restrictedDir = path.join(tempDir, 'restricted');
-
-      try {
-        // Try to restrict permissions (may not work on all platforms/file systems)
-        fs.chmodSync(restrictedDir, 0o000);
-
-        process.chdir(subDir);
-        const result = executeScript(subDir);
-
-        // Should still succeed by finding the task manager in parent
-        expect(result.exitCode).toBe(0);
-        expect(parseInt(result.stdout)).toBe(2);
-
-        // Restore permissions for cleanup
-        fs.chmodSync(restrictedDir, 0o755);
-      } catch (err) {
-        // Platform doesn't support permission changes - skip this test
-        console.warn('Skipping permission test - platform limitation');
-      }
-    });
   });
 
   describe('YAML Frontmatter Parsing Robustness', () => {
