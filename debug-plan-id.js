@@ -58,8 +58,17 @@ This is a test plan for debugging.
   const result = spawnSync('node', [scriptPath], {
     cwd: tempDir,
     encoding: 'utf8',
-    env: { ...process.env, DEBUG: 'true' }
+    env: {
+      ...process.env,
+      DEBUG: 'true',
+      NO_COLOR: '1',
+      FORCE_COLOR: '0',
+      NODE_DISABLE_COLORS: '1'
+    }
   });
+
+  // Strip ANSI escape codes
+  const stripAnsi = (str) => str ? str.replace(/\u001b\[[0-9;]*m/g, '') : str;
 
   console.log('Exit code:', result.status);
   console.log('Stdout length:', (result.stdout || '').length);
@@ -68,7 +77,9 @@ This is a test plan for debugging.
   console.log('Raw stderr:', JSON.stringify(result.stderr));
 
   if (result.stdout) {
-    const trimmed = result.stdout.trim();
+    const stripped = stripAnsi(result.stdout);
+    const trimmed = stripped.trim();
+    console.log('Stripped stdout:', JSON.stringify(stripped));
     console.log('Trimmed stdout:', JSON.stringify(trimmed));
     const parsed = parseInt(trimmed);
     console.log('Parsed as int:', parsed);
