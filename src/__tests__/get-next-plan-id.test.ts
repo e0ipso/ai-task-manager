@@ -185,7 +185,16 @@ describe('get-next-plan-id Integration Tests', () => {
       const result = executeScript(tempDir);
 
       expect(result.exitCode).toBe(0);
-      expect(parseInt(result.stdout)).toBe(2); // Next ID after 1
+      if (result.exitCode !== 0) {
+        console.error('Script failed with stderr:', result.stderr);
+        console.error('Script stdout:', result.stdout);
+      }
+      const parsedId = parseInt(result.stdout);
+      if (isNaN(parsedId)) {
+        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error('Raw stderr:', JSON.stringify(result.stderr));
+      }
+      expect(parsedId).toBe(2); // Next ID after 1
     });
 
     test('traverses upward to find task manager directory in parent', () => {
@@ -201,7 +210,16 @@ describe('get-next-plan-id Integration Tests', () => {
       const result = executeScript(subDir);
 
       expect(result.exitCode).toBe(0);
-      expect(parseInt(result.stdout)).toBe(4); // Next ID after 3
+      if (result.exitCode !== 0) {
+        console.error('Script failed with stderr:', result.stderr);
+        console.error('Script stdout:', result.stdout);
+      }
+      const parsedId = parseInt(result.stdout);
+      if (isNaN(parsedId)) {
+        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error('Raw stderr:', JSON.stringify(result.stderr));
+      }
+      expect(parsedId).toBe(4); // Next ID after 3
     });
 
     test('chooses contextually relevant task manager when multiple exist', () => {
@@ -429,7 +447,16 @@ describe('get-next-plan-id Integration Tests', () => {
       const result = executeScript(tempDir);
 
       expect(result.exitCode).toBe(0);
-      expect(parseInt(result.stdout)).toBe(1); // First plan ID
+      if (result.exitCode !== 0) {
+        console.error('Script failed with stderr:', result.stderr);
+        console.error('Script stdout:', result.stdout);
+      }
+      const parsedId = parseInt(result.stdout);
+      if (isNaN(parsedId)) {
+        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error('Raw stderr:', JSON.stringify(result.stderr));
+      }
+      expect(parsedId).toBe(1); // First plan ID
     });
 
     test('handles script execution from different working directory contexts', () => {
