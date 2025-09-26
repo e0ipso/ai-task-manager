@@ -1,3 +1,10 @@
+## <small>1.9.2 (2025-09-26)</small>
+
+* test: add enhanced diagnostics for plan ID detection test failures ([47d2a0b](https://github.com/e0ipso/ai-task-manager/commit/47d2a0b))
+* test: remove unreliable permission test for plan ID detection ([4b8061b](https://github.com/e0ipso/ai-task-manager/commit/4b8061b))
+* fix: address plan ID detection issues ([5d9fb02](https://github.com/e0ipso/ai-task-manager/commit/5d9fb02))
+* fix: remove ANSI color codes from plan ID script output in tests ([9c0eed4](https://github.com/e0ipso/ai-task-manager/commit/9c0eed4))
+
 ## <small>1.9.1 (2025-09-25)</small>
 
 * fix: use common js extension ([1641655](https://github.com/e0ipso/ai-task-manager/commit/1641655))
