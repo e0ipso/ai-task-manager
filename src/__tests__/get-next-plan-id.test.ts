@@ -71,12 +71,22 @@ describe('get-next-plan-id Integration Tests', () => {
     const result = spawnSync('node', [scriptPath], {
       cwd,
       encoding: 'utf8',
-      env: { ...process.env, ...env }
+      env: {
+        ...process.env,
+        ...env,
+        // Disable color output to prevent ANSI codes in stdout
+        NO_COLOR: '1',
+        FORCE_COLOR: '0',
+        NODE_DISABLE_COLORS: '1'
+      }
     });
 
+    // Strip ANSI escape codes from stdout as additional safety
+    const stripAnsi = (str: string) => str.replace(/\u001b\[[0-9;]*m/g, '');
+
     return {
-      stdout: (result.stdout || '').trim(),
-      stderr: (result.stderr || '').trim(),
+      stdout: stripAnsi((result.stdout || '')).trim(),
+      stderr: stripAnsi((result.stderr || '')).trim(),
       exitCode: result.status || 0
     };
   };
