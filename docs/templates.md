@@ -11,7 +11,7 @@ The AI Task Manager uses a templates system to provide consistent structure for 
 
 ## Available Templates
 
-The system includes 4 core templates:
+The system includes 5 core templates:
 
 ### 1. PLAN_TEMPLATE.md
 
@@ -89,6 +89,23 @@ The system includes 4 core templates:
 - **Recommendations**: Follow-up actions or optimizations
 
 **Usage**: Appended to plans by `/tasks:execute-blueprint` upon successful completion.
+
+### 5. fix-broken-tests.md
+
+**Purpose**: Provides a systematic approach to fixing tests that break after implementation.
+
+**Key Features**:
+- **Integrity Requirements**: Emphasizes fixing actual bugs rather than test manipulation
+- **Anti-Cheating Measures**: Explicitly prohibits test skipping, assertion modification, or conditional workarounds
+- **Proper Process**: Step-by-step approach to identify, diagnose, and fix root causes
+- **Test Command Integration**: Accepts test command as parameter or reads from CLAUDE.md
+
+**Usage**: Called with `/tasks:fix-broken-tests [test-command]` when tests fail after task execution.
+
+**Critical Philosophy**:
+- Green tests must reflect actual working code
+- Fixing tests means fixing the underlying implementation issues
+- No shortcuts or workarounds that mask real problems
 
 ## Template Customization
 

@@ -30,6 +30,7 @@ Built-in templates for different project types:
 - **create-plan**: Strategic planning and requirement analysis
 - **generate-tasks**: Task decomposition and dependency mapping
 - **execute-blueprint**: Implementation and execution workflows
+- **fix-broken-tests**: Post-implementation test fixing and validation
 
 ## 🏗️ Workspace Management
 

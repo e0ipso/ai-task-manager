@@ -109,7 +109,8 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 4. **📋 Create the tasks** for the plan: `/tasks:generate-tasks 1`
 5. **👀 Review the list of tasks**. This step is important to avoid scope creep and ensure the right things are to be built. Again, **do not skip this step**. Find the tasks in the folder `.ai/task-manager/plans/01--authentication-workflow/tasks/`
 6. **🚀 Execute the tasks**: `/tasks:execute-blueprint 1`
-7. **✅ Review the implementation** and the generated tests.
+7. **🔧 Fix any broken tests**: `/tasks:fix-broken-tests npm test` (if tests fail after implementation)
+8. **✅ Review the implementation** and the generated tests.
 
 ## 🔧 Troubleshooting
 
@@ -145,6 +146,11 @@ Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/co
 ### 3. Execute Implementation
 ```bash
 /tasks:execute-blueprint 1
+```
+
+### 4. Fix Broken Tests
+```bash
+/tasks:fix-broken-tests npm test
 ```
 
 ## Value Proposition
