@@ -1,3 +1,7 @@
+## 1.10.0 (2025-09-27)
+
+* feat: add command to fix broken tests ([4bb1678](https://github.com/e0ipso/ai-task-manager/commit/4bb1678))
+
 ## <small>1.9.2 (2025-09-26)</small>
 
 * test: add enhanced diagnostics for plan ID detection test failures ([47d2a0b](https://github.com/e0ipso/ai-task-manager/commit/47d2a0b))
