@@ -1,3 +1,12 @@
+## 1.11.0 (2025-09-27)
+
+* docs: remove unnecessary artifact ([e90438c](https://github.com/e0ipso/ai-task-manager/commit/e90438c))
+* docs: rename docs ([8bba9c8](https://github.com/e0ipso/ai-task-manager/commit/8bba9c8))
+* docs: update site to include the new command ([5ba4399](https://github.com/e0ipso/ai-task-manager/commit/5ba4399))
+* feat(docs): complete Phase 1 audit and research tasks ([ead4870](https://github.com/e0ipso/ai-task-manager/commit/ead4870))
+* feat(docs): complete Phase 3 - restructure CLAUDE.md ([faad459](https://github.com/e0ipso/ai-task-manager/commit/faad459))
+* feat(docs): complete Phase 4 - validate documentation accuracy ([658a6ad](https://github.com/e0ipso/ai-task-manager/commit/658a6ad))
+
 ## 1.10.0 (2025-09-27)
 
 * feat: add command to fix broken tests ([4bb1678](https://github.com/e0ipso/ai-task-manager/commit/4bb1678))
