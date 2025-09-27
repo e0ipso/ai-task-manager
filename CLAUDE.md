@@ -1,143 +1,394 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides comprehensive guidance to Claude Code (claude.ai/code) when working with this repository. It serves as the primary context source for AI-assisted development, following Anthropic's 2025 best practices for optimal Claude integration.
 
-## Development Commands
+## Quick Start Guide
 
-### Build and Development
+### Essential Commands
 ```bash
-npm run build        # Compile TypeScript to dist/
-npm run dev          # Watch mode compilation
-npm run clean        # Remove dist/ directory
-npm start            # Run compiled CLI (requires build first)
+# Build and run
+npm run build && npm start init --assistants claude
+
+# Development workflow  
+npm run dev           # Watch mode compilation
+npm test              # Run test suite (67 tests, ~3 seconds)
+npm run lint:fix      # Auto-fix code style issues
+
+# Post-implementation validation
+/tasks:fix-broken-tests "npm test"    # Fix failing tests after changes
 ```
 
-### Testing and Quality
+### Project Initialization
 ```bash
-npm test             # Run Jest test suite (~3 seconds, 37 tests)
-npm run test:watch   # Run tests in watch mode
-npm run lint         # ESLint check (excludes test files)
-npm run lint:fix     # ESLint with auto-fix
-npm run format       # Prettier formatting
+# Initialize AI task management for single assistant
+npx . init --assistants claude --destination-directory /path/to/project
+
+# Initialize for multiple assistants
+npx . init --assistants claude,gemini,opencode --destination-directory /path/to/project
 ```
 
-### Security and Maintenance
-```bash
-npm run security:audit        # Security audit
-npm run security:fix          # Fix security issues
-npm run prepublishOnly        # Pre-publish build (auto-runs on publish)
-```
+---
 
-### Local CLI Testing
-```bash
-# After building, test CLI locally:
-node dist/cli.js init --assistants claude
-node dist/cli.js init --assistants opencode
-npx . init --assistants gemini --destination-directory /tmp/test
-npx . init --assistants claude,opencode,gemini --destination-directory /tmp/test
-```
+## Project Overview
 
-## Task Manager Conceptual Model
+### Purpose and Scope
 
-This project implements a hierarchical task management system for AI-assisted development:
+This CLI tool initializes AI-assisted development environments with hierarchical task management systems. It creates structured workflows that transform complex programming requests into manageable, validated implementations through progressive refinement and atomic task decomposition.
 
-- **Work Orders**: Independent complex prompts for programming tasks
-- **Plans**: Comprehensive documents breaking down work orders into structured approaches
-- **Tasks**: Atomic units with dependencies and specific skill requirements
+### Core Value Proposition
 
-Workflow uses slash commands (`/tasks:create-plan`, `/tasks:generate-tasks`, `/tasks:execute-blueprint`) to guide users through the hierarchy. All artifacts are Markdown files with YAML front-matter under `.ai/task-manager/`. See `TASK_MANAGER.md` and `POST_PHASE.md` for specifications.
+- **Cognitive Load Management**: Prevents AI context overload through staged processing
+- **Scope Control**: Enforces YAGNI principles and prevents feature creep
+- **Quality Assurance**: Ensures working code through integrity-focused testing
+- **Multi-Assistant Support**: Unified workflow across Claude, Gemini, and Open Code platforms
 
-## Code Architecture
+---
+
+## AI Task Management System
+
+### Three-Phase Progressive Refinement
+
+The system implements a specialized workflow optimized for AI cognitive constraints:
+
+#### Phase 1: Strategic Planning (`/tasks:create-plan`)
+- **Focus**: Context gathering and requirement clarification
+- **Output**: Comprehensive plan with mandatory clarification gates
+- **Prevents**: Assumption-based planning and scope ambiguity
+
+#### Phase 2: Task Decomposition (`/tasks:generate-tasks`)  
+- **Focus**: Breaking complexity into atomic units
+- **Output**: Dependency-mapped tasks with skill assignments
+- **Enforces**: 20-30% task reduction and 1-2 skill maximum per task
+
+#### Phase 3: Execution (`/tasks:execute-blueprint`)
+- **Focus**: Current task implementation with minimal context
+- **Output**: Working functionality with validation gates
+- **Implements**: Dependency-aware parallelism and quality control
+
+### Key Design Principles
+
+#### Atomic Task Decomposition
+- **Maximum 2 skills per task**: Prevents over-complexity
+- **Automatic skill inference**: Context-based task categorization  
+- **Dependency mapping**: Clear prerequisite relationships
+- **Subdivision triggers**: 3+ skills indicate need for task breakdown
+
+#### Scope Control (YAGNI Enforcement)
+- **Anti-pattern enumeration**: Identifies common scope expansion behaviors
+- **Question-based validation**: "Is this explicitly mentioned?" decision framework
+- **Quantified minimization**: 20-30% reduction targets from comprehensive lists
+- **Requirement traceability**: Every task links to explicit user requirements
+
+#### Test Philosophy: "Write a Few Tests, Mostly Integration"
+- **Selective coverage**: 24% lines, 67 meaningful tests
+- **Integration-heavy**: Real filesystem operations over mocking
+- **Business logic focus**: Custom logic, critical workflows, edge cases
+- **Framework avoidance**: Don't test third-party library features
+
+---
+
+## Architecture Overview
 
 ### Core Components
 
-**CLI Entry Point (`src/cli.ts`)**
-- Uses Commander.js for argument parsing
-- Single command: `init` with required `--assistants` flag
-- Handles error routing and exit codes
-- Initializes logger for colored output
+#### CLI Entry Point (`src/cli.ts`)
+```typescript
+// Key responsibilities:
+- Commander.js argument parsing
+- Single `init` command with required `--assistants` flag  
+- Error routing and exit code management
+- Colored logging initialization
+```
 
-**Main Implementation (`src/index.ts`)**
-- `init()` function: main business logic for project initialization
-- Creates directory structures: `.ai/task-manager/`, `.claude/`, `.gemini/`, `.opencode/`
-- Template processing workflow: reads Markdown templates, converts to appropriate format
-- Assistant-specific directory creation and template copying
+#### Main Implementation (`src/index.ts`)
+```typescript
+// Core business logic:
+- init() function for project initialization
+- Directory structure creation (.ai/task-manager/, .claude/, etc.)
+- Template processing workflow (Markdown → format conversion)
+- Assistant-specific setup and template copying
+```
 
-**Utilities (`src/utils.ts`)**
-- File system operations: `ensureDir()`, `copyTemplate()`, `exists()`
-- Assistant validation: `parseAssistants()`, `validateAssistants()`
-- Template processing: `convertMdToToml()`, `readAndProcessTemplate()`
-- Path utilities: `resolvePath()`, cross-platform path handling
+#### Utilities (`src/utils.ts`)
+```typescript
+// Supporting operations:
+- File system: ensureDir(), copyTemplate(), exists()
+- Validation: parseAssistants(), validateAssistants()  
+- Template processing: convertMdToToml(), readAndProcessTemplate()
+- Path handling: resolvePath() with cross-platform support
+```
 
-**Type System (`src/types.ts`)**
-- Core types: `Assistant` ('claude' | 'gemini' | 'opencode'), `TemplateFormat` ('md' | 'toml')
-- Custom error classes: `FileSystemError`, `ConfigError`, etc.
-- Interface definitions for options, configs, and results
+#### Type System (`src/types.ts`)
+```typescript
+// Type definitions:
+- Assistant type: 'claude' | 'gemini' | 'opencode'
+- TemplateFormat: 'md' | 'toml'
+- Custom error classes: FileSystemError, ConfigError
+- Interface definitions for configurations and results
+```
 
 ### Template System Architecture
 
-**Single Source of Truth**
-- All templates are authored in Markdown format (`templates/commands/tasks/*.md`)
-- Dynamic conversion to TOML format for Gemini assistant
-- Conversion handles variable substitution: `$ARGUMENTS` → `{{args}}`, `$1` → `{{plan_id}}`
+#### Single Source of Truth Approach
+- **Markdown authoring**: All templates written in Markdown format
+- **Dynamic conversion**: TOML generation for Gemini assistant
+- **Variable transformation**: Format-specific syntax conversion
+- **Consistency validation**: Functionality parity across formats
 
-**Template Processing Flow**
-1. Read Markdown template from `templates/`
-2. Parse frontmatter (YAML) and body content
-3. For Gemini: convert to TOML format with escaped content
-4. For Claude and Open Code: use Markdown as-is
-5. Write to assistant-specific directory (`.claude/`, `.gemini/`, or `.opencode/`)
+#### Template Processing Flow
+1. **Source**: Read Markdown template from `templates/commands/tasks/`
+2. **Parse**: Extract YAML frontmatter and body content
+3. **Convert**: Transform to TOML for Gemini (Markdown for others)
+4. **Substitute**: Apply variable transformations (`$ARGUMENTS` → `{{args}}`)
+5. **Output**: Write to assistant-specific directories
 
-**Variable Transformations (MD→TOML)**
-- `$ARGUMENTS` → `{{args}}`
-- `$1` → `{{plan_id}}`
-- `[plan-ID]` → `{{plan_id}}` (in frontmatter)
-- `[user-prompt]` → `{{args}}` (in frontmatter)
+#### Variable Transformation Mapping
+```
+Markdown → TOML
+$ARGUMENTS → {{args}}
+$1 → {{plan_id}}
+[plan-ID] → {{plan_id}} (frontmatter)
+[user-prompt] → {{args}} (frontmatter)
+```
 
-### Directory Structure Created
+---
 
+## Directory Structure and Organization
+
+### Generated Project Structure
 ```
 project/
-├── .ai/task-manager/           # Shared project configuration
-│   ├── plans/                  # Generated plans with task subdirectories
+├── .ai/task-manager/              # Shared project configuration
+│   ├── plans/                     # Active plans with task subdirectories
+│   │   └── 28--current-plan/
+│   │       ├── plan-28--current-plan.md
+│   │       └── tasks/
+│   │           ├── 01--task-one.md
+│   │           └── 02--task-two.md
+│   ├── archive/                   # Completed plans (preserved history)
+│   │   └── 25--archived-plan/     # Full structure maintained
 │   ├── config/
-│       ├── TASK_MANAGER.md    # Project context (user-editable)
-│       └── hooks/
-│           └── POST_PHASE.md  # Quality criteria (user-editable)
-│   └── templates/              # Project-specific templates
-│       ├── PLAN_TEMPLATE.md    # Customizable plan template
-│       └── TASK_TEMPLATE.md    # Customizable task template
-├── .claude/commands/tasks/     # Claude commands (Markdown format)
+│   │   ├── TASK_MANAGER.md        # Project context (user-editable)
+│   │   ├── scripts/               # Enhanced ID generation
+│   │   │   ├── get-next-plan-id.cjs
+│   │   │   └── get-next-task-id.cjs
+│   │   └── hooks/
+│   │       └── POST_PHASE.md      # Quality criteria (user-editable)
+│   └── templates/                 # Project-specific templates
+│       ├── PLAN_TEMPLATE.md       # Customizable plan template
+│       └── TASK_TEMPLATE.md       # Customizable task template
+├── .claude/commands/tasks/        # Claude commands (Markdown)
 │   ├── create-plan.md
+│   ├── generate-tasks.md
 │   ├── execute-blueprint.md
-│   └── generate-tasks.md
-├── .gemini/commands/tasks/     # Gemini commands (TOML format)
+│   └── fix-broken-tests.md        # NEW: Test integrity command
+├── .gemini/commands/tasks/        # Gemini commands (TOML)
 │   ├── create-plan.toml
+│   ├── generate-tasks.toml
 │   ├── execute-blueprint.toml
-│   └── generate-tasks.toml
-└── .opencode/commands/tasks/   # Open Code commands (Markdown format)
+│   └── fix-broken-tests.toml      # NEW: Test integrity command
+└── .opencode/commands/tasks/      # Open Code commands (Markdown)
     ├── create-plan.md
+    ├── generate-tasks.md
     ├── execute-blueprint.md
-    └── generate-tasks.md
+    └── fix-broken-tests.md        # NEW: Test integrity command
 ```
 
-## Customizing Plan and Task Templates
+### Archive System and Lifecycle Management
 
-### Template Structure
+#### Purpose and Benefits
+- **Organization**: Clean active workspace with historical preservation
+- **Reference**: Past implementations available for pattern reuse
+- **ID Management**: Prevents conflicts through continuous numbering
+- **Compliance**: Maintains audit trail of project evolution
 
-**Plan Template Sections:**
-- YAML Frontmatter (id, summary, created)
+#### Archival Process
+```bash
+# Manual archival after completion
+mv .ai/task-manager/plans/25--completed-plan .ai/task-manager/archive/
+
+# Validation of archive integrity
+DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
+```
+
+---
+
+## Enhanced Features and Commands
+
+### Fix-Broken-Tests Command
+
+#### Critical Integrity Requirements
+
+The fix-broken-tests command enforces strict integrity standards to prevent "test cheating":
+
+**❌ Absolutely Forbidden Practices**:
+- Adding environment checks to bypass test execution
+- Modifying test assertions to match broken implementation  
+- Implementing test-environment-specific code in source
+- Disabling or commenting out failing tests
+- ANY workaround that doesn't fix the actual bug
+
+**✅ Required Approach**:
+- Find root cause in source code
+- Fix the actual bug in implementation
+- Ensure tests pass because code truly works
+
+#### Usage Examples
+```bash
+# Fix tests after feature implementation
+/tasks:fix-broken-tests "npm test"
+
+# Fix specific test file
+/tasks:fix-broken-tests "jest src/__tests__/user-auth.test.ts"
+
+# Auto-detect test command from CLAUDE.md
+/tasks:fix-broken-tests ""
+
+# Integration with development workflow
+git commit -m "feat: implement feature"
+/tasks:fix-broken-tests "npm test"
+git commit -m "fix: resolve test failures from implementation"
+```
+
+### Enhanced ID Generation Scripts
+
+#### get-next-plan-id.cjs
+**Features**:
+- Comprehensive directory traversal from any subdirectory
+- Multi-source ID validation (directories, filenames, frontmatter)
+- Enhanced error handling with graceful degradation
+- Debug logging via `DEBUG=true` environment variable
+- Consistency validation with mismatch reporting
+
+```bash
+# Generate next plan ID with debug info
+DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
+```
+
+#### get-next-task-id.cjs  
+**Features**:
+- Performance optimization for empty directories (90% case)
+- Flexible ID format support (padded and unpadded)
+- Resilient YAML parsing with multiple regex patterns
+- Graceful error handling for corrupted files
+
+```bash
+# Generate next task ID for specific plan
+node .ai/task-manager/config/scripts/get-next-task-id.cjs 28
+```
+
+---
+
+## Development Workflow
+
+### Standard Development Commands
+
+#### Build and Development
+```bash
+npm run build        # TypeScript compilation to dist/
+npm run dev          # Watch mode with automatic recompilation  
+npm run clean        # Remove dist/ directory
+npm start            # Execute compiled CLI (requires build first)
+```
+
+#### Testing and Quality Assurance
+```bash
+npm test             # Run Jest test suite (67 tests, ~3 seconds)
+npm run test:watch   # Tests in watch mode for development
+npm run lint         # ESLint validation (excludes test files)
+npm run lint:fix     # Automated lint fixes
+npm run format       # Prettier code formatting
+```
+
+#### Security and Maintenance
+```bash
+npm run security:audit        # Standard security audit
+npm run security:audit-json   # JSON formatted audit output  
+npm run security:fix          # Automated security fixes
+npm run security:fix-force    # Force fixes for critical issues
+npm run prepublishOnly        # Pre-publish validation (auto-runs)
+```
+
+### Testing Philosophy Implementation
+
+#### Current Test Statistics
+- **Test Suites**: 3 passed, 3 total
+- **Tests**: 67 passed, 67 total
+- **Execution Time**: ~3 seconds
+- **Coverage**: 24% lines (deliberately selective)
+
+#### Test File Organization
+- `src/__tests__/utils.test.ts`: Business logic validation
+- `src/__tests__/cli.integration.test.ts`: End-to-end workflows
+- `src/__tests__/get-next-plan-id.test.ts`: ID generation validation
+
+#### Testing Guidelines
+**DO Test**:
+- Data transformation and validation logic
+- Complex business rules and algorithms
+- Error scenarios and edge cases
+- Integration points and workflows
+- Critical path functionality
+
+**DON'T Test**:
+- Simple getters/setters
+- Third-party library features
+- Framework-provided functionality
+- Obvious utility functions
+- Trivial CRUD operations
+
+### Adding New Assistant Support
+
+1. **Type System**: Update `Assistant` type in `src/types.ts`
+2. **Format Mapping**: Add template format in `getTemplateFormat()` (`src/utils.ts`)
+3. **Conversion Logic**: Extend `convertMdToToml()` if needed
+4. **Directory Structure**: Create template directories
+5. **Testing**: Add integration tests for new assistant
+
+### Template Development Workflow
+
+1. **Source Creation**: Author Markdown templates in `templates/commands/tasks/`
+2. **Metadata**: Use standard YAML frontmatter format
+3. **Variable Testing**: Verify substitution across all formats
+4. **Output Validation**: Check Claude (.md), Gemini (.toml), Open Code (.md)
+5. **Integration Testing**: Validate end-to-end template processing
+
+---
+
+## Template Customization Guide
+
+### Plan Template Structure
+
+**YAML Frontmatter**:
+```yaml
+id: [plan-ID]
+summary: "[user-prompt]"
+created: "YYYY-MM-DD"
+```
+
+**Core Sections**:
 - Original Work Order
-- Plan Clarifications
+- Plan Clarifications  
 - Executive Summary
-- Context
+- Context and Background
 - Technical Implementation Approach
 - Risk Considerations
 - Success Criteria
 - Resource Requirements
 
-**Task Template Sections:**
-- YAML Frontmatter (id, group, dependencies, status, created, skills)
+### Task Template Structure
+
+**YAML Frontmatter**:
+```yaml
+id: [task-number]
+group: "[logical-grouping]"
+dependencies: [list-of-task-ids]
+status: "pending"
+created: "YYYY-MM-DD"
+skills: ["skill-1", "skill-2"]
+```
+
+**Core Sections**:
 - Objective
 - Skills Required
 - Acceptance Criteria
@@ -146,175 +397,169 @@ project/
 - Output Artifacts
 - Implementation Notes
 
-### Modification Guidelines
+### Customization Guidelines
 
-1. **Source Templates:**
-   - Located in `/workspace/templates/ai-task-manager/templates/`
-   - Modify `PLAN_TEMPLATE.md` and `TASK_TEMPLATE.md`
+#### Source Templates Location
+```bash
+# Edit base templates
+/workspace/templates/ai-task-manager/templates/PLAN_TEMPLATE.md
+/workspace/templates/ai-task-manager/templates/TASK_TEMPLATE.md
+```
 
-2. **Customization Limits:**
-   - Maintain YAML frontmatter structure
-   - Keep core sections intact
-   - Add project-specific sections as needed
-   - Avoid removing critical metadata fields
+#### Customization Best Practices
+- **Maintain Structure**: Keep YAML frontmatter format
+- **Preserve Core Sections**: Don't remove critical metadata fields
+- **Add Context**: Include project-specific guidance
+- **Stay Focused**: Keep templates concise and actionable
 
-3. **Best Practices:**
-   - Add context-specific guidance
-   - Include project-specific validation criteria
-   - Create sections that capture unique workflow requirements
-   - Keep templates concise and focused
+#### Template Processing Validation
+```bash
+# Test template processing for all formats
+npm run build
+node dist/cli.js init --assistants claude,gemini,opencode --destination-directory /tmp/test
+```
 
-**Workflow**: Plans are created in `.ai/task-manager/plans/`, then broken into tasks within subdirectories. Each assistant uses its native command format while accessing shared project files.
+---
 
-## AI Task Management System Architecture
+## Error Handling and Troubleshooting
 
-### Overview
+### Common Issues and Solutions
 
-The AI task management system implements a specialized multi-agent architecture designed to address fundamental limitations in AI-assisted complex feature development. Through progressive refinement, atomic task decomposition, and skill-based agent matching, the system transforms general user requests into reliable, high-quality implementations while maintaining cognitive load balance and preventing scope creep.
+#### ID Generation Problems
+**Symptoms**: ID conflicts, missing plans, inconsistent numbering
+**Debugging**:
+```bash
+# Enable comprehensive debug logging
+DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
+```
+**Solutions**: Verify directory structure, check file permissions, align ID sources
 
-### Three-Command Workflow: Progressive Refinement
+#### Template Processing Errors
+**Symptoms**: Malformed TOML, missing variables, conversion failures
+**Debugging**: Check template syntax, validate frontmatter format, verify variable names
+**Solutions**: Use standard frontmatter, test variable substitution, validate against schema
 
-The system's core innovation lies in its **three-phase progressive refinement strategy** that mirrors classical software engineering patterns (Analysis → Design → Implementation) but optimized for AI cognitive constraints:
+#### Assistant Integration Issues
+**Symptoms**: Commands not found, format errors, execution failures
+**Debugging**: Verify assistant directory creation, check template format conversion
+**Solutions**: Rebuild templates, validate format mapping, check file permissions
 
-**Phase 1: create-plan** - Context gathering and strategic planning
-- Focuses entirely on understanding and clarifying user intent
-- Implements mandatory clarification gates to prevent assumption-based planning
-- Uses broad analysis with open-ended questions to establish comprehensive requirements
+### Error Handling Architecture
 
-**Phase 2: generate-tasks** - Decomposition and dependency mapping
-- Concentrates on breaking down complexity without execution details
-- Applies strict minimization rules (20-30% reduction target) and atomic decomposition
-- Creates dependency graphs and skill-based task assignment
+#### Custom Error Classes
+```typescript
+// From src/types.ts
+FileSystemError    // File operation failures
+ConfigError        // Configuration validation issues  
+TemplateError      // Template processing problems
+AssistantError     // Assistant validation failures
+```
 
-**Phase 3: execute-blueprint** - Parallel execution and validation
-- Handles current task execution with minimal extraneous context
-- Implements dependency-aware parallelism within phases
-- Applies external validation gates for quality control
+#### Error Recovery Strategies
+- **Graceful Degradation**: Continue operation when possible
+- **Detailed Logging**: Provide context for debugging
+- **User-Friendly Messages**: Clear guidance for resolution
+- **Fail-Fast**: Stop early for critical errors
 
-This **staged context isolation** prevents the common AI problem of simultaneous multi-context confusion while enabling sophisticated task coordination through persistent artifacts (YAML frontmatter + Markdown).
+---
 
-### Key Design Patterns
+## Quality Assurance and Best Practices
 
-#### Atomic Task Decomposition
-The system enforces **1-2 skill maximum per task** with automatic skill inference based on contextual analysis. This approach addresses research findings showing that AI agents achieve 55% accuracy with sequential task processing compared to significantly lower performance with one-step approaches. Tasks requiring 3+ skills indicate over-complexity and trigger automatic subdivision.
+### Code Quality Standards
 
-#### Scope Control (YAGNI Enforcement)
-Multiple complementary mechanisms prevent scope creep:
-- **Explicit anti-pattern enumeration** identifying common scope expansion behaviors
-- **Question-based validation** providing decision frameworks ("Is this explicitly mentioned?")
-- **Quantified minimization targets** (20-30% reduction from comprehensive task lists)
-- **Requirement traceability** ensuring every task links to explicit user requirements
+#### Formatting Requirements
+- **No trailing spaces**: Enforced by Prettier
+- **File endings**: Always include newline at end
+- **Indentation**: Match existing code patterns
+- **Naming**: Use meaningful variable and function names
 
-#### Test Minimization: "Write a Few Tests, Mostly Integration"
-The system challenges conventional test-driven development through selective testing philosophy:
-- **Test only meaningful validation**: Custom business logic, critical workflows, edge cases, integration points
-- **Avoid testing framework features**: Third-party libraries, simple CRUD operations, obvious getters/setters
-- **Consolidate related scenarios**: Single tasks for related test scenarios rather than fragmented individual tests
+#### Architecture Principles
+- **Modularity**: Write reusable, focused components
+- **Single Responsibility**: Keep functions small and focused
+- **Standard Patterns**: Prefer established patterns over novel approaches
+- **Minimal Dependencies**: Add external dependencies only when essential
 
-#### Simplicity Enforcement
-Codified simplicity principles prevent over-engineering:
-- **Favor maintainability over cleverness** with explicit complexity red flags
-- **Standard pattern preference** defaulting to established patterns rather than novel approaches
-- **Minimal dependency policy** adding external dependencies only when essential
-- **Complexity detection** through skill count thresholds and dependency cycle analysis
+### Security Guidelines
 
-### Theoretical Foundations
+#### Critical Security Practices
+- **No hardcoded secrets**: Use environment variables
+- **Input validation**: Sanitize all user inputs
+- **Error handling**: Don't expose internal system details
+- **Least privilege**: Minimize permission requirements
+- **Audit integration**: Regular security scanning
 
-#### Cognitive Load Theory Application
-The architecture applies established Cognitive Load Theory principles:
-- **Intrinsic load minimization** through atomic task decomposition
-- **Extraneous load reduction** via context isolation and progressive disclosure
-- **Germane load optimization** using structured templates and decision frameworks
+### Performance Considerations
 
-Research demonstrates that proper cognitive load management in AI systems leads to 25% improvement in task completion accuracy when processing multiple parallel workstreams.
+#### Optimization Strategies
+- **Fast test execution**: 3-second test suite for quick feedback
+- **Efficient ID generation**: Early returns for common cases
+- **Template caching**: Minimize redundant file operations
+- **Memory management**: Clean up temporary resources
 
-#### Multi-Agent System Coordination
-The system implements proven multi-agent coordination patterns:
-- **Task allocation** based on skill matching and domain expertise
-- **Communication protocol** through structured artifacts rather than direct parameter passing
-- **Conflict resolution** through validation gates and dependency management
-- **Collaborative enhancement** where specialized agents outperform generalist approaches
+---
 
-Microsoft's Magentic-One and Anthropic's multi-agent research systems validate this approach, demonstrating statistically competitive performance through specialized agent architectures.
+## Theoretical Foundations and Research Context
 
-#### Mixture of Agents (MoA) Framework
-The architecture leverages the "collaborativeness" phenomenon where LLMs generate better responses when presented with outputs from other models. This supports the three-phase approach where each phase builds upon artifacts from previous phases, creating a layered architecture of progressive refinement.
+### Cognitive Load Theory Application
 
-### Practical Benefits for AI Agent Accuracy
+The system applies established Cognitive Load Theory principles:
+- **Intrinsic Load Minimization**: Atomic task decomposition
+- **Extraneous Load Reduction**: Context isolation and progressive disclosure  
+- **Germane Load Optimization**: Structured templates and decision frameworks
 
-The system addresses specific AI cognitive limitations with measurable improvements:
+Research demonstrates 25% improvement in task completion accuracy through proper cognitive load management in AI systems.
 
-**Context Window Optimization**: Phase-based processing prevents information overload while maintaining task relationships through persistent artifact storage.
+### Multi-Agent System Coordination
 
-**Scope Boundary Management**: Explicit constraints and anti-pattern recognition reduce the common AI tendency toward feature creep and over-engineering.
+Implementation of proven coordination patterns:
+- **Task Allocation**: Skill-based matching and domain expertise
+- **Communication Protocol**: Structured artifacts vs. direct parameter passing
+- **Conflict Resolution**: Validation gates and dependency management
+- **Collaborative Enhancement**: Specialized agents outperforming generalist approaches
 
-**Sequential Task Benefits**: Research shows sequential agents achieve 55% accuracy compared to lower one-step performance, with benefits from richer contextual understanding and error correction between steps.
+### Mixture of Agents (MoA) Framework
 
-**Specialized Agent Performance**: Domain-specific agents demonstrate superior performance (30.4% task completion for clear software development goals vs. 0% for broad business context tasks), supporting the skill-based matching approach.
+Leverages "collaborativeness" phenomenon where LLMs generate better responses when presented with outputs from other models. The three-phase approach builds progressive refinement through layered artifact creation.
 
-**Quality Assurance Integration**: Multi-layer quality control through template constraints, validation gates, dependency verification, and status tracking ensures reliable execution.
+### Research Validation
 
-The system's emphasis on progressive refinement, atomic decomposition, and parallel execution demonstrates deep understanding of both AI capabilities and software development best practices, creating an effective framework for managing AI-assisted development at scale.
+- **Sequential Processing**: 55% accuracy vs. lower one-step performance
+- **Specialized Agents**: 30.4% task completion for clear goals vs. 0% for broad context
+- **Context Window Optimization**: Phase-based processing prevents information overload
+- **Quality Assurance**: Multi-layer validation ensures reliable execution
 
-## Testing Philosophy: "Write a Few Tests, Mostly Integration"
+---
 
-**Current Stats**: 37 tests, 628 lines, ~3 seconds execution time
+## Integration with Claude Code Workflow
 
-**Test Coverage Strategy**
-- Integration tests over unit tests (real file system operations)
-- Focus on business logic that could silently fail
-- Test complete workflows end-to-end
-- Deliberately low coverage (24% lines) - only critical paths
+### Context Utilization Optimization
 
-**Key Test Files**
-- `src/__tests__/utils.test.ts` - Business logic validation
-- `src/__tests__/cli.integration.test.ts` - End-to-end CLI workflows
+This CLAUDE.md is structured to provide Claude Code with:
+- **Immediate Access**: Essential commands and quick start information
+- **Progressive Detail**: Hierarchical information disclosure
+- **Cross-References**: Clear navigation between related sections
+- **Workflow Integration**: Seamless connection to task management system
 
-**Testing Guidelines**
-- DO test: data transformation, validation, complex parsing, error scenarios
-- DON'T test: simple utilities, framework code, obvious getters/setters
-- Use real file system, minimal mocking
-- Test error paths and edge cases
+### Claude Code Specific Features
 
-## Development Workflow
+#### Enhanced Context Understanding
+- **Purpose-Driven Sections**: Each section serves specific development workflow needs
+- **Cross-Reference Navigation**: Links between related concepts and procedures
+- **Implementation Guidance**: Step-by-step instructions for complex operations
+- **Error Recovery**: Comprehensive troubleshooting and debugging guidance
 
-### Adding New Assistant Support
-1. Update `Assistant` type in `src/types.ts`
-2. Add template format mapping in `getTemplateFormat()` (`src/utils.ts`)
-3. Add conversion logic in `convertMdToToml()` if needed
-4. Create template directory structure
-5. Add integration tests for new assistant
+#### AI-Optimized Information Architecture
+- **Logical Grouping**: Related information clustered for efficient processing
+- **Consistent Structure**: Predictable section organization for reliable navigation
+- **Clear Hierarchies**: Well-defined information levels for appropriate detail selection
+- **Actionable Content**: Focus on implementable guidance over theoretical explanation
 
-### Template Development
-1. Create/edit Markdown templates in `templates/commands/tasks/`
-2. Use standard frontmatter format for metadata
-3. Test variable substitution for all formats
-4. Verify Claude (.md), Gemini (.toml), and Open Code (.md) outputs
+### Workflow Integration Points
 
-### Error Handling
-- Use custom error classes from `src/types.ts`
-- File system operations wrapped with descriptive errors
-- CLI provides user-friendly error messages with colored output
-- Exit codes: 0 (success), 1 (failure)
+1. **Project Initialization**: Seamless setup of AI task management
+2. **Development Process**: Integrated commands for build, test, and validation
+3. **Quality Assurance**: Built-in testing and integrity validation
+4. **Collaboration**: Multi-assistant support with consistent workflows
+5. **Documentation**: Self-maintaining documentation through structured templates
 
-## Key Implementation Details
-
-**Assistant Validation**
-- Strict validation of assistant names via `parseAssistants()`
-- Duplicate removal and normalization
-- Clear error messages for invalid options
-
-**Path Resolution**
-- Cross-platform path handling via `resolvePath()`
-- Supports both relative and absolute destination directories
-- Safe filename sanitization for generated files
-
-**Template Format Conversion**
-- TOML string escaping for special characters
-- Frontmatter preservation and transformation
-- Body content variable substitution
-
-**Logging System**
-- Colored output via Chalk library
-- Multiple log levels: info, debug, error, success
-- Progress indicators during initialization
+This comprehensive guide ensures Claude Code has optimal context for effective collaboration on this AI task management CLI project.
