@@ -23,7 +23,10 @@ describe('get-next-plan-id Integration Tests', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'plan-id-test-'));
 
     // Get script path relative to project root
-    scriptPath = path.resolve(__dirname, '../../templates/ai-task-manager/config/scripts/get-next-plan-id.cjs');
+    scriptPath = path.resolve(
+      __dirname,
+      '../../templates/ai-task-manager/config/scripts/get-next-plan-id.cjs'
+    );
 
     // Store original working directory
     originalCwd = process.cwd();
@@ -67,7 +70,10 @@ describe('get-next-plan-id Integration Tests', () => {
    * @param env - Environment variables to set
    * @returns { stdout, stderr, exitCode }
    */
-  const executeScript = (cwd: string = tempDir, env: Record<string, string> = {}): { stdout: string; stderr: string; exitCode: number } => {
+  const executeScript = (
+    cwd: string = tempDir,
+    env: Record<string, string> = {}
+  ): { stdout: string; stderr: string; exitCode: number } => {
     const result = spawnSync('node', [scriptPath], {
       cwd,
       encoding: 'utf8',
@@ -77,17 +83,17 @@ describe('get-next-plan-id Integration Tests', () => {
         // Disable color output to prevent ANSI codes in stdout
         NO_COLOR: '1',
         FORCE_COLOR: '0',
-        NODE_DISABLE_COLORS: '1'
-      }
+        NODE_DISABLE_COLORS: '1',
+      },
     });
 
     // Strip ANSI escape codes from stdout as additional safety
     const stripAnsi = (str: string) => str.replace(/\u001b\[[0-9;]*m/g, '');
 
     return {
-      stdout: stripAnsi((result.stdout || '')).trim(),
-      stderr: stripAnsi((result.stderr || '')).trim(),
-      exitCode: result.status || 0
+      stdout: stripAnsi(result.stdout || '').trim(),
+      stderr: stripAnsi(result.stderr || '').trim(),
+      exitCode: result.status || 0,
     };
   };
 
@@ -98,7 +104,12 @@ describe('get-next-plan-id Integration Tests', () => {
    * @param id - ID to put in frontmatter
    * @param format - YAML format variation
    */
-  const createPlanFile = (dir: string, filename: string, id: number, format: string = 'simple'): void => {
+  const createPlanFile = (
+    dir: string,
+    filename: string,
+    id: number,
+    format: string = 'simple'
+  ): void => {
     fs.mkdirSync(dir, { recursive: true });
 
     let frontmatter;
@@ -201,7 +212,10 @@ describe('get-next-plan-id Integration Tests', () => {
       }
       const parsedId = parseInt(result.stdout);
       if (isNaN(parsedId)) {
-        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error(
+          'Failed to parse stdout as number. Raw stdout:',
+          JSON.stringify(result.stdout)
+        );
         console.error('Raw stderr:', JSON.stringify(result.stderr));
       }
       expect(parsedId).toBe(2); // Next ID after 1
@@ -226,7 +240,10 @@ describe('get-next-plan-id Integration Tests', () => {
       }
       const parsedId = parseInt(result.stdout);
       if (isNaN(parsedId)) {
-        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error(
+          'Failed to parse stdout as number. Raw stdout:',
+          JSON.stringify(result.stdout)
+        );
         console.error('Raw stderr:', JSON.stringify(result.stderr));
       }
       expect(parsedId).toBe(4); // Next ID after 3
@@ -261,7 +278,6 @@ describe('get-next-plan-id Integration Tests', () => {
       expect(result.stderr).toContain('current directory or any parent directory');
       expect(result.stderr).toContain(emptyDir); // Should show current directory
     });
-
   });
 
   describe('YAML Frontmatter Parsing Robustness', () => {
@@ -273,7 +289,7 @@ describe('get-next-plan-id Integration Tests', () => {
         { format: 'quoted-key', id: 20 },
         { format: 'extra-spaces', id: 25 },
         { format: 'with-comments', id: 30 },
-        { format: 'mixed-quotes', id: 35 }
+        { format: 'mixed-quotes', id: 35 },
       ];
 
       // Create task manager with plans using different YAML formats
@@ -289,9 +305,9 @@ describe('get-next-plan-id Integration Tests', () => {
 
     test('handles malformed YAML gracefully and extracts what it can', () => {
       const plans = [
-        { id: 5, format: 'simple' },      // Valid
-        { id: 10, format: 'malformed' },  // Malformed but ID might be extractable
-        { id: 15, format: 'simple' }      // Valid
+        { id: 5, format: 'simple' }, // Valid
+        { id: 10, format: 'malformed' }, // Malformed but ID might be extractable
+        { id: 15, format: 'simple' }, // Valid
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -308,9 +324,9 @@ describe('get-next-plan-id Integration Tests', () => {
     test('handles edge cases in YAML parsing', () => {
       const plans = [
         { id: 1, format: 'simple' },
-        { id: 2, format: 'empty-id' },    // Empty ID value
-        { id: 3, format: 'null-id' },     // Null ID value
-        { id: 4, format: 'no-frontmatter' } // No frontmatter block
+        { id: 2, format: 'empty-id' }, // Empty ID value
+        { id: 3, format: 'null-id' }, // Null ID value
+        { id: 4, format: 'no-frontmatter' }, // No frontmatter block
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -329,8 +345,8 @@ describe('get-next-plan-id Integration Tests', () => {
         { id: 1, format: 'simple' },
         { id: 25, format: 'quoted' },
         { id: 10, format: 'single-quoted' },
-        { id: 50, format: 'with-comments' },  // Highest
-        { id: 15, format: 'extra-spaces' }
+        { id: 50, format: 'with-comments' }, // Highest
+        { id: 15, format: 'extra-spaces' },
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -347,8 +363,8 @@ describe('get-next-plan-id Integration Tests', () => {
     test('handles legacy plan files in plans directory', () => {
       const plans = [
         { id: 5, format: 'simple', legacy: false }, // New format
-        { id: 10, format: 'simple', legacy: true },  // Legacy format
-        { id: 15, format: 'simple', legacy: false }  // New format
+        { id: 10, format: 'simple', legacy: true }, // Legacy format
+        { id: 15, format: 'simple', legacy: false }, // New format
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -362,9 +378,9 @@ describe('get-next-plan-id Integration Tests', () => {
 
     test('includes archived plans in ID calculation', () => {
       const plans = [
-        { id: 5, format: 'simple' },                    // Active
-        { id: 20, format: 'simple', archived: true },   // Archived - highest
-        { id: 10, format: 'simple' }                    // Active
+        { id: 5, format: 'simple' }, // Active
+        { id: 20, format: 'simple', archived: true }, // Archived - highest
+        { id: 10, format: 'simple' }, // Active
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -378,10 +394,10 @@ describe('get-next-plan-id Integration Tests', () => {
 
     test('handles mixed legacy and new formats in both plans and archive', () => {
       const plans = [
-        { id: 1, format: 'simple', legacy: false },                  // New active
-        { id: 25, format: 'simple', legacy: true },                  // Legacy active
+        { id: 1, format: 'simple', legacy: false }, // New active
+        { id: 25, format: 'simple', legacy: true }, // Legacy active
         { id: 10, format: 'simple', legacy: false, archived: true }, // New archived
-        { id: 30, format: 'simple', legacy: true, archived: true }   // Legacy archived - highest
+        { id: 30, format: 'simple', legacy: true, archived: true }, // Legacy archived - highest
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -402,7 +418,7 @@ describe('get-next-plan-id Integration Tests', () => {
         { id: 2, format: 'quoted' },
         { id: 5, format: 'with-comments' }, // Gap in sequence is normal
         { id: 7, format: 'simple' },
-        { id: 12, format: 'mixed-quotes' } // Highest
+        { id: 12, format: 'mixed-quotes' }, // Highest
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -435,7 +451,10 @@ describe('get-next-plan-id Integration Tests', () => {
       }
       const parsedId = parseInt(result.stdout);
       if (isNaN(parsedId)) {
-        console.error('Failed to parse stdout as number. Raw stdout:', JSON.stringify(result.stdout));
+        console.error(
+          'Failed to parse stdout as number. Raw stdout:',
+          JSON.stringify(result.stdout)
+        );
         console.error('Raw stderr:', JSON.stringify(result.stderr));
       }
       expect(parsedId).toBe(1); // First plan ID
@@ -446,9 +465,9 @@ describe('get-next-plan-id Integration Tests', () => {
 
       // Test from various subdirectory levels
       const testDirs = [
-        tempDir,                                    // Root
-        path.join(tempDir, 'sub'),                 // One level down
-        path.join(tempDir, 'deep', 'nested', 'dir') // Deep nesting
+        tempDir, // Root
+        path.join(tempDir, 'sub'), // One level down
+        path.join(tempDir, 'deep', 'nested', 'dir'), // Deep nesting
       ];
 
       testDirs.forEach(testDir => {
@@ -473,7 +492,9 @@ describe('get-next-plan-id Integration Tests', () => {
 
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toContain('No .ai/task-manager/plans directory found');
-      expect(result.stderr).toContain('Please ensure you are in a project with task manager initialized');
+      expect(result.stderr).toContain(
+        'Please ensure you are in a project with task manager initialized'
+      );
       expect(result.stderr).toContain(`Current working directory: ${emptyDir}`);
     });
 
@@ -488,7 +509,7 @@ describe('get-next-plan-id Integration Tests', () => {
       // Create corrupted binary file
       const corruptedPlanDir = path.join(plansDir, '10--corrupted-plan');
       fs.mkdirSync(corruptedPlanDir, { recursive: true });
-      const binaryData = Buffer.from([0x00, 0x01, 0x02, 0xFF, 0xFE]);
+      const binaryData = Buffer.from([0x00, 0x01, 0x02, 0xff, 0xfe]);
       fs.writeFileSync(path.join(corruptedPlanDir, 'plan-10--corrupted.md'), binaryData);
 
       process.chdir(tempDir);
@@ -503,7 +524,7 @@ describe('get-next-plan-id Integration Tests', () => {
     test('debug mode provides detailed logging information', () => {
       createTaskManagerStructure(tempDir, [
         { id: 1, format: 'simple' },
-        { id: 3, format: 'quoted' }
+        { id: 3, format: 'quoted' },
       ]);
 
       process.chdir(tempDir);
@@ -557,7 +578,8 @@ describe('get-next-plan-id Integration Tests', () => {
       fs.mkdirSync(planDir, { recursive: true });
 
       // Test with Windows-style line endings
-      const windowsContent = '---\r\nid: 5\r\ntitle: Cross Platform\r\n---\r\n\r\n# Plan Content\r\n';
+      const windowsContent =
+        '---\r\nid: 5\r\ntitle: Cross Platform\r\n---\r\n\r\n# Plan Content\r\n';
       fs.writeFileSync(path.join(planDir, 'plan-1--cross-platform.md'), windowsContent, 'utf8');
 
       process.chdir(tempDir);
@@ -573,7 +595,11 @@ describe('get-next-plan-id Integration Tests', () => {
       // Create additional files with different casing (might be relevant on case-sensitive systems)
       const extraDir = path.join(tempDir, '.ai', 'task-manager', 'plans', '2--case-test');
       fs.mkdirSync(extraDir, { recursive: true });
-      fs.writeFileSync(path.join(extraDir, 'PLAN-2--case-test.md'), '---\nid: 2\n---\n# Plan', 'utf8');
+      fs.writeFileSync(
+        path.join(extraDir, 'PLAN-2--case-test.md'),
+        '---\nid: 2\n---\n# Plan',
+        'utf8'
+      );
 
       process.chdir(tempDir);
       const result = executeScript(tempDir);

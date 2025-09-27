@@ -187,7 +187,7 @@ project/
 │   ├── generate-tasks.toml
 │   ├── execute-blueprint.toml
 │   └── fix-broken-tests.toml      # NEW: Test integrity command
-└── .opencode/commands/tasks/      # Open Code commands (Markdown)
+└── .opencode/command/tasks/       # Open Code commands (Markdown)
     ├── create-plan.md
     ├── generate-tasks.md
     ├── execute-blueprint.md
@@ -402,8 +402,8 @@ skills: ["skill-1", "skill-2"]
 #### Source Templates Location
 ```bash
 # Edit base templates
-/workspace/templates/ai-task-manager/templates/PLAN_TEMPLATE.md
-/workspace/templates/ai-task-manager/templates/TASK_TEMPLATE.md
+/workspace/templates/ai-task-manager/config/templates/PLAN_TEMPLATE.md
+/workspace/templates/ai-task-manager/config/templates/TASK_TEMPLATE.md
 ```
 
 #### Customization Best Practices
