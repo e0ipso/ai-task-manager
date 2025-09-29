@@ -99,7 +99,7 @@ project-root/
 
 ### 📋 One-time Setup
 
-Review and tweak the `.ai/task-manager/TASK_MANAGER.md` and `.ai/task-manager/config/hooks/POST_PHASE.md`. These files are yours to edit and should reflect your project's tech stack and goals.
+Review and tweak the `.ai/task-manager/config/TASK_MANAGER.md` and `.ai/task-manager/config/hooks/POST_PHASE.md`. These files are yours to edit and should reflect your project's tech stack and goals.
 
 ### 🔄 Day-to-day Workflow
 
