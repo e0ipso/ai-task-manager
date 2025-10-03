@@ -44,10 +44,6 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
 
-# Create workspace and config directories and set permissions
-RUN mkdir -p /workspace /home/node/.claude && \
-  chown -R node:node /workspace /home/node/.claude
-
 WORKDIR /workspace
 
 ARG GIT_DELTA_VERSION=0.18.2
@@ -80,8 +76,6 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
 
-# Install Claude
+# Install Claude & Gemini
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION:-latest}
-
-# Install Gemini
 RUN npm install -g @google/gemini-cli@${GEMINI_VERSION:-latest}
