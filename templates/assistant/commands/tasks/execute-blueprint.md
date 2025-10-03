@@ -36,7 +36,8 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 - [ ] Execute .ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 3.
 - [ ] Phase 3: Execute 1 task(s) in parallel.
 - [ ] Execute .ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 3.
-- [ ] Update the Plan 7 with execution summary, and the archive it.
+- [ ] Update the Plan 7 with execution summary using .ai/task-manager/config/hooks/EXECUTION_SUMMARY_TEMPLATE.md.
+- [ ] Archive Plan 7.
 
 ### Phase Pre-Execution
 
