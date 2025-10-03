@@ -1,3 +1,9 @@
+## <small>1.11.1 (2025-10-03)</small>
+
+* fix: improve execution todo list ([0694923](https://github.com/e0ipso/ai-task-manager/commit/0694923))
+* ci: update the devcontainer ([0c7c381](https://github.com/e0ipso/ai-task-manager/commit/0c7c381))
+* docs: update path file in docs ([3557b65](https://github.com/e0ipso/ai-task-manager/commit/3557b65))
+
 ## 1.11.0 (2025-09-27)
 
 * docs: remove unnecessary artifact ([e90438c](https://github.com/e0ipso/ai-task-manager/commit/e90438c))
