@@ -4,14 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const DEBUG = process.env.DEBUG === 'true';
-
-function debugLog(message, ...args) {
-  if (DEBUG) {
-    console.error(`[DEBUG] ${message}`, ...args);
-  }
-}
-
 // Configuration path mapping
 const CONFIG_PATHS = {
   claude: {
@@ -36,14 +28,10 @@ function readConfigFile(filePath) {
   try {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
-      debugLog(`Successfully read config file: ${filePath}`);
       return content.trim();
-    } else {
-      debugLog(`Config file not found: ${filePath}`);
-      return null;
     }
+    return null;
   } catch (error) {
-    debugLog(`Error reading config file ${filePath}: ${error.message}`);
     return null;
   }
 }
@@ -52,7 +40,6 @@ function readAssistantConfig(assistant) {
   const configs = CONFIG_PATHS[assistant];
 
   if (!configs) {
-    debugLog(`Unknown assistant: ${assistant}`);
     return '';
   }
 
@@ -98,21 +85,15 @@ function readAssistantConfig(assistant) {
 const assistant = process.argv[2];
 
 if (!assistant) {
-  debugLog('No assistant identifier provided');
   process.exit(0); // Silent exit for graceful degradation
 }
-
-debugLog(`Reading configuration for assistant: ${assistant}`);
 
 try {
   const config = readAssistantConfig(assistant);
   if (config) {
     console.log(config);
-  } else {
-    debugLog('No configuration files found');
   }
   process.exit(0);
 } catch (error) {
-  console.error(`[ERROR] Failed to read configuration: ${error.message}`);
   process.exit(0); // Graceful degradation
 }
