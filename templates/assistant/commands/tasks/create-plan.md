@@ -4,6 +4,20 @@ description: Create a comprehensive plan to accomplish the request from the user
 ---
 # Comprehensive Plan Creation
 
+## Assistant Configuration
+
+Before proceeding with this command, you MUST load and respect the assistant's configuration:
+
+**Run the following scripts:**
+```bash
+ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+```
+
+The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
+
+---
+
 Think harder and use tools.
 
 You are a comprehensive task planning assistant. Your role is to think hard to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.

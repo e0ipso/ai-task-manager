@@ -4,6 +4,20 @@ description: Execute the task in the plan
 ---
 # Task Execution
 
+## Assistant Configuration
+
+Before proceeding with this command, you MUST load and respect the assistant's configuration:
+
+**Run the following scripts:**
+```bash
+ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+```
+
+The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
+
+---
+
 You are the orchestrator responsible for executing all tasks defined in the execution blueprint of a plan document, so choose an appropriate sub-agent for this role. Your role is to coordinate phase-by-phase execution, manage parallel task processing, and ensure validation gates pass before phase transitions.
 
 ## Critical Rules
