@@ -3,21 +3,26 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts'
-  ],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\.ts$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json'
-    }]
+    '^.+\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
+  },
+  transformIgnorePatterns: ['node_modules/(?!(inquirer|chalk|diff)/)'],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
     '!src/cli.ts',
     '!src/**/*.test.ts',
-    '!src/**/__tests__/**'
+    '!src/**/__tests__/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'json-summary'],
@@ -26,8 +31,8 @@ module.exports = {
       branches: 19,
       functions: 12,
       lines: 24,
-      statements: 24
-    }
+      statements: 24,
+    },
   },
   // Optimized for performance
   verbose: false,
@@ -38,5 +43,5 @@ module.exports = {
   bail: false,
   errorOnDeprecated: false,
   // Skip setup files for faster execution
-  setupFilesAfterEnv: []
+  setupFilesAfterEnv: [],
 };
