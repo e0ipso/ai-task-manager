@@ -1,3 +1,15 @@
+## 1.12.0 (2025-10-09)
+
+* fix: improve devcontainer ([f24f2cf](https://github.com/e0ipso/ai-task-manager/commit/f24f2cf))
+* chore: archive AI plan ([14d7645](https://github.com/e0ipso/ai-task-manager/commit/14d7645))
+* refactor: remove debug logging from config scripts ([515f1ff](https://github.com/e0ipso/ai-task-manager/commit/515f1ff))
+* docs: add comparison section with plan mode ([91187aa](https://github.com/e0ipso/ai-task-manager/commit/91187aa))
+* docs: add execution summary to plan 29 ([6bff58a](https://github.com/e0ipso/ai-task-manager/commit/6bff58a))
+* test: validate configuration detection system ([771ebf4](https://github.com/e0ipso/ai-task-manager/commit/771ebf4))
+* feat: implement assistant detection script ([61866bf](https://github.com/e0ipso/ai-task-manager/commit/61866bf))
+* feat: implement configuration reader script ([fa82f5c](https://github.com/e0ipso/ai-task-manager/commit/fa82f5c))
+* feat: inject config detection into command templates ([dcad3b7](https://github.com/e0ipso/ai-task-manager/commit/dcad3b7))
+
 ## <small>1.11.1 (2025-10-03)</small>
 
 * fix: improve execution todo list ([0694923](https://github.com/e0ipso/ai-task-manager/commit/0694923))
