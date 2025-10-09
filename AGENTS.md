@@ -9,9 +9,9 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) when w
 # Build and run
 npm run build && npm start init --assistants claude
 
-# Development workflow  
+# Development workflow
 npm run dev           # Watch mode compilation
-npm test              # Run test suite (67 tests, ~3 seconds)
+npm test              # Run test suite (79 tests, ~6 seconds)
 npm run lint:fix      # Auto-fix code style issues
 
 # Post-implementation validation
@@ -25,7 +25,49 @@ npx . init --assistants claude --destination-directory /path/to/project
 
 # Initialize for multiple assistants
 npx . init --assistants claude,gemini,opencode --destination-directory /path/to/project
+
+# Re-run init to update configuration files
+# Your customizations are automatically detected and protected
+npx . init --assistants claude --destination-directory /path/to/project
+
+# Force overwrite all files (bypass conflict detection)
+npx . init --assistants claude --destination-directory /path/to/project --force
 ```
+
+### File Conflict Detection
+
+The init command includes intelligent conflict detection to protect user customizations:
+
+**How it works:**
+- On first init, creates `.ai/task-manager/.init-metadata.json` tracking file hashes
+- On subsequent inits, compares current file hashes against stored baseline
+- Detects user-modified files and prompts for resolution with unified diff display
+- Excludes `config/scripts/` directory (not meant for user modification)
+
+**User experience:**
+- **No modifications**: Files update automatically without prompts
+- **User modifications detected**: Interactive prompts show diff and ask for resolution:
+  - Keep my changes (skip update)
+  - Overwrite with new version
+  - Keep/Overwrite all remaining conflicts
+- **Force flag**: Bypass all prompts and overwrite everything
+
+**Metadata file:** `.ai/task-manager/.init-metadata.json`
+```json
+{
+  "version": "1.12.0",
+  "timestamp": "2025-10-09T10:30:00.000Z",
+  "files": {
+    "config/TASK_MANAGER.md": "a3b2c1d4e5f6...",
+    "config/hooks/POST_PHASE.md": "f6e5d4c3b2a1..."
+  }
+}
+```
+
+**Troubleshooting:**
+- **Corrupted metadata**: Treated as first-time init, files recreated
+- **Missing metadata**: Treated as first-time init
+- **Git conflicts**: Metadata file is local, not committed to git
 
 ---
 
@@ -80,7 +122,7 @@ The system implements a specialized workflow optimized for AI cognitive constrai
 - **Requirement traceability**: Every task links to explicit user requirements
 
 #### Test Philosophy: "Write a Few Tests, Mostly Integration"
-- **Selective coverage**: 24% lines, 67 meaningful tests
+- **Selective coverage**: 24% lines, 79 meaningful tests (12 new for conflict detection)
 - **Integration-heavy**: Real filesystem operations over mocking
 - **Business logic focus**: Custom logic, critical workflows, edge cases
 - **Framework avoidance**: Don't test third-party library features

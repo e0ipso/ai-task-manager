@@ -27,6 +27,10 @@ export interface InitOptions {
    * Optional destination directory for the configuration
    */
   destinationDirectory?: string;
+  /**
+   * Force overwrite all files without prompting
+   */
+  force?: boolean;
 }
 
 /**
@@ -234,3 +238,52 @@ export interface CommandResult {
    */
   error?: Error;
 }
+
+/**
+ * Metadata tracking for init command file management
+ */
+export interface InitMetadata {
+  /**
+   * Package version at time of init
+   */
+  version: string;
+  /**
+   * Timestamp of last init operation
+   */
+  timestamp: string;
+  /**
+   * Map of relative file paths to SHA-256 hashes
+   */
+  files: Record<string, string>;
+}
+
+/**
+ * Represents a file conflict detected during init
+ */
+export interface FileConflict {
+  /**
+   * Relative path from .ai/task-manager/ directory
+   */
+  relativePath: string;
+  /**
+   * User's current file content
+   */
+  userFileContent: string;
+  /**
+   * New incoming file content from package
+   */
+  newFileContent: string;
+  /**
+   * Original hash from metadata when file was first copied
+   */
+  originalHash: string;
+  /**
+   * Current hash of user's file
+   */
+  currentHash: string;
+}
+
+/**
+ * User's resolution choice for file conflicts
+ */
+export type ConflictResolution = 'keep' | 'overwrite' | 'keep-all' | 'overwrite-all';

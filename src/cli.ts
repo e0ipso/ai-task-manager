@@ -26,6 +26,7 @@ program
     '--destination-directory <path>',
     'Directory to create project structure in (default: current directory)'
   )
+  .option('--force', 'Force overwrite all files without prompting')
   .action(async (options: InitOptions) => {
     try {
       // Initialize the logger to ensure colors are available

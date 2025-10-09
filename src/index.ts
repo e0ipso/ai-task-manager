@@ -7,7 +7,7 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { InitOptions, Assistant, CommandResult } from './types';
+import { InitOptions, Assistant, CommandResult, ConflictResolution } from './types';
 import * as logger from './logger';
 import {
   parseAssistants,
@@ -16,6 +16,9 @@ import {
   readAndProcessTemplate,
   writeProcessedTemplate,
 } from './utils';
+import { calculateFileHash, loadMetadata, saveMetadata, getPackageVersion } from './metadata';
+import { detectConflicts } from './conflict-detector';
+import { promptForConflicts } from './prompts';
 
 /**
  * Get the absolute path to a template file
@@ -78,9 +81,9 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
 
-    // Copy common templates to .ai/task-manager
+    // Copy common templates to .ai/task-manager with conflict detection
     await logger.info('📋 Copying common template files...');
-    await copyCommonTemplates(baseDir);
+    await copyCommonTemplates(baseDir, options.force || false);
 
     // Create assistant-specific directories and copy templates
     for (const assistant of assistants) {
@@ -133,20 +136,148 @@ export async function init(options: InitOptions): Promise<CommandResult> {
 }
 
 /**
- * Copy common template files to .ai/task-manager directory
+ * Copy common template files to .ai/task-manager directory with conflict detection
  */
-async function copyCommonTemplates(baseDir: string): Promise<void> {
+async function copyCommonTemplates(baseDir: string, force: boolean): Promise<void> {
   const sourceDir = getTemplatePath('ai-task-manager');
   const destDir = resolvePath(baseDir, '.ai/task-manager');
+  const metadataPath = resolvePath(destDir, '.init-metadata.json');
 
   // Check if source template directory exists
   if (!(await exists(sourceDir))) {
     throw new Error(`Template directory not found: ${sourceDir}`);
   }
 
-  // Copy entire directory structure exactly as-is
-  await fs.copy(sourceDir, destDir);
-  await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
+  // Load existing metadata if present
+  const existingMetadata = await loadMetadata(metadataPath);
+
+  // Scenario 1: First-time init (no metadata) - copy all files
+  if (!existingMetadata) {
+    await logger.debug('First-time initialization detected');
+    await fs.copy(sourceDir, destDir);
+    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
+
+    // Create initial metadata
+    await createMetadata(sourceDir, destDir, metadataPath);
+    return;
+  }
+
+  // Scenario 2: Force flag - overwrite all files
+  if (force) {
+    await logger.debug('Force flag detected, overwriting all files');
+    await fs.copy(sourceDir, destDir, { overwrite: true });
+    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
+
+    // Update metadata
+    await createMetadata(sourceDir, destDir, metadataPath);
+    return;
+  }
+
+  // Scenario 3: Conflict detection - check for user modifications
+  await logger.debug('Checking for file conflicts...');
+  const conflicts = await detectConflicts(destDir, sourceDir, existingMetadata);
+
+  if (conflicts.length === 0) {
+    await logger.debug('No conflicts detected, updating files');
+    await fs.copy(sourceDir, destDir, { overwrite: true });
+    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
+
+    // Update metadata
+    await createMetadata(sourceDir, destDir, metadataPath);
+    return;
+  }
+
+  // Conflicts detected - prompt user for resolution
+  await logger.info(
+    `⚠️  Detected ${conflicts.length} modified file(s). Prompting for resolution...`
+  );
+  const resolutions = await promptForConflicts(conflicts);
+
+  // Apply resolutions
+  await applyResolutions(sourceDir, destDir, resolutions);
+
+  // Update metadata for all files (including resolved conflicts)
+  await createMetadata(sourceDir, destDir, metadataPath);
+}
+
+/**
+ * Create or update metadata file with current file hashes
+ */
+async function createMetadata(
+  sourceDir: string,
+  destDir: string,
+  metadataPath: string
+): Promise<void> {
+  const files: Record<string, string> = {};
+
+  // Get all config files (excluding scripts directory)
+  async function walkDir(dir: string, relativeTo: string): Promise<void> {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relativePath = path.relative(relativeTo, fullPath);
+
+      // Skip scripts directory
+      if (relativePath.startsWith('config/scripts') || relativePath.includes('/scripts/')) {
+        continue;
+      }
+
+      // Skip metadata file itself
+      if (relativePath === '.init-metadata.json') {
+        continue;
+      }
+
+      if (entry.isDirectory()) {
+        await walkDir(fullPath, relativeTo);
+      } else if (entry.isFile()) {
+        // Calculate hash of the destination file (what we just copied)
+        const destFilePath = path.join(destDir, relativePath);
+        if (await exists(destFilePath)) {
+          const hash = await calculateFileHash(destFilePath);
+          files[relativePath] = hash;
+        }
+      }
+    }
+  }
+
+  const configDir = path.join(destDir, 'config');
+  if (await exists(configDir)) {
+    await walkDir(configDir, destDir);
+  }
+
+  // Create metadata object
+  const metadata = {
+    version: getPackageVersion(),
+    timestamp: new Date().toISOString(),
+    files,
+  };
+
+  // Save metadata
+  await saveMetadata(metadataPath, metadata);
+  await logger.debug(`💾 Saved metadata to ${metadataPath}`);
+}
+
+/**
+ * Apply user resolutions to file conflicts
+ */
+async function applyResolutions(
+  sourceDir: string,
+  destDir: string,
+  resolutions: Map<string, ConflictResolution>
+): Promise<void> {
+  for (const [relativePath, resolution] of resolutions) {
+    const sourcePath = path.join(sourceDir, relativePath);
+    const destPath = path.join(destDir, relativePath);
+
+    if (resolution === 'overwrite') {
+      await fs.copy(sourcePath, destPath, { overwrite: true });
+      await logger.debug(`📤 Overwrote ${relativePath}`);
+    } else if (resolution === 'keep') {
+      await logger.debug(`📌 Kept user version of ${relativePath}`);
+      // Do nothing, keep user's file
+    }
+  }
 }
 
 /**

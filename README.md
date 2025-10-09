@@ -21,6 +21,13 @@ npx @e0ipso/ai-task-manager init --assistants opencode
 
 # Or configure multiple assistants
 npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
+
+# Re-run init to update configuration files
+# Your customizations are protected with conflict detection
+npx @e0ipso/ai-task-manager init --assistants claude
+
+# Force overwrite all files (bypass conflict detection)
+npx @e0ipso/ai-task-manager init --assistants claude --force
 ```
 
 ## 📖 Documentation
