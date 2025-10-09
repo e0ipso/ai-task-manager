@@ -40,6 +40,13 @@ Built-in templates for different project types:
 - Preserves existing files while updating templates
 - Supports custom destination directories
 
+### File Conflict Detection
+- **Hash-based tracking**: Monitors user modifications to configuration files
+- **Interactive resolution**: Shows unified diff and prompts for conflicts
+- **Force mode**: `--force` flag bypasses prompts for automation
+- **Metadata tracking**: Stores baseline hashes in `.init-metadata.json`
+- **Smart updates**: Automatically updates unchanged files without prompts
+
 ### Format Adaptation
 - **Markdown** format for Claude and Open Code
 - **TOML** format for Gemini integration

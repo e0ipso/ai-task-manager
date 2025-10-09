@@ -36,38 +36,11 @@ npx . init --assistants claude --destination-directory /path/to/project --force
 
 ### File Conflict Detection
 
-The init command includes intelligent conflict detection to protect user customizations:
-
-**How it works:**
-- On first init, creates `.ai/task-manager/.init-metadata.json` tracking file hashes
-- On subsequent inits, compares current file hashes against stored baseline
-- Detects user-modified files and prompts for resolution with unified diff display
-- Excludes `config/scripts/` directory (not meant for user modification)
-
-**User experience:**
-- **No modifications**: Files update automatically without prompts
-- **User modifications detected**: Interactive prompts show diff and ask for resolution:
-  - Keep my changes (skip update)
-  - Overwrite with new version
-  - Keep/Overwrite all remaining conflicts
-- **Force flag**: Bypass all prompts and overwrite everything
-
-**Metadata file:** `.ai/task-manager/.init-metadata.json`
-```json
-{
-  "version": "1.12.0",
-  "timestamp": "2025-10-09T10:30:00.000Z",
-  "files": {
-    "config/TASK_MANAGER.md": "a3b2c1d4e5f6...",
-    "config/hooks/POST_PHASE.md": "f6e5d4c3b2a1..."
-  }
-}
-```
-
-**Troubleshooting:**
-- **Corrupted metadata**: Treated as first-time init, files recreated
-- **Missing metadata**: Treated as first-time init
-- **Git conflicts**: Metadata file is local, not committed to git
+The init command uses hash-based tracking to protect user customizations:
+- Creates `.ai/task-manager/.init-metadata.json` with SHA-256 file hashes
+- Compares current vs original hashes to detect user modifications
+- Excludes `config/scripts/` directory from tracking
+- Use `--force` flag to bypass prompts in automation
 
 ---
 
@@ -122,7 +95,7 @@ The system implements a specialized workflow optimized for AI cognitive constrai
 - **Requirement traceability**: Every task links to explicit user requirements
 
 #### Test Philosophy: "Write a Few Tests, Mostly Integration"
-- **Selective coverage**: 24% lines, 79 meaningful tests (12 new for conflict detection)
+- **Selective coverage**: 79 meaningful tests
 - **Integration-heavy**: Real filesystem operations over mocking
 - **Business logic focus**: Custom logic, critical workflows, edge cases
 - **Framework avoidance**: Don't test third-party library features
