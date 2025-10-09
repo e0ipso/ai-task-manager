@@ -1,3 +1,15 @@
+## 1.13.0 (2025-10-09)
+
+* docs: document file conflict detection feature ([3ccc98d](https://github.com/e0ipso/ai-task-manager/commit/3ccc98d))
+* docs: document overwrite protection ([66c9e52](https://github.com/e0ipso/ai-task-manager/commit/66c9e52))
+* feat: add hash-based file conflict detection to init command ([2f3c2fa](https://github.com/e0ipso/ai-task-manager/commit/2f3c2fa))
+* feat: add npm dependencies for conflict detection ([ffb506f](https://github.com/e0ipso/ai-task-manager/commit/ffb506f))
+* feat: add type definitions for metadata tracking ([b6a98f1](https://github.com/e0ipso/ai-task-manager/commit/b6a98f1))
+* feat: implement conflict detection and interactive prompts ([6c3891c](https://github.com/e0ipso/ai-task-manager/commit/6c3891c))
+* feat: implement hash utilities and force flag ([22b92e3](https://github.com/e0ipso/ai-task-manager/commit/22b92e3))
+* feat: integrate conflict detection with init command ([e3f604a](https://github.com/e0ipso/ai-task-manager/commit/e3f604a))
+* test: add integration tests for conflict detection ([93eead0](https://github.com/e0ipso/ai-task-manager/commit/93eead0))
+
 ## 1.12.0 (2025-10-09)
 
 * fix: improve devcontainer ([f24f2cf](https://github.com/e0ipso/ai-task-manager/commit/f24f2cf))
