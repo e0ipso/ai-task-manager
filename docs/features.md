@@ -95,6 +95,53 @@ flowchart TD
 - **Error Handling**: Graceful failure recovery and remediation workflows
 - **Documentation**: Comprehensive logging of decisions and outcomes
 
+### Progress Monitoring & Dashboard
+
+The status dashboard provides real-time visibility into your project's task management state.
+
+**Key Features:**
+
+- **Summary Statistics**: Overview of total plans, active/archived counts, and overall task completion rate
+- **Active Plans View**: Shows in-progress plans with visual progress bars and task counts
+- **Unfinished Task Alerts**: Highlights archived plans with incomplete tasks (warning indicators)
+- **Archived Plans List**: Complete history of finished plans
+- **Color-Coded Output**: Visual hierarchy using terminal colors for easy scanning
+
+**Usage:**
+
+```bash
+npx @e0ipso/ai-task-manager status
+```
+
+**Dashboard Sections:**
+
+1. **Summary**: High-level metrics across all plans
+   - Total plans count
+   - Active vs. archived breakdown
+   - Overall task completion percentage with progress bar
+
+2. **Active Plans**: Current work in progress
+   - Plan ID and summary
+   - Completion percentage with visual bar
+   - Completed/total task counts
+
+3. **Unfinished Tasks in Archived Plans**: Quality assurance
+   - Plans archived with incomplete work
+   - Incomplete task counts
+   - Warning indicators for attention
+
+4. **Archived Plans**: Historical record
+   - Completed plans list
+   - Plan summaries for reference
+
+**Use Cases:**
+
+- Daily standup progress checks
+- Sprint planning and estimation
+- Identifying forgotten or blocked work
+- Project status reporting
+- Historical work pattern analysis
+
 ## 🔧 Configuration & Customization
 
 ### Project Context

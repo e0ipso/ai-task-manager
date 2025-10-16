@@ -48,6 +48,7 @@ The documentation includes:
 1. **📝 Create a plan**: `/tasks:create-plan Create user authentication system`
 2. **📋 Generate tasks**: `/tasks:generate-tasks 1`
 3. **🚀 Execute blueprint**: `/tasks:execute-blueprint 1`
+4. **🔍 Monitor progress**: `npx @e0ipso/ai-task-manager status`
 
 ## 🤖 Supported Assistants
 
