@@ -87,7 +87,7 @@ async function parsePlanFile(planDir: string): Promise<PlanMetadata | null> {
 /**
  * Parse task files in a plan directory
  */
-async function parseTaskFiles(planDir: string): Promise<TaskMetadata[]> {
+export async function parseTaskFiles(planDir: string): Promise<TaskMetadata[]> {
   const tasksDir = path.join(planDir, 'tasks');
   if (!(await fs.pathExists(tasksDir))) return [];
 
