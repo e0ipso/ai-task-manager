@@ -99,6 +99,8 @@ flowchart TD
 
 The status dashboard provides real-time visibility into your project's task management state.
 
+![Dashboard](../img/dashboard.svg)
+
 **Key Features:**
 
 - **Summary Statistics**: Overview of total plans, active/archived counts, and overall task completion rate

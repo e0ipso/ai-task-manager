@@ -3,6 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/@e0ipso/ai-task-manager.svg)](https://www.npmjs.com/package/@e0ipso/ai-task-manager)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
+![Dashboard](./docs/img/dashboard.svg)
+
 **AI-powered task management that creates structured workflows within your existing AI subscriptions.**
 
 Transform chaotic AI prompts into organized, executable development workflows through custom slash commands for Claude Code, Gemini CLI, and Open Code.
