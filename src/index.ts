@@ -223,6 +223,11 @@ async function createMetadata(
         continue;
       }
 
+      // Skip README.md (always overwrite on init/re-init)
+      if (relativePath === 'README.md') {
+        continue;
+      }
+
       // Skip metadata file itself
       if (relativePath === '.init-metadata.json') {
         continue;
