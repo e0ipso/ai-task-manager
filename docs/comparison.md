@@ -1,13 +1,16 @@
 ---
 layout: default
-title: Plan Mode vs AI Task Manager
-nav_order: 5
+title: Comparison with Other Tools
+nav_order: 10
+parent: Reference
 description: "Understanding the difference between plan mode and structured task management"
 ---
 
-# Plan Mode vs AI Task Manager
+# 🔍 Comparison with Other Tools
 
-## The Problem with Plan Mode Alone
+AI Task Manager takes a fundamentally different architectural approach compared to both traditional AI assistant "plan mode" features and specialized task management tools.
+
+## Plan Mode vs AI Task Manager
 
 Most coding assistants (Claude, Gemini, etc.) offer a "plan mode" feature where the AI creates a plan before implementing. While useful, this approach has significant limitations:
 
@@ -250,3 +253,134 @@ AI Task Manager leverages research-backed principles:
 - **Human-in-the-Loop**: Strategic human input at decision points maximizes quality
 
 **Remember:** The tool doesn't replace plan mode—it structures and validates it through mandatory human gates, preventing the common pitfalls of unchecked AI planning.
+
+## Comparison with Specialized Task Management Tools
+
+### AI Task Manager vs Plandex / Conductor Tasks / Claude Task Master
+
+**Architectural Difference:**
+- **Plandex/Conductor/Others**: API-based tools requiring separate service, pay-per-token pricing
+- **AI Task Manager**: Works within existing AI subscription interfaces (Claude Pro/Max, Gemini)
+
+**Cost Model Comparison:**
+
+| Tool | Pricing Model | Monthly Cost (Estimate) |
+|------|---------------|------------------------|
+| **AI Task Manager** | Works within Claude Pro/Max or Gemini subscriptions | $0 additional (uses existing subscription) |
+| **Plandex** | API-based (Anthropic API + OpenAI API) | ~$20-200 depending on usage |
+| **Conductor Tasks** | API-based (Anthropic API) | ~$50-300 depending on usage |
+| **Claude Task Master** | API-based (Anthropic API) | ~$30-150 depending on usage |
+
+**Note**: API-based tools have variable costs based on token usage. Heavy users may see significantly higher costs. AI Task Manager's cost is fixed (your existing subscription) regardless of usage.
+
+**Workflow Differences:**
+- **API-based tools**: Require API key setup, external service dependencies, internet connectivity for all operations
+- **AI Task Manager**: Works directly in AI assistant interface, no additional setup beyond `init`, most operations work offline
+
+**Extensibility:**
+- **AI-based tools**: Configuration typically via JSON/YAML files, limited customization points
+- **AI Task Manager**: Fully editable Markdown hooks and templates, unlimited customization
+
+**When to Use API-Based Tools:**
+- You need programmatic access to task management
+- You're building automation pipelines
+- You want to integrate with external services directly
+
+**When to Use AI Task Manager:**
+- You work primarily in AI assistant interfaces (Claude Code, Gemini CLI)
+- You want to avoid additional API costs
+- You prefer file-based customization over API configuration
+- You want offline capability
+
+## Frequently Asked Questions
+
+### Does this require API keys or additional costs?
+
+**No.** AI Task Manager works within your existing AI assistant subscriptions:
+- **Claude**: Works with Claude Pro or Claude Max via [claude.ai/code](https://claude.ai/code)
+- **Gemini**: Works with Gemini subscriptions via Gemini CLI
+- **Open Code**: Free and open source
+
+No API keys, no pay-per-token charges, no additional service subscriptions required.
+
+### What file formats does it support?
+
+AI Task Manager uses:
+- **Markdown (.md)** for Claude and Open Code commands
+- **TOML (.toml)** for Gemini commands
+- **Markdown (.md)** for all configuration files (hooks, templates, plans, tasks)
+
+All formats are automatically generated from a single source during initialization.
+
+### Can I customize the workflow?
+
+**Yes, extensively.** Customize:
+- **Hooks**: Seven lifecycle hooks for validation gates and custom logic
+- **Templates**: Five templates for plans, tasks, blueprints, and summaries
+- **Configuration**: TASK_MANAGER.md and POST_PHASE.md for project context
+
+See [Customization Guide]({% link customization.md %}) for detailed examples.
+
+### Does it work with existing projects?
+
+**Yes.** Run `npx @e0ipso/ai-task-manager init --assistants claude` in any directory:
+- Merges with existing project structure
+- Doesn't break existing files
+- Uses hash-based conflict detection
+- Preserves your customizations on re-init
+
+Compatible with any project type: web apps, APIs, CLI tools, libraries, etc.
+
+### How long does setup take?
+
+**Under 30 seconds** for initial setup:
+```bash
+npx @e0ipso/ai-task-manager init --assistants claude
+# Creates all necessary files and directories
+# Ready to use immediately
+```
+
+### Can I use it with multiple AI assistants?
+
+**Yes.** Initialize with multiple assistants:
+```bash
+npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
+```
+
+All assistants share the same plans, tasks, and configuration. Team members can use different assistants while collaborating on the same project.
+
+### How does it integrate with Git?
+
+AI Task Manager is **Git-friendly**:
+- Creates commits automatically after each phase (configurable)
+- All files are plain text (Markdown, TOML, YAML)
+- Include `.ai/` directory in version control for team consistency
+- Merge-friendly: conflicts are rare and easy to resolve
+
+### What if I don't want to use the three-phase workflow?
+
+You can:
+- Use only plan creation without task generation
+- Generate tasks without executing
+- Execute specific tasks manually
+- Skip phases that don't apply
+
+The three-phase workflow is recommended but not mandatory. Use what works for your project.
+
+### Can I use this for non-coding projects?
+
+**Yes.** AI Task Manager works for any structured project:
+- Content creation (blog posts, documentation)
+- Research and analysis
+- Project planning and management
+- Learning roadmaps
+- Business process documentation
+
+Customize templates and hooks for your specific domain.
+
+## Next Steps
+
+- **[How It Works]({% link architecture.md %})**: Understand the architecture and design principles
+- **[Customization Guide]({% link customization.md %})**: Tailor AI Task Manager to your needs
+- **[Workflow Patterns]({% link workflows.md %})**: Advanced patterns including plan mode integration
+- **[Basic Workflow]({% link workflow.md %})**: Get started with day-to-day usage
