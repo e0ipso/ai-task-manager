@@ -109,8 +109,9 @@ Review and tweak the `.ai/task-manager/config/TASK_MANAGER.md` and `.ai/task-man
 4. **📋 Create the tasks** for the plan: `/tasks:generate-tasks 1`
 5. **👀 Review the list of tasks**. This step is important to avoid scope creep and ensure the right things are to be built. Again, **do not skip this step**. Find the tasks in the folder `.ai/task-manager/plans/01--authentication-workflow/tasks/`
 6. **🚀 Execute the tasks**: `/tasks:execute-blueprint 1`
-7. **🔧 Fix any broken tests**: `/tasks:fix-broken-tests npm test` (if tests fail after implementation)
-8. **✅ Review the implementation** and the generated tests.
+7. **📊 Check your progress** anytime with `npx @e0ipso/ai-task-manager status`
+8. **🔧 Fix any broken tests**: `/tasks:fix-broken-tests npm test` (if tests fail after implementation)
+9. **✅ Review the implementation** and the generated tests.
 
 ## 🔧 Troubleshooting
 
@@ -148,7 +149,23 @@ Review and tweak the `.ai/task-manager/config/TASK_MANAGER.md` and `.ai/task-man
 /tasks:execute-blueprint 1
 ```
 
-### 4. Fix Broken Tests
+### 4. Check Progress
+
+Display a dashboard showing plan and task statistics:
+
+```bash
+npx @e0ipso/ai-task-manager status
+```
+
+![Dashboard](../img/dashboard.svg)
+
+This shows:
+- Summary statistics (total plans, active/archived counts)
+- Active plans with progress bars
+- Unfinished tasks in archived plans
+- Archived plans list
+
+### 5. Fix Broken Tests
 ```bash
 /tasks:fix-broken-tests npm test
 ```
