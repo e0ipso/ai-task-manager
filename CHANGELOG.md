@@ -1,3 +1,8 @@
+## 1.15.0 (2025-10-16)
+
+* feat: add status command for dashboard ([15d191d](https://github.com/e0ipso/ai-task-manager/commit/15d191d))
+* chore: add README.md file to inform what the folder is about ([14f0f49](https://github.com/e0ipso/ai-task-manager/commit/14f0f49))
+
 ## 1.14.0 (2025-10-16)
 
 * feat: mount Claude folders and files ([5dc987d](https://github.com/e0ipso/ai-task-manager/commit/5dc987d))
