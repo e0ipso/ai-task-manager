@@ -1,3 +1,7 @@
+## 1.14.0 (2025-10-16)
+
+* feat: mount Claude folders and files ([5dc987d](https://github.com/e0ipso/ai-task-manager/commit/5dc987d))
+
 ## 1.13.0 (2025-10-09)
 
 * docs: document file conflict detection feature ([3ccc98d](https://github.com/e0ipso/ai-task-manager/commit/3ccc98d))
