@@ -99,7 +99,7 @@ flowchart TD
 
 The status dashboard provides real-time visibility into your project's task management state.
 
-![Dashboard](../img/dashboard.svg)
+![Dashboard](img/dashboard.svg)
 
 **Key Features:**
 
@@ -114,35 +114,6 @@ The status dashboard provides real-time visibility into your project's task mana
 ```bash
 npx @e0ipso/ai-task-manager status
 ```
-
-**Dashboard Sections:**
-
-1. **Summary**: High-level metrics across all plans
-   - Total plans count
-   - Active vs. archived breakdown
-   - Overall task completion percentage with progress bar
-
-2. **Active Plans**: Current work in progress
-   - Plan ID and summary
-   - Completion percentage with visual bar
-   - Completed/total task counts
-
-3. **Unfinished Tasks in Archived Plans**: Quality assurance
-   - Plans archived with incomplete work
-   - Incomplete task counts
-   - Warning indicators for attention
-
-4. **Archived Plans**: Historical record
-   - Completed plans list
-   - Plan summaries for reference
-
-**Use Cases:**
-
-- Daily standup progress checks
-- Sprint planning and estimation
-- Identifying forgotten or blocked work
-- Project status reporting
-- Historical work pattern analysis
 
 ## 🔧 Configuration & Customization
 

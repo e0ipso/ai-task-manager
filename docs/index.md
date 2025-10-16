@@ -157,7 +157,7 @@ Display a dashboard showing plan and task statistics:
 npx @e0ipso/ai-task-manager status
 ```
 
-![Dashboard](../img/dashboard.svg)
+![Dashboard](img/dashboard.svg)
 
 This shows:
 - Summary statistics (total plans, active/archived counts)
