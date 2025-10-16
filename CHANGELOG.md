@@ -1,3 +1,14 @@
+## 1.17.0 (2025-10-16)
+
+* feat: add plan remove subcommand ([61eeae3](https://github.com/e0ipso/ai-task-manager/commit/61eeae3))
+* fix: ensure full-workflow does not do pit stops ([33ac8f8](https://github.com/e0ipso/ai-task-manager/commit/33ac8f8))
+* docs: complete Phase 1 - Foundation Setup ([6e631e7](https://github.com/e0ipso/ai-task-manager/commit/6e631e7))
+* docs: complete Phase 2 - Core Content Restructure ([2fffe32](https://github.com/e0ipso/ai-task-manager/commit/2fffe32)), closes [#1](https://github.com/e0ipso/ai-task-manager/issues/1) [#2](https://github.com/e0ipso/ai-task-manager/issues/2) [#9](https://github.com/e0ipso/ai-task-manager/issues/9)
+* docs: complete Phase 3 - Detail Pages Creation ([09f9f7c](https://github.com/e0ipso/ai-task-manager/commit/09f9f7c))
+* docs: complete Phase 4 - Cleanup Deprecated Files ([e790d21](https://github.com/e0ipso/ai-task-manager/commit/e790d21))
+* docs: fix documentation issues ([a33436b](https://github.com/e0ipso/ai-task-manager/commit/a33436b))
+* Merge branch 'feat/refocus-documentation' ([25702fd](https://github.com/e0ipso/ai-task-manager/commit/25702fd))
+
 ## 1.16.0 (2025-10-16)
 
 * chore: archive AI plan ([b69cd9d](https://github.com/e0ipso/ai-task-manager/commit/b69cd9d))
