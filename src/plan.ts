@@ -143,6 +143,55 @@ export async function showPlan(planId: number): Promise<{ success: boolean; mess
 }
 
 /**
+ * Delete a plan permanently from either active or archive directory
+ */
+export async function deletePlan(
+  planId: number,
+  autoConfirm: boolean = false
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    // 1. Find the plan
+    const location = await findPlanById(planId);
+
+    if (!location) {
+      return {
+        success: false,
+        message: `Plan ${planId} not found. Check .ai/task-manager/plans/ and .ai/task-manager/archive/ directories.`,
+      };
+    }
+
+    // 2. Prompt for confirmation (unless autoConfirm is true)
+    if (!autoConfirm) {
+      const planType = location.isArchived ? 'archived' : 'active';
+      console.log(
+        chalk.yellow(
+          `\n⚠  Warning: This will permanently delete ${planType} plan ${planId} and all its tasks.\n`
+        )
+      );
+
+      const confirmed = await promptConfirmation('Delete plan? (y/n): ');
+      if (!confirmed) {
+        return { success: false, message: 'Deletion cancelled by user.' };
+      }
+    }
+
+    // 3. Delete the directory
+    await fs.remove(location.directoryPath);
+
+    // 4. Display success message
+    console.log(chalk.green(`\n✓ Plan ${planId} successfully deleted.\n`));
+
+    return { success: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      message: `Failed to delete plan: ${message}`,
+    };
+  }
+}
+
+/**
  * Archive a plan by moving it to the archive directory
  */
 export async function archivePlan(

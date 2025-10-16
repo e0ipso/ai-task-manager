@@ -9,7 +9,7 @@
 import { Command } from 'commander';
 import { init } from './index';
 import { status } from './status';
-import { showPlan, archivePlan } from './plan';
+import { showPlan, archivePlan, deletePlan } from './plan';
 import { InitOptions } from './types';
 import * as logger from './logger';
 
@@ -76,49 +76,26 @@ program
     }
   });
 
-program
-  .command('plan [subcommand] [plan-id]')
-  .description('Display or manage a specific plan')
-  .action(async (subcommandOrId: string, maybePlanId?: string) => {
+// Create parent plan command for help organization
+const planCommand = program
+  .command('plan')
+  .description('Display and manage plans. Use `plan <id>` as shorthand for `plan show <id>`.');
+
+// Plan show subcommand
+planCommand
+  .command('show <plan-id>')
+  .description('Display plan metadata, progress, and executive summary')
+  .action(async (planId: string) => {
     try {
       await logger.initLogger();
 
-      // Validate that at least one argument is provided
-      if (!subcommandOrId) {
-        await logger.error('Missing plan ID. Usage: plan [show|archive] <plan-id>');
-        process.exit(1);
-      }
-
-      // Handle shorthand: plan <id> = plan show <id>
-      let subcommand: string;
-      let planId: string;
-
-      if (maybePlanId === undefined) {
-        // Called as: plan <id>
-        subcommand = 'show';
-        planId = subcommandOrId;
-      } else {
-        // Called as: plan <subcommand> <id>
-        subcommand = subcommandOrId;
-        planId = maybePlanId;
-      }
-
-      // Validate subcommand
-      if (subcommand !== 'show' && subcommand !== 'archive') {
-        await logger.error(`Invalid subcommand: ${subcommand}. Use 'show' or 'archive'.`);
-        process.exit(1);
-      }
-
-      // Validate plan ID is a number
       const planIdNum = parseInt(planId, 10);
       if (isNaN(planIdNum)) {
         await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
         process.exit(1);
       }
 
-      // Route to appropriate handler
-      const result =
-        subcommand === 'show' ? await showPlan(planIdNum) : await archivePlan(planIdNum);
+      const result = await showPlan(planIdNum);
 
       if (result.success) {
         process.exit(0);
@@ -133,6 +110,104 @@ program
         `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
       );
       process.exit(1);
+    }
+  });
+
+// Plan archive subcommand
+planCommand
+  .command('archive <plan-id>')
+  .description('Move a plan from active to archive directory')
+  .action(async (planId: string) => {
+    try {
+      await logger.initLogger();
+
+      const planIdNum = parseInt(planId, 10);
+      if (isNaN(planIdNum)) {
+        await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+        process.exit(1);
+      }
+
+      const result = await archivePlan(planIdNum);
+
+      if (result.success) {
+        process.exit(0);
+      } else {
+        if (result.message) {
+          await logger.error(result.message);
+        }
+        process.exit(1);
+      }
+    } catch (error) {
+      await logger.error(
+        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      process.exit(1);
+    }
+  });
+
+// Plan delete subcommand
+planCommand
+  .command('delete <plan-id>')
+  .description('Permanently delete a plan and all its tasks')
+  .action(async (planId: string) => {
+    try {
+      await logger.initLogger();
+
+      const planIdNum = parseInt(planId, 10);
+      if (isNaN(planIdNum)) {
+        await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+        process.exit(1);
+      }
+
+      const result = await deletePlan(planIdNum);
+
+      if (result.success) {
+        process.exit(0);
+      } else {
+        if (result.message) {
+          await logger.error(result.message);
+        }
+        process.exit(1);
+      }
+    } catch (error) {
+      await logger.error(
+        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      process.exit(1);
+    }
+  });
+
+// Backward compatibility: plan <id> as shorthand for plan show <id>
+planCommand
+  .argument('[plan-id]', 'Plan ID to display (shorthand for show subcommand)')
+  .action(async (planId?: string) => {
+    // Only handle if planId is provided and no subcommand was matched
+    if (planId) {
+      try {
+        await logger.initLogger();
+
+        const planIdNum = parseInt(planId, 10);
+        if (isNaN(planIdNum)) {
+          await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+          process.exit(1);
+        }
+
+        const result = await showPlan(planIdNum);
+
+        if (result.success) {
+          process.exit(0);
+        } else {
+          if (result.message) {
+            await logger.error(result.message);
+          }
+          process.exit(1);
+        }
+      } catch (error) {
+        await logger.error(
+          `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
+        );
+        process.exit(1);
+      }
     }
   });
 

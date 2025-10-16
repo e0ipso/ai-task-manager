@@ -3,14 +3,30 @@
  * Focuses on business logic - plan lookup, archival operations, data integrity
  */
 
-// Mock chalk to avoid ESM issues
+// Mock chalk to avoid ESM issues - must be before imports
 jest.mock('chalk', () => ({
-  default: (str: string) => str,
+  __esModule: true,
+  default: {
+    green: jest.fn((str: string) => str),
+    blue: jest.fn((str: string) => str),
+    yellow: jest.fn((str: string) => str),
+    gray: jest.fn((str: string) => str),
+    red: jest.fn((str: string) => str),
+    white: jest.fn((str: string) => str),
+    bold: {
+      cyan: jest.fn((str: string) => str),
+      white: jest.fn((str: string) => str),
+    },
+    cyan: Object.assign(jest.fn((str: string) => str), {
+      bold: jest.fn((str: string) => str),
+    }),
+  },
 }));
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { loadPlanData, findPlanById } from '../plan-utils';
+import { deletePlan } from '../plan';
 
 describe('Plan Command Integration Tests', () => {
   const testDir = path.join(__dirname, 'test-plans');
@@ -172,6 +188,71 @@ Test content.
       const location = await findPlanById(999);
 
       expect(location).toBeNull();
+    });
+  });
+
+  describe('Plan Deletion', () => {
+    it('should delete an active plan with auto-confirm', async () => {
+      await createTestPlan(10, 'Plan To Delete', false);
+
+      // Verify plan exists
+      const beforeLocation = await findPlanById(10);
+      expect(beforeLocation).not.toBeNull();
+
+      // Delete with auto-confirm
+      const result = await deletePlan(10, true);
+
+      // Verify deletion
+      expect(result.success).toBe(true);
+      const afterLocation = await findPlanById(10);
+      expect(afterLocation).toBeNull();
+    });
+
+    it('should delete an archived plan with auto-confirm', async () => {
+      await createTestPlan(11, 'Archived Plan To Delete', true);
+
+      // Verify plan exists in archive
+      const beforeLocation = await findPlanById(11);
+      expect(beforeLocation?.isArchived).toBe(true);
+
+      // Delete with auto-confirm
+      const result = await deletePlan(11, true);
+
+      // Verify deletion
+      expect(result.success).toBe(true);
+      const afterLocation = await findPlanById(11);
+      expect(afterLocation).toBeNull();
+    });
+
+    it('should return error for non-existent plan', async () => {
+      const result = await deletePlan(999, true);
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('not found');
+    });
+
+    it('should delete plan with all tasks', async () => {
+      await createTestPlan(12, 'Plan With Tasks', false, [
+        { id: 1, status: 'pending' },
+        { id: 2, status: 'completed' },
+      ]);
+
+      const planDirName = '12--plan-with-tasks';
+      const planDir = path.join(plansDir, planDirName);
+      const tasksDir = path.join(planDir, 'tasks');
+
+      // Verify tasks exist
+      expect(await fs.pathExists(tasksDir)).toBe(true);
+      const taskFiles = await fs.readdir(tasksDir);
+      expect(taskFiles.length).toBe(2);
+
+      // Delete
+      const result = await deletePlan(12, true);
+
+      // Verify entire directory tree is removed
+      expect(result.success).toBe(true);
+      expect(await fs.pathExists(planDir)).toBe(false);
+      expect(await fs.pathExists(tasksDir)).toBe(false);
     });
   });
 });
