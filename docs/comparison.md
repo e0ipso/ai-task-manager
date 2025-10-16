@@ -1,7 +1,8 @@
 ---
 layout: default
-title: Plan Mode vs AI Task Manager
-nav_order: 5
+title: Comparison with Other Tools
+nav_order: 10
+parent: Reference
 description: "Understanding the difference between plan mode and structured task management"
 ---
 

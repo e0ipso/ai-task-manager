@@ -1,7 +1,8 @@
 ---
 layout: default
 title: Features
-nav_order: 2
+nav_order: 5
+parent: Core Concepts
 description: "Comprehensive features and capabilities of AI Task Manager"
 ---
 
