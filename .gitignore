@@ -75,4 +75,6 @@ temp/
 # Generated TOML files (these are created on-the-fly from MD templates)
 templates/commands/tasks/*.toml
 .jest-cache
-worktrees/
+
+# Worktrees
+/worktrees
