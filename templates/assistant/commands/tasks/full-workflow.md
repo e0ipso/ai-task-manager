@@ -63,6 +63,8 @@ Use the SlashCommand tool to execute plan creation with the user's prompt:
 After plan creation completes, provide minimal progress update:
 "Step 1/4: Plan created (ID: [plan-id])"
 
+**CRITICAL**: Do not wait for user approval or review of the plan. In full-workflow mode, plan validation is automated (Step 3 performs file existence checking only). Proceed immediately to Step 3 without waiting for user input.
+
 #### Step 3: Validate Plan Creation
 
 Verify the plan was created successfully by checking if the plan document exists:
