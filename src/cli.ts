@@ -77,11 +77,17 @@ program
   });
 
 program
-  .command('plan [subcommand] <plan-id>')
+  .command('plan [subcommand] [plan-id]')
   .description('Display or manage a specific plan')
   .action(async (subcommandOrId: string, maybePlanId?: string) => {
     try {
       await logger.initLogger();
+
+      // Validate that at least one argument is provided
+      if (!subcommandOrId) {
+        await logger.error('Missing plan ID. Usage: plan [show|archive] <plan-id>');
+        process.exit(1);
+      }
 
       // Handle shorthand: plan <id> = plan show <id>
       let subcommand: string;
