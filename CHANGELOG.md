@@ -1,3 +1,16 @@
+## 1.16.0 (2025-10-16)
+
+* chore: archive AI plan ([b69cd9d](https://github.com/e0ipso/ai-task-manager/commit/b69cd9d))
+* chore: improve .gitignore ([7b1d5aa](https://github.com/e0ipso/ai-task-manager/commit/7b1d5aa))
+* Merge branch 'feat/plan-35-full-workflow-command' ([be6c1b0](https://github.com/e0ipso/ai-task-manager/commit/be6c1b0))
+* docs: add full-workflow option to init help text ([a4880c9](https://github.com/e0ipso/ai-task-manager/commit/a4880c9))
+* docs: document status command (#5) ([3ff7b47](https://github.com/e0ipso/ai-task-manager/commit/3ff7b47)), closes [#5](https://github.com/e0ipso/ai-task-manager/issues/5)
+* docs: fix image in docs ([d773025](https://github.com/e0ipso/ai-task-manager/commit/d773025))
+* test: verify full-workflow template integration ([3bcff0f](https://github.com/e0ipso/ai-task-manager/commit/3bcff0f))
+* feat: add full-workflow command template ([2f5f9d6](https://github.com/e0ipso/ai-task-manager/commit/2f5f9d6))
+* feat: implement plan CLI command with show and archive subcommands ([9080aa9](https://github.com/e0ipso/ai-task-manager/commit/9080aa9))
+* fix: make plan-id optional to support shorthand syntax ([7d0368b](https://github.com/e0ipso/ai-task-manager/commit/7d0368b))
+
 ## 1.15.0 (2025-10-16)
 
 * feat: add status command for dashboard ([15d191d](https://github.com/e0ipso/ai-task-manager/commit/15d191d))
