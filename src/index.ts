@@ -401,7 +401,23 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`└${thinSeparator}┘`);
   console.log('');
 
-  console.log(`┌─ DAY-TO-DAY WORKFLOW ${thinSeparator.slice(22)}┐`);
+  console.log(`┌─ AUTOMATED WORKFLOW (RECOMMENDED FOR SIMPLE TASKS) ${thinSeparator.slice(53)}┐`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  Run the full workflow in one command:${' '.repeat(21)}│`);
+  console.log(`│      /tasks:full-workflow Create an authentication...${' '.repeat(6)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  This automatically:${' '.repeat(39)}│`);
+  console.log(`│    • Creates the plan (with clarification prompts)${' '.repeat(10)}│`);
+  console.log(`│    • Generates tasks${' '.repeat(38)}│`);
+  console.log(`│    • Executes the blueprint${' '.repeat(31)}│`);
+  console.log(`│    • Archives the completed plan${' '.repeat(26)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`│  Best for: Straightforward implementations${' '.repeat(18)}│`);
+  console.log(`│${' '.repeat(width)}│`);
+  console.log(`└${thinSeparator}┘`);
+  console.log('');
+
+  console.log(`┌─ MANUAL WORKFLOW (RECOMMENDED FOR COMPLEX TASKS) ${thinSeparator.slice(51)}┐`);
   console.log(`│${' '.repeat(width)}│`);
   console.log(`│  1) Create a plan:${' '.repeat(41)}│`);
   console.log(`│      /tasks:create-plan Create an authentication...${' '.repeat(8)}│`);
@@ -423,6 +439,10 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`│  7) Review the implementation and generated tests${' '.repeat(10)}│`);
   console.log(`│${' '.repeat(width)}│`);
   console.log(`└${thinSeparator}┘`);
+  console.log('');
+  console.log('Choose your workflow:');
+  console.log('  • Use /tasks:full-workflow for straightforward implementations');
+  console.log('  • Use manual workflow when you need to review/modify plans or tasks');
   console.log('');
   console.log('Pro tip: The manual review steps are crucial for success!');
   console.log('');
