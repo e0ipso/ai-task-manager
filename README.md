@@ -5,13 +5,9 @@
 
 ![Dashboard](./docs/img/dashboard.svg)
 
-**AI-powered task management that creates structured workflows within your existing AI subscriptions.**
+**Extensible AI-powered task management with customizable workflows and structured development processes.**
 
-Transform chaotic AI prompts into organized, executable development workflows through custom slash commands for Claude Code, Gemini CLI, and Open Code.
-
-## 💰 No Additional Costs
-
-Unlike Plandex, Claude Task Master, and Conductor Tasks that require API keys with pay-per-token pricing, **AI Task Manager works within your existing AI subscriptions** - no API keys or additional costs required.
+Transform complex AI prompts into organized, executable workflows through customizable hooks, templates, and progressive refinement. Works seamlessly within your existing AI subscriptions for Claude Code, Gemini CLI, and Open Code.
 
 ## 🚀 Quick Start
 
@@ -23,42 +19,40 @@ npx @e0ipso/ai-task-manager init --assistants opencode
 
 # Or configure multiple assistants
 npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
-
-# Re-run init to update configuration files
-# Your customizations are protected with conflict detection
-npx @e0ipso/ai-task-manager init --assistants claude
-
-# Force overwrite all files (bypass conflict detection)
-npx @e0ipso/ai-task-manager init --assistants claude --force
 ```
+
+## ✨ Key Benefits
+
+- **🔧 Fully Customizable**: Tailor hooks, templates, and workflows to your project's specific needs
+- **🎯 Extensible Architecture**: Add custom validation gates, quality checks, and workflow patterns
+- **📋 Structured Workflows**: Three-phase progressive refinement with validation gates
+- **🔄 Plan Mode Integration**: Enhance existing AI assistant features with structured task management
+- **💰 Works Within Subscriptions**: No additional API keys or costs required
 
 ## 📖 Documentation
 
-**For complete setup instructions, features, and workflow guides, visit:**
+### 🌐 **[Complete Documentation →](https://mateuaguilo.com/ai-task-manager/)**
 
-### 🌐 **[Documentation Site →](https://mateuaguilo.com/ai-task-manager/)**
+Comprehensive guides covering:
+- Installation and configuration
+- Customization with hooks and templates
+- Workflow patterns and best practices
+- Architecture and design principles
 
-The documentation includes:
-- Detailed installation and setup instructions
-- Complete workflow guides with examples
-- Feature overview and capabilities
-- Troubleshooting and best practices
-- Architecture and customization details
+## 🔄 Workflow Preview
 
-## 💡 Quick Workflow Preview
-
-1. **📝 Create a plan**: `/tasks:create-plan Create user authentication system`
-2. **📋 Generate tasks**: `/tasks:generate-tasks 1`
-3. **🚀 Execute blueprint**: `/tasks:execute-blueprint 1`
-4. **📊 Monitor progress**: `npx @e0ipso/ai-task-manager status`
+1. **📝 Create a plan** → `/tasks:create-plan Create user authentication system`
+2. **📋 Generate tasks** → `/tasks:generate-tasks 1`
+3. **🚀 Execute blueprint** → `/tasks:execute-blueprint 1`
+4. **📊 Monitor progress** → `npx @e0ipso/ai-task-manager status`
 
 ## 🤖 Supported Assistants
 
-| Assistant | Interface | Cost Model |
+| Assistant | Interface | Setup Time |
 |-----------|-----------|------------|
-| 🎭 **Claude** | [claude.ai/code](https://claude.ai/code) | Your existing subscription |
-| 💎 **Gemini** | Gemini CLI | Your existing subscription |
-| 📝 **Open Code** | Open source | Free |
+| 🎭 **Claude** | [claude.ai/code](https://claude.ai/code) | < 30 seconds |
+| 💎 **Gemini** | Gemini CLI | < 30 seconds |
+| 📝 **Open Code** | Open source | < 30 seconds |
 
 ## 📄 License
 
