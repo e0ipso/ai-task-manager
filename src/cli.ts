@@ -8,6 +8,7 @@
 
 import { Command } from 'commander';
 import { init } from './index';
+import { status } from './status';
 import { InitOptions } from './types';
 import * as logger from './logger';
 
@@ -39,6 +40,31 @@ program
       if (result.success) {
         process.exit(0);
       } else {
+        process.exit(1);
+      }
+    } catch (error) {
+      await logger.error(
+        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      process.exit(1);
+    }
+  });
+
+program
+  .command('status')
+  .description('Display dashboard with plans and task statistics')
+  .action(async () => {
+    try {
+      await logger.initLogger();
+
+      const result = await status();
+
+      if (result.success) {
+        process.exit(0);
+      } else {
+        if (result.message) {
+          await logger.error(result.message);
+        }
         process.exit(1);
       }
     } catch (error) {
