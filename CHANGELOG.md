@@ -1,3 +1,12 @@
+## 1.18.0 (2025-10-17)
+
+* Merge branch 'chore/worktrees-out-repo' ([e50994a](https://github.com/e0ipso/ai-task-manager/commit/e50994a))
+* Merge branch 'feat/auto-create-tasks-if-missing' ([04d11a5](https://github.com/e0ipso/ai-task-manager/commit/04d11a5))
+* Merge branch 'main' into feat/auto-create-tasks-if-missing ([a4dea1d](https://github.com/e0ipso/ai-task-manager/commit/a4dea1d))
+* Merge remote-tracking branch 'origin/main' ([e3e25c9](https://github.com/e0ipso/ai-task-manager/commit/e3e25c9))
+* feat: add automatic task generation to execute-blueprint command ([12e5b1e](https://github.com/e0ipso/ai-task-manager/commit/12e5b1e))
+* feat: create named volume for worktrees ([cc7d9bf](https://github.com/e0ipso/ai-task-manager/commit/cc7d9bf))
+
 ## <small>1.17.1 (2025-10-17)</small>
 
 * fix: replace Jekyll link tags with relative paths in documentation ([51ef602](https://github.com/e0ipso/ai-task-manager/commit/51ef602))
