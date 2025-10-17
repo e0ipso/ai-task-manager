@@ -52,7 +52,7 @@
   "remoteUser": "node",
   "mounts": [
     "source=claude-code-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=worktrees-${devcontainerId},target=/worktrees,type=volume",
+    "source=${localWorkspaceFolder}/../worktrees,target=/worktrees,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/node/.claude/CLAUDE.md,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gemini/GEMINI.md,target=/home/node/.gemini/GEMINI.md,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind,consistency=cached",
