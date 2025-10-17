@@ -293,3 +293,26 @@ If the plan lacks sufficient detail:
 #### Step 4: POST_TASK_GENERATION_ALL hook
 
 Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+
+### Output Requirements
+
+**Context-Aware Output Behavior:**
+
+First, check if running in automated full-workflow mode:
+```bash
+echo "${FULL_WORKFLOW_MODE:-false}"
+```
+
+Then adjust output based on context:
+
+- **If `FULL_WORKFLOW_MODE=true` (automated workflow mode)**:
+  - Simply confirm task generation with task count
+  - Do NOT instruct user to review the tasks
+  - Do NOT add any prompts that would pause execution
+  - Example output: "Tasks generated for plan [id]: [count] tasks created"
+
+- **If `FULL_WORKFLOW_MODE=false` or unset (standalone mode)**:
+  - Be concise but helpful
+  - Tell the user that you are done
+  - Instruct them to review the tasks with file paths
+  - Example output: "Task generation complete. Review tasks in: `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
