@@ -480,6 +480,6 @@ After Phase 3 (UI Components):
 
 ## Next Steps
 
-- **Customize Hooks**: See [Customization Guide]({% link customization.md %}) for project-specific validation gates
-- **Understand Architecture**: See [How It Works]({% link architecture.md %}) for design principles
-- **Compare Approaches**: See [Comparison]({% link comparison.md %}) for when to use AI Task Manager vs plan mode alone
+- **Customize Hooks**: See [Customization Guide](customization.html) for project-specific validation gates
+- **Understand Architecture**: See [How It Works](architecture.html) for design principles
+- **Compare Approaches**: See [Comparison](comparison.html) for when to use AI Task Manager vs plan mode alone

@@ -193,16 +193,16 @@ After installation, customize these files for your specific needs:
 
 ### Advanced Customizations
 
-See the [Customization Guide]({% link customization.md %}) for:
+See the [Customization Guide](customization.html) for:
 - Template modifications
 - Hook customization examples
 - Real-world scenarios (React projects, API projects, monorepos)
 
 ## Next Steps
 
-- **[Basic Workflow Guide]({% link workflow.md %})**: Learn the day-to-day development workflow
-- **[How It Works]({% link architecture.md %})**: Understand the three-phase system
-- **[Customization Guide]({% link customization.md %})**: Tailor AI Task Manager to your project
+- **[Basic Workflow Guide](workflow.html)**: Learn the day-to-day development workflow
+- **[How It Works](architecture.html)**: Understand the three-phase system
+- **[Customization Guide](customization.html)**: Tailor AI Task Manager to your project
 
 Ready to create your first plan:
 
