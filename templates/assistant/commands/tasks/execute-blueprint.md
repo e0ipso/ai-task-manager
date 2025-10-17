@@ -139,6 +139,27 @@ Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ### Output Requirements
 
+**Context-Aware Output Behavior:**
+
+First, check if running in automated full-workflow mode:
+```bash
+echo "${FULL_WORKFLOW_MODE:-false}"
+```
+
+Then adjust output based on context:
+
+- **If `FULL_WORKFLOW_MODE=true` (automated workflow mode)**:
+  - Provide minimal progress updates at phase boundaries
+  - Do NOT instruct user to review implementation details
+  - Do NOT add any prompts that would pause execution
+  - Example output: "Phase 1/3 completed. Proceeding to Phase 2."
+
+- **If `FULL_WORKFLOW_MODE=false` or unset (standalone mode)**:
+  - Provide detailed execution summary with phase results
+  - List completed tasks and any noteworthy events
+  - Instruct user to review the execution summary in the plan document
+  - Example output: "Execution completed. Review summary: `.ai/task-manager/archive/[plan]/plan-[id].md`"
+
 ## Optimization Guidelines
 
 - **Maximize parallelism**: Always run all available tasks in a phase simultaneously

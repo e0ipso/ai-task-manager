@@ -52,11 +52,18 @@ Store this ID for later validation and use.
 
 #### Step 2: Execute Plan Creation
 
+Set full-workflow execution context:
+```bash
+export FULL_WORKFLOW_MODE=true
+```
+
 Use the SlashCommand tool to execute plan creation with the user's prompt:
 
 ```
 /tasks:create-plan $ARGUMENTS
 ```
+
+**Note**: The FULL_WORKFLOW_MODE environment variable signals to subordinate commands (create-plan, generate-tasks, execute-blueprint) that they are running in automated workflow mode and should suppress interactive prompts for plan review.
 
 **Important**: The plan creation command may ask clarification questions. Wait for user responses before continuing. This is expected behavior and maintains quality control.
 
