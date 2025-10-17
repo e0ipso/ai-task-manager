@@ -52,18 +52,11 @@ Store this ID for later validation and use.
 
 #### Step 2: Execute Plan Creation
 
-Set full-workflow execution context:
-```bash
-export FULL_WORKFLOW_MODE=true
-```
-
 Use the SlashCommand tool to execute plan creation with the user's prompt:
 
 ```
 /tasks:create-plan $ARGUMENTS
 ```
-
-**Note**: The FULL_WORKFLOW_MODE environment variable signals to subordinate commands (create-plan, generate-tasks, execute-blueprint) that they are running in automated workflow mode and should suppress interactive prompts for plan review.
 
 **Important**: The plan creation command may ask clarification questions. Wait for user responses before continuing. This is expected behavior and maintains quality control.
 
@@ -72,16 +65,33 @@ After plan creation completes, provide minimal progress update:
 
 **CRITICAL**: Do not wait for user approval or review of the plan. In full-workflow mode, plan validation is automated (Step 3 performs file existence checking only). Proceed immediately to Step 3 without waiting for user input.
 
-#### Step 3: Validate Plan Creation
+#### Step 3: Validate Plan Creation and Set Approval Method
 
-Verify the plan was created successfully by checking if the plan document exists:
+Verify the plan was created successfully and set it to automated workflow mode:
 
 ```bash
-find .ai/task-manager/plans -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?[plan-id]$" {} \;
+# Find the created plan file
+PLAN_FILE=$(find .ai/task-manager/plans -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?[plan-id]$" {} \;)
+
+# Verify plan exists
+if [ -z "$PLAN_FILE" ]; then
+  echo "❌ Error: Plan creation failed. Expected plan with ID [plan-id] not found."
+  exit 1
+fi
+
+# Set approval_method to auto for automated workflow execution
+# This ensures generate-tasks and execute-blueprint run without interruption
+if ! grep -q "^approval_method:" "$PLAN_FILE"; then
+  # Insert approval_method after the created: line in frontmatter
+  sed -i.bak '/^created:/a\
+approval_method: auto' "$PLAN_FILE" && rm -f "${PLAN_FILE}.bak"
+else
+  # Update existing approval_method to auto
+  sed -i.bak 's/^approval_method:.*/approval_method: auto/' "$PLAN_FILE" && rm -f "${PLAN_FILE}.bak"
+fi
 ```
 
-If the plan is not found, halt with error:
-"❌ Error: Plan creation failed. Expected plan with ID [plan-id] not found."
+**Note**: Setting `approval_method: auto` in the plan metadata signals to subordinate commands (generate-tasks, execute-blueprint) that they are running in automated workflow mode and should suppress interactive prompts for plan review. This metadata persists in the plan document and is reliably read by subsequent commands, eliminating dependency on environment variables.
 
 #### Step 4: Execute Task Generation
 

@@ -103,6 +103,7 @@ export async function showPlan(planId: number): Promise<{ success: boolean; mess
     output += `  ${chalk.cyan('●')} Created: ${planData.created}\n`;
     output += `  ${chalk.cyan('●')} Status: ${planData.isArchived ? chalk.blue('Archived') : chalk.green('Active')}\n`;
     output += `  ${chalk.cyan('●')} Summary: ${planData.summary}\n`;
+    output += `  ${chalk.cyan('●')} Approval: ${planData.approval_method ?? 'unset'}\n`;
 
     // Task statistics section
     const taskCount = planData.tasks.length;
