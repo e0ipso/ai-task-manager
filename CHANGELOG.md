@@ -1,3 +1,9 @@
+## <small>1.18.1 (2025-10-17)</small>
+
+* fix: make full-workflow continue through commands ([6653a40](https://github.com/e0ipso/ai-task-manager/commit/6653a40))
+* fix: update devcontainer ([78375d3](https://github.com/e0ipso/ai-task-manager/commit/78375d3))
+* chore: fix devcontainer issues ([e74d820](https://github.com/e0ipso/ai-task-manager/commit/e74d820))
+
 ## 1.18.0 (2025-10-17)
 
 * Merge branch 'chore/worktrees-out-repo' ([e50994a](https://github.com/e0ipso/ai-task-manager/commit/e50994a))
