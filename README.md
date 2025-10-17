@@ -27,6 +27,7 @@ npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
 - **🎯 Extensible Architecture**: Add custom validation gates, quality checks, and workflow patterns
 - **📋 Structured Workflows**: Three-phase progressive refinement with validation gates
 - **🔄 Plan Mode Integration**: Enhance existing AI assistant features with structured task management
+- **📊 Plan Inspection & Management**: View progress, archive completed work, and manage plans via CLI
 - **💰 Works Within Subscriptions**: No additional API keys or costs required
 
 ## 📖 Documentation
@@ -41,10 +42,17 @@ Comprehensive guides covering:
 
 ## 🔄 Workflow Preview
 
+**Automated Workflow (Recommended for Beginners):**
+```bash
+/tasks:full-workflow Create user authentication system
+```
+
+**Manual Workflow (Full Control):**
 1. **📝 Create a plan** → `/tasks:create-plan Create user authentication system`
 2. **📋 Generate tasks** → `/tasks:generate-tasks 1`
 3. **🚀 Execute blueprint** → `/tasks:execute-blueprint 1`
 4. **📊 Monitor progress** → `npx @e0ipso/ai-task-manager status`
+5. **🗂️ Manage plans** → `npx @e0ipso/ai-task-manager plan show 1`
 
 ## 🤖 Supported Assistants
 
