@@ -1,3 +1,7 @@
+## <small>1.18.3 (2025-10-17)</small>
+
+* fix: attempt to not pause after auto-generated tasks ([bd9dd1a](https://github.com/e0ipso/ai-task-manager/commit/bd9dd1a))
+
 ## <small>1.18.2 (2025-10-17)</small>
 
 * fix: make full-workflow continue through commands (1) ([6720978](https://github.com/e0ipso/ai-task-manager/commit/6720978))
