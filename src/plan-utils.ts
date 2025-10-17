@@ -102,6 +102,7 @@ export async function loadPlanData(planId: number): Promise<PlanData | null> {
     id: data.id,
     summary: data.summary,
     created: data.created,
+    approval_method: data.approval_method,
     isArchived: location.isArchived,
     directoryPath: location.directoryPath,
     tasks,

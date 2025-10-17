@@ -24,6 +24,7 @@ export interface PlanMetadata {
   id: number;
   summary: string;
   created: string;
+  approval_method?: string;
   isArchived: boolean;
   directoryPath: string;
   tasks: TaskMetadata[];
@@ -69,6 +70,7 @@ async function parsePlanFile(planDir: string): Promise<PlanMetadata | null> {
       id: data.id,
       summary: data.summary,
       created: data.created,
+      approval_method: data.approval_method,
       isArchived: planDir.includes('/archive/'),
       directoryPath: planDir,
       tasks: [],

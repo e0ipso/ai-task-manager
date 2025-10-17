@@ -141,20 +141,30 @@ Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 **Context-Aware Output Behavior:**
 
-First, check if running in automated full-workflow mode:
+**Extract approval method from plan metadata:**
+
+First, extract the approval_method from the plan document:
+
 ```bash
-echo "${FULL_WORKFLOW_MODE:-false}"
+# Find plan file by ID
+PLAN_FILE=$(find .ai/task-manager/{plans,archive} -name "plan-$1--*.md" -type f -exec grep -l "^id: \?$1$" {} \;)
+
+# Extract approval_method from YAML frontmatter
+APPROVAL_METHOD=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method:' | sed 's/approval_method: *//;s/"//g;s/'"'"'//g' | tr -d ' ')
+
+# Default to "manual" if field doesn't exist (backward compatibility)
+APPROVAL_METHOD=${APPROVAL_METHOD:-manual}
 ```
 
-Then adjust output based on context:
+Then adjust output based on the extracted approval method:
 
-- **If `FULL_WORKFLOW_MODE=true` (automated workflow mode)**:
+- **If `APPROVAL_METHOD="auto"` (automated workflow mode)**:
   - Provide minimal progress updates at phase boundaries
   - Do NOT instruct user to review implementation details
   - Do NOT add any prompts that would pause execution
   - Example output: "Phase 1/3 completed. Proceeding to Phase 2."
 
-- **If `FULL_WORKFLOW_MODE=false` or unset (standalone mode)**:
+- **If `APPROVAL_METHOD="manual"` or empty (standalone mode)**:
   - Provide detailed execution summary with phase results
   - List completed tasks and any noteworthy events
   - Instruct user to review the execution summary in the plan document
