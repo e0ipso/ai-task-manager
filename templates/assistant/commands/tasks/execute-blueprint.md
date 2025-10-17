@@ -69,6 +69,7 @@ If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
    ```
    /tasks:generate-tasks $1
    ```
+   - **CRITICAL**: After task generation completes successfully, you MUST immediately proceed with blueprint execution without waiting for user input. The workflow should continue seamlessly.
    - If generation fails: Halt execution with clear error message:
      ```
      ❌ Error: Automatic task generation failed.
@@ -77,7 +78,7 @@ If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
      /tasks:generate-tasks $1
      ```
 
-**After successful validation or generation**, proceed with the execution process below.
+**After successful validation or generation**, immediately proceed with the execution process below without pausing.
 
 ## Execution Process
 
