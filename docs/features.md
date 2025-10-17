@@ -82,8 +82,37 @@ flowchart TD
 - **Validation Gates**: Quality checkpoints between phases catch issues early
 - **Iterative Improvement**: Human review and feedback loops at each phase
 - **Scope Control**: Built-in mechanisms prevent feature creep through YAGNI enforcement
+- **Automatic Task Generation**: execute-blueprint auto-generates tasks if missing, reducing manual steps
 
 **Learn more**: See the [Architecture](architecture.html) page for design principles and [Workflow Patterns](workflows.html) for advanced usage.
+
+## 🚀 Workflow Automation
+
+### Automated End-to-End Execution
+
+For streamlined development, the full-workflow command automates all three phases:
+
+```bash
+/tasks:full-workflow Create user authentication system with JWT tokens
+```
+
+**Benefits:**
+- **Single Command**: Entire workflow from plan to execution
+- **Reduced Friction**: No manual phase transitions
+- **Faster Iteration**: Ideal for clear requirements
+- **Automatic Archival**: Completed plans moved to archive
+
+**Use Cases:**
+- Quick prototyping and proof-of-concepts
+- Well-defined features with clear scope
+- Reducing cognitive load during development
+- Onboarding new users to the workflow
+
+**Manual vs Automated:**
+- Use automated workflow for straightforward implementations
+- Use manual workflow (step-by-step) for complex features needing review
+
+**Learn more**: See the [Workflow Guide](workflow.html) for detailed usage examples.
 
 ## 🎯 Task Management
 
@@ -115,6 +144,38 @@ Real-time visibility into your project's task management state:
 ```bash
 npx @e0ipso/ai-task-manager status
 ```
+
+## 📊 Plan Management CLI
+
+### Inspect and Manage Plans
+
+Command-line tools for plan inspection and lifecycle management:
+
+```bash
+# View plan details
+npx @e0ipso/ai-task-manager plan show 41
+npx @e0ipso/ai-task-manager plan 41  # shorthand
+
+# Archive completed plan
+npx @e0ipso/ai-task-manager plan archive 41
+
+# Delete plan permanently
+npx @e0ipso/ai-task-manager plan delete 41
+```
+
+**Features:**
+- **Plan Inspection**: View metadata, progress, and executive summary
+- **Manual Archival**: Move completed plans from active to archive directory
+- **Plan Deletion**: Permanently remove plans and all associated tasks
+- **Shorthand Syntax**: `plan <id>` defaults to `plan show <id>`
+
+**Benefits:**
+- No manual file system navigation required
+- Consistent interface across all plan operations
+- Progress visibility without opening files
+- Clean workspace management
+
+**Learn more**: See the [Workflow Guide](workflow.html) for integrated usage patterns.
 
 ## 🏗️ Workspace Management
 

@@ -34,6 +34,47 @@ Fully customizable through hooks, templates, and configuration files. Every aspe
 ### Skill-Based Agent Deployment
 Tasks are automatically assigned to specialized agents based on their skill requirements, enabling parallel execution and domain expertise.
 
+## CLI Commands
+
+### Plan Management
+
+Command-line interface for inspecting and managing plans:
+
+```bash
+npx @e0ipso/ai-task-manager plan <subcommand> <plan-id>
+```
+
+**Subcommands:**
+
+**`plan show <plan-id>`** or **`plan <plan-id>`** (shorthand)
+Display plan metadata, executive summary, and task progress.
+
+```bash
+npx @e0ipso/ai-task-manager plan show 41
+npx @e0ipso/ai-task-manager plan 41  # shorthand
+```
+
+**`plan archive <plan-id>`**
+Move a completed plan from `plans/` directory to `archive/` directory.
+
+```bash
+npx @e0ipso/ai-task-manager plan archive 41
+```
+
+**`plan delete <plan-id>`**
+Permanently delete a plan and all associated tasks. Cannot be undone.
+
+```bash
+npx @e0ipso/ai-task-manager plan delete 41
+```
+
+**Usage Notes:**
+- Plan ID must be numeric
+- Commands work on both active plans (in `plans/`) and archived plans (in `archive/`)
+- Shorthand `plan <id>` defaults to `plan show <id>` for convenience
+
+See [Workflow Guide](workflow.html) for integrated workflow usage examples.
+
 ## When to Use AI Task Manager
 
 Use AI Task Manager when you need:

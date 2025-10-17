@@ -34,6 +34,32 @@ See the [Customization Guide](customization.html) for detailed examples.
 
 ## Daily Development Workflow
 
+### Automated Workflow (Alternative)
+
+For a streamlined experience, use the automated workflow command that handles all three phases:
+
+```bash
+/tasks:full-workflow Create user authentication with email/password and JWT tokens
+```
+
+**What happens:**
+- Creates plan with clarification questions (Phase 1)
+- Automatically generates tasks (Phase 2)
+- Executes blueprint with validation gates (Phase 3)
+- Archives completed plan
+
+**When to use:**
+- Clear requirements with minimal ambiguity
+- Prefer automation over manual review gates
+- Quick prototyping or straightforward features
+
+**When to use manual workflow:**
+- Complex features needing careful planning review
+- Requirements need significant refinement
+- Want to review/edit tasks before execution
+
+For the manual workflow, follow the step-by-step process below.
+
 ### Step 1: Create a Plan
 
 Start any new feature or project by creating a structured plan:
@@ -124,6 +150,8 @@ After reviewing and approving tasks:
 - POST_PHASE hook validates quality after each phase
 - Commits created automatically for each phase
 - You receive updates as phases complete
+
+**Note**: If you forgot to run `/tasks:generate-tasks`, execute-blueprint will automatically generate tasks and the blueprint for you before starting execution.
 
 ### Step 7: Monitor Progress
 
@@ -309,6 +337,34 @@ Same commands, TOML format configuration
 
 **Open Code:**
 Same commands, Markdown format configuration
+
+## Plan Management Commands
+
+Inspect and manage plans using CLI commands:
+
+```bash
+# View plan details and progress
+npx @e0ipso/ai-task-manager plan show 41
+npx @e0ipso/ai-task-manager plan 41  # shorthand
+
+# Move completed plan to archive
+npx @e0ipso/ai-task-manager plan archive 41
+
+# Permanently delete a plan
+npx @e0ipso/ai-task-manager plan delete 41
+```
+
+**plan show** displays:
+- Plan metadata (ID, summary, creation date)
+- Executive summary excerpt
+- Task progress (completed/total tasks)
+- Plan location in filesystem
+
+**plan archive** moves the entire plan directory from `plans/` to `archive/` while preserving all tasks and history.
+
+**plan delete** permanently removes the plan and all associated tasks. Use with caution.
+
+See [Features](features.html) for more details on plan management capabilities.
 
 ## Next Steps
 
