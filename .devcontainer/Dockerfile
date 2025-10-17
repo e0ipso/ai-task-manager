@@ -41,6 +41,10 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
   && touch /commandhistory/.bash_history \
   && chown -R $USERNAME /commandhistory
 
+# Create worktrees directory for git worktrees
+RUN mkdir -p /worktrees \
+  && chown -R $USERNAME /worktrees
+
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
 
