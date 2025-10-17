@@ -1,3 +1,7 @@
+## <small>1.17.1 (2025-10-17)</small>
+
+* fix: replace Jekyll link tags with relative paths in documentation ([51ef602](https://github.com/e0ipso/ai-task-manager/commit/51ef602))
+
 ## 1.17.0 (2025-10-16)
 
 * feat: add plan remove subcommand ([61eeae3](https://github.com/e0ipso/ai-task-manager/commit/61eeae3))
