@@ -256,7 +256,7 @@ POST_ERROR_DETECTION → Error handling
 - PRE_PLAN: Include architecture guidelines from design docs
 - POST_ERROR_DETECTION: Send Slack notifications on failures
 
-See [Customization Guide]({% link customization.md %}) for detailed hook examples.
+See [Customization Guide](customization.html) for detailed hook examples.
 
 ### 2. Templates System
 
@@ -278,7 +278,7 @@ Five customizable templates structure artifacts:
 - Include performance requirements section in plan template
 - Add compliance considerations for regulated industries
 
-See [Customization Guide]({% link customization.md %}) for template modification examples.
+See [Customization Guide](customization.html) for template modification examples.
 
 ### 3. Configuration Files
 
@@ -364,7 +364,7 @@ AI Task Manager leverages research-backed principles:
 
 ## Next Steps
 
-- **[Customization Guide]({% link customization.md %})**: Learn to customize hooks, templates, and workflows
-- **[Workflow Patterns]({% link workflows.md %})**: Advanced patterns for complex projects
-- **[Basic Workflow]({% link workflow.md %})**: Day-to-day usage guide
-- **[Features]({% link features.md %})**: Complete feature overview
+- **[Customization Guide](customization.html)**: Learn to customize hooks, templates, and workflows
+- **[Workflow Patterns](workflows.html)**: Advanced patterns for complex projects
+- **[Basic Workflow](workflow.html)**: Day-to-day usage guide
+- **[Features](features.html)**: Complete feature overview
