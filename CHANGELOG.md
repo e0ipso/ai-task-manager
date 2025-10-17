@@ -1,3 +1,8 @@
+## <small>1.18.2 (2025-10-17)</small>
+
+* fix: make full-workflow continue through commands (1) ([6720978](https://github.com/e0ipso/ai-task-manager/commit/6720978))
+* docs: update documentation with latest features ([0b1dbf3](https://github.com/e0ipso/ai-task-manager/commit/0b1dbf3))
+
 ## <small>1.18.1 (2025-10-17)</small>
 
 * fix: make full-workflow continue through commands ([6653a40](https://github.com/e0ipso/ai-task-manager/commit/6653a40))
