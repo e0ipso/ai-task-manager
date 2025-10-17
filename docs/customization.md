@@ -533,5 +533,5 @@ These patterns guide AI assistants on project-specific workflows while still usi
 **Questions about customization?**
 - Review existing hooks in `.ai/task-manager/config/hooks/` for examples
 - Check templates in `.ai/task-manager/config/templates/` for structure
-- See [Workflow Patterns]({% link workflows.md %}) for advanced usage examples
-- Reference [Features]({% link features.md %}) page for system capabilities
+- See [Workflow Patterns](workflows.html) for advanced usage examples
+- Reference [Features](features.html) page for system capabilities

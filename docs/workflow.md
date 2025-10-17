@@ -30,7 +30,7 @@ Edit `.ai/task-manager/config/hooks/POST_PHASE.md` to add quality gates:
 - Security scans
 - Documentation requirements
 
-See the [Customization Guide]({% link customization.md %}) for detailed examples.
+See the [Customization Guide](customization.html) for detailed examples.
 
 ## Daily Development Workflow
 
@@ -160,7 +160,7 @@ If tests fail after implementation:
 - Fix the actual bug
 - Ensure tests pass because code truly works
 
-See [Customization Guide]({% link customization.md %}) for fix-broken-tests details.
+See [Customization Guide](customization.html) for fix-broken-tests details.
 
 ### Step 9: Review Implementation
 
@@ -172,7 +172,7 @@ After execution completes:
 
 ## Advanced Workflows
 
-For more sophisticated patterns, see [Workflow Patterns]({% link workflows.md %}):
+For more sophisticated patterns, see [Workflow Patterns](workflows.html):
 - **Plan Mode Integration**: Combine AI brainstorming with structured execution
 - **Iterative Refinement**: Multiple feedback rounds
 - **Multi-Session Projects**: Large projects spanning days/weeks
@@ -312,7 +312,7 @@ Same commands, Markdown format configuration
 
 ## Next Steps
 
-- **[How It Works]({% link architecture.md %})**: Understand the three-phase system and design principles
-- **[Customization Guide]({% link customization.md %})**: Tailor hooks and templates for your project
-- **[Workflow Patterns]({% link workflows.md %})**: Advanced patterns for complex projects
-- **[Features]({% link features.md %})**: Full feature overview and capabilities
+- **[How It Works](architecture.html)**: Understand the three-phase system and design principles
+- **[Customization Guide](customization.html)**: Tailor hooks and templates for your project
+- **[Workflow Patterns](workflows.html)**: Advanced patterns for complex projects
+- **[Features](features.html)**: Full feature overview and capabilities

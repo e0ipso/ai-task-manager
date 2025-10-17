@@ -64,19 +64,19 @@ Each phase includes **mandatory human review**, ensuring you control scope and q
 ## Next Steps
 
 <div class="nav-grid">
-  <a href="{% link installation.md %}" class="nav-card">
+  <a href="installation.html" class="nav-card">
     <strong>📦 Installation & Setup</strong>
     <p>Get started with configuration and directory structure</p>
   </a>
-  <a href="{% link workflow.md %}" class="nav-card">
+  <a href="workflow.html" class="nav-card">
     <strong>🔄 Basic Workflow Guide</strong>
     <p>Learn the day-to-day development workflow</p>
   </a>
-  <a href="{% link architecture.md %}" class="nav-card">
+  <a href="architecture.html" class="nav-card">
     <strong>🏗️ How It Works</strong>
     <p>Understand the architecture and design principles</p>
   </a>
-  <a href="{% link customization.md %}" class="nav-card">
+  <a href="customization.html" class="nav-card">
     <strong>🔧 Customization Guide</strong>
     <p>Tailor hooks and templates to your needs</p>
   </a>

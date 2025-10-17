@@ -18,7 +18,7 @@ This section provides detailed comparisons and technical context to help you und
 
 In this section:
 
-- **[Comparison with Other Tools]({% link comparison.md %})**: Understand the differences between plan mode and structured task management, and how AI Task Manager compares to other tools
+- **[Comparison with Other Tools](comparison.html)**: Understand the differences between plan mode and structured task management, and how AI Task Manager compares to other tools
 
 ## Key Differentiators
 
@@ -47,4 +47,4 @@ Use AI Task Manager when you need:
 
 ## Next Steps
 
-Explore [Comparison with Other Tools]({% link comparison.md %}) to understand when to use AI Task Manager versus traditional plan mode or other task management tools.
+Explore [Comparison with Other Tools](comparison.html) to understand when to use AI Task Manager versus traditional plan mode or other task management tools.
