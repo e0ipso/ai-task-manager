@@ -22,9 +22,9 @@ AI Task Manager transforms complex development requests into organized, executab
 
 In this section:
 
-- **[Installation & Setup]({% link installation.md %})**: Install and configure AI Task Manager for your project
-- **[Basic Workflow Guide]({% link workflow.md %})**: Learn the day-to-day development workflow
+- **[Installation & Setup](installation.html)**: Install and configure AI Task Manager for your project
+- **[Basic Workflow Guide](workflow.html)**: Learn the day-to-day development workflow
 
 ## Next Steps
 
-Start with [Installation & Setup]({% link installation.md %}) to initialize your project, then follow the [Basic Workflow Guide]({% link workflow.md %}) to create your first plan.
+Start with [Installation & Setup](installation.html) to initialize your project, then follow the [Basic Workflow Guide](workflow.html) to create your first plan.

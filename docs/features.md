@@ -25,7 +25,7 @@ AI Task Manager provides comprehensive tools for structured AI-assisted developm
 - **Integration Points**: Connect with existing CI/CD pipelines, testing frameworks, or development tools
 - **Workflow Patterns**: Create and share reusable workflow patterns for common project types
 
-**Learn more**: See the [Customization Guide]({% link customization.md %}) for detailed examples and real-world scenarios.
+**Learn more**: See the [Customization Guide](customization.html) for detailed examples and real-world scenarios.
 
 ## 📋 Template System
 
@@ -43,7 +43,7 @@ AI Task Manager provides comprehensive tools for structured AI-assisted developm
 - **Variable Substitution**: Dynamic content based on context (plan ID, task ID, arguments)
 - **Format Adaptation**: Automatic conversion between Markdown (Claude, Open Code) and TOML (Gemini)
 
-**Learn more**: See the [Customization Guide]({% link customization.md %}) for template modification examples.
+**Learn more**: See the [Customization Guide](customization.html) for template modification examples.
 
 ## 🤝 Multi-Assistant Support
 
@@ -83,7 +83,7 @@ flowchart TD
 - **Iterative Improvement**: Human review and feedback loops at each phase
 - **Scope Control**: Built-in mechanisms prevent feature creep through YAGNI enforcement
 
-**Learn more**: See the [Architecture]({% link architecture.md %}) page for design principles and [Workflow Patterns]({% link workflows.md %}) for advanced usage.
+**Learn more**: See the [Architecture](architecture.html) page for design principles and [Workflow Patterns](workflows.html) for advanced usage.
 
 ## 🎯 Task Management
 

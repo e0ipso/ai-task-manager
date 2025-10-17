@@ -23,8 +23,8 @@ AI Task Manager uses **progressive refinement** with **validation gates** to tra
 
 In this section:
 
-- **[How It Works]({% link architecture.md %})**: Understand the three-phase system and design principles
-- **[Features]({% link features.md %})**: Comprehensive overview of all capabilities
+- **[How It Works](architecture.html)**: Understand the three-phase system and design principles
+- **[Features](features.html)**: Comprehensive overview of all capabilities
 
 ## Key Principles
 
@@ -39,4 +39,4 @@ Validation gates and hooks ensure quality at each phase, not just at the end.
 
 ## Next Steps
 
-Start with [How It Works]({% link architecture.md %}) to understand the architecture, then explore [Features]({% link features.md %}) for a complete capability overview.
+Start with [How It Works](architecture.html) to understand the architecture, then explore [Features](features.html) for a complete capability overview.

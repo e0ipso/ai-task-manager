@@ -319,7 +319,7 @@ All formats are automatically generated from a single source during initializati
 - **Templates**: Five templates for plans, tasks, blueprints, and summaries
 - **Configuration**: TASK_MANAGER.md and POST_PHASE.md for project context
 
-See [Customization Guide]({% link customization.md %}) for detailed examples.
+See [Customization Guide](customization.html) for detailed examples.
 
 ### Does it work with existing projects?
 
@@ -380,7 +380,7 @@ Customize templates and hooks for your specific domain.
 
 ## Next Steps
 
-- **[How It Works]({% link architecture.md %})**: Understand the architecture and design principles
-- **[Customization Guide]({% link customization.md %})**: Tailor AI Task Manager to your needs
-- **[Workflow Patterns]({% link workflows.md %})**: Advanced patterns including plan mode integration
-- **[Basic Workflow]({% link workflow.md %})**: Get started with day-to-day usage
+- **[How It Works](architecture.html)**: Understand the architecture and design principles
+- **[Customization Guide](customization.html)**: Tailor AI Task Manager to your needs
+- **[Workflow Patterns](workflows.html)**: Advanced patterns including plan mode integration
+- **[Basic Workflow](workflow.html)**: Get started with day-to-day usage

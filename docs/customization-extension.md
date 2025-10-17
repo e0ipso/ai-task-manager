@@ -24,8 +24,8 @@ Out-of-the-box, AI Task Manager provides a solid foundation for structured AI-as
 
 In this section:
 
-- **[Customization Guide]({% link customization.md %})**: Tailor hooks and templates to your project
-- **[Workflow Patterns]({% link workflows.md %})**: Advanced patterns for complex projects
+- **[Customization Guide](customization.html)**: Tailor hooks and templates to your project
+- **[Workflow Patterns](workflows.html)**: Advanced patterns for complex projects
 
 ## Customization Points
 
@@ -55,4 +55,4 @@ Five customizable templates structure artifacts in `.ai/task-manager/config/temp
 
 ## Next Steps
 
-Start with the [Customization Guide]({% link customization.md %}) for detailed examples and real-world scenarios, then explore [Workflow Patterns]({% link workflows.md %}) for advanced usage.
+Start with the [Customization Guide](customization.html) for detailed examples and real-world scenarios, then explore [Workflow Patterns](workflows.html) for advanced usage.
