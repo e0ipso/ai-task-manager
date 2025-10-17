@@ -69,7 +69,7 @@
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "mkdir -p /home/node/.claude/debug /home/node/.gemini && sudo chown -R node:node /home/node/.claude /home/node/.gemini",
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude /home/node/.gemini || true",
   "postStartCommand": "npm update -g @anthropic-ai/claude-code && npm update -g @google/gemini-cli",
   "waitFor": "postStartCommand"
 }

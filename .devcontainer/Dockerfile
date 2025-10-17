@@ -1,6 +1,6 @@
 FROM node:20
 
-ARG TZ
+ARG TZ=Europe/Madrid
 ENV TZ="$TZ"
 
 ARG CLAUDE_CODE_VERSION=latest
@@ -44,6 +44,10 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 # Create worktrees directory for git worktrees
 RUN mkdir -p /worktrees \
   && chown -R $USERNAME /worktrees
+
+# Pre-create directories that will be needed for bind mounts
+RUN mkdir -p /home/$USERNAME/.claude/debug /home/$USERNAME/.gemini \
+  && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude /home/$USERNAME/.gemini
 
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
