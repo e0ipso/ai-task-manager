@@ -173,6 +173,20 @@ Then adjust output based on the extracted approval method:
   - Instruct user to review the execution summary in the plan document
   - Example output: "Execution completed. Review summary: `.ai/task-manager/archive/[plan]/plan-[id].md`"
 
+**CRITICAL - Structured Output for Command Coordination:**
+
+Always end your output with a standardized summary in this exact format:
+
+```
+---
+Execution Summary:
+- Plan ID: [numeric-id]
+- Status: Archived
+- Location: .ai/task-manager/archive/[plan-id]--[plan-name]/
+```
+
+This structured output enables automated workflow coordination and must be included even when running standalone.
+
 ## Optimization Guidelines
 
 - **Maximize parallelism**: Always run all available tasks in a phase simultaneously
