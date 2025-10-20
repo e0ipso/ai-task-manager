@@ -53,7 +53,9 @@ PLAN_DIR=$(dirname "$PLAN_FILE")
 
 2. **Check for task files**:
 ```bash
-TASK_COUNT=$(ls "$PLAN_DIR"/tasks/*.md 2>/dev/null | wc -l)
+setopt null_glob 2>/dev/null || true
+TASK_FILES=(${PLAN_DIR}/tasks/*.md)
+TASK_COUNT=${#TASK_FILES[@]}
 ```
 
 3. **Check for execution blueprint section**:
