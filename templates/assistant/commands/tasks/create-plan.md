@@ -88,14 +88,18 @@ Structure your response as follows:
 - If context is insufficient: List specific clarifying questions
 - If context is sufficient: Provide the comprehensive plan using the structure above. Use the information in @TASK_MANAGER.md for the directory structure and additional information about plans.
 
-**Output Behavior:**
+**Output Behavior: CRITICAL - Structured Output for Command Coordination**
 
-Be extremely concise but helpful:
-- Tell the user that you are done
-- Instruct them to review the plan document with the file path
-- Example output: "Plan created. Please review: `.ai/task-manager/plans/40--plan-name/plan-40--plan-name.md`"
+Always end your output with a standardized summary in this exact format:
 
-**Note:** When this command is invoked by the full-workflow command, the full-workflow will modify the plan's `approval_method` field after creation to enable automated execution.
+```
+---
+Plan Summary:
+- Plan ID: [numeric-id]
+- Plan File: [full-path-to-plan-file]
+```
+
+This structured output enables automated workflow coordination and must be included even when running standalone.
 
 ###### Plan Template
 

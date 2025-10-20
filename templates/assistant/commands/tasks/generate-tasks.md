@@ -326,3 +326,17 @@ Then adjust output based on the extracted approval method:
   - Tell the user that you are done
   - Instruct them to review the tasks with file paths
   - Example output: "Task generation complete. Review tasks in: `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
+
+**CRITICAL - Structured Output for Command Coordination:**
+
+Always end your output with a standardized summary in this exact format:
+
+```
+---
+Task Generation Summary:
+- Plan ID: [numeric-id]
+- Tasks: [count]
+- Status: Ready for execution
+```
+
+This structured output enables automated workflow coordination and must be included even when running standalone.
