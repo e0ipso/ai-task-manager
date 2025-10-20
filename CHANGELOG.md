@@ -1,3 +1,7 @@
+## <small>1.18.4 (2025-10-20)</small>
+
+* fix: avoid bash error during execution ([5c81ee3](https://github.com/e0ipso/ai-task-manager/commit/5c81ee3))
+
 ## <small>1.18.3 (2025-10-17)</small>
 
 * fix: attempt to not pause after auto-generated tasks ([bd9dd1a](https://github.com/e0ipso/ai-task-manager/commit/bd9dd1a))
