@@ -1,3 +1,7 @@
+## <small>1.18.5 (2025-10-20)</small>
+
+* fix: make full-workflow continue through commands (2) ([1f48854](https://github.com/e0ipso/ai-task-manager/commit/1f48854))
+
 ## <small>1.18.4 (2025-10-20)</small>
 
 * fix: avoid bash error during execution ([5c81ee3](https://github.com/e0ipso/ai-task-manager/commit/5c81ee3))
