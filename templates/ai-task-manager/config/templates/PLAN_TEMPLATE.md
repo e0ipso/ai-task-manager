@@ -2,7 +2,8 @@
 id: [PLAN-ID]
 summary: "[Brief one-line description of what this plan accomplishes]"
 created: [YYYY-MM-DD]
-approval_method: [auto|manual]  # Optional: Workflow approval mode (auto=automated, manual=requires review)
+approval_method_plan: [auto|manual]  # Workflow approval for plan review (default: manual)
+approval_method_tasks: [auto|manual]  # Workflow approval for task generation review (default: manual)
 ---
 
 # Plan: [Descriptive Plan Title]

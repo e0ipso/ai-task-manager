@@ -306,22 +306,22 @@ First, extract the approval_method from the plan document:
 # Find plan file by ID
 PLAN_FILE=$(find .ai/task-manager/{plans,archive} -name "plan-$1--*.md" -type f -exec grep -l "^id: \?$1$" {} \;)
 
-# Extract approval_method from YAML frontmatter
-APPROVAL_METHOD=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method:' | sed 's/approval_method: *//;s/"//g;s/'"'"'//g' | tr -d ' ')
+# Extract approval_method_tasks from YAML frontmatter
+APPROVAL_METHOD_TASKS=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method_tasks:' | sed 's/approval_method_tasks: *//;s/"//g' | tr -d " '")
 
 # Default to "manual" if field doesn't exist (backward compatibility)
-APPROVAL_METHOD=${APPROVAL_METHOD:-manual}
+APPROVAL_METHOD_TASKS=${APPROVAL_METHOD_TASKS:-manual}
 ```
 
 Then adjust output based on the extracted approval method:
 
-- **If `APPROVAL_METHOD="auto"` (automated workflow mode)**:
+- **If `APPROVAL_METHOD_TASKS="auto"` (automated workflow mode)**:
   - Simply confirm task generation with task count
   - Do NOT instruct user to review the tasks
   - Do NOT add any prompts that would pause execution
   - Example output: "Tasks generated for plan [id]: [count] tasks created"
 
-- **If `APPROVAL_METHOD="manual"` or empty (standalone mode)**:
+- **If `APPROVAL_METHOD_TASKS="manual"` or empty (standalone mode)**:
   - Be concise but helpful
   - Tell the user that you are done
   - Instruct them to review the tasks with file paths

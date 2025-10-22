@@ -118,11 +118,12 @@ Example:
 id: 1
 summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing"
 created: 2025-09-01
-approval_method: "manual"
+approval_method_plan: "manual"
+approval_method_tasks: "manual"
 ---
 ```
 
-**Important**: Always set `approval_method` to "manual" when creating a plan. The full-workflow command will modify this field to "auto" after creation if running in automated mode.
+**Important**: Always set both `approval_method_plan` and `approval_method_tasks` to "manual" when creating a plan. The full-workflow command will modify these fields to "auto" after creation if running in automated mode.
 
 The schema for this frontmatter is:
 ```json
@@ -143,10 +144,15 @@ The schema for this frontmatter is:
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "description": "Creation date in YYYY-MM-DD format"
     },
-    "approval_method": {
+    "approval_method_plan": {
       "type": "string",
       "enum": ["auto", "manual"],
-      "description": "Workflow approval mode: auto for automated workflows, manual for standalone execution"
+      "description": "Workflow approval mode for plan review: auto for automated workflows, manual for standalone execution"
+    },
+    "approval_method_tasks": {
+      "type": "string",
+      "enum": ["auto", "manual"],
+      "description": "Workflow approval mode for task generation review: auto when tasks auto-generated in workflow, manual for standalone execution"
     }
   },
   "additionalProperties": false
