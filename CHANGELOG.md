@@ -1,3 +1,8 @@
+## <small>1.18.6 (2025-10-22)</small>
+
+* refactor: split approval method into plan and tasks fields ([f84cc42](https://github.com/e0ipso/ai-task-manager/commit/f84cc42))
+* fix: make full-workflow continue through commands (3) ([c399ba7](https://github.com/e0ipso/ai-task-manager/commit/c399ba7))
+
 ## <small>1.18.5 (2025-10-20)</small>
 
 * fix: make full-workflow continue through commands (2) ([1f48854](https://github.com/e0ipso/ai-task-manager/commit/1f48854))
