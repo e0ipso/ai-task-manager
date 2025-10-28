@@ -303,11 +303,10 @@ Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 First, extract the approval_method from the plan document:
 
 ```bash
-# Find plan file by ID
-PLAN_FILE=$(find .ai/task-manager/{plans,archive} -name "plan-$1--*.md" -type f -exec grep -l "^id: \?$1$" {} \;)
+# Extract approval method from plan metadata
+APPROVAL_METHODS=$(node .ai/task-manager/config/scripts/get-approval-methods.cjs $1)
 
-# Extract approval_method_tasks from YAML frontmatter
-APPROVAL_METHOD_TASKS=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method_tasks:' | sed 's/approval_method_tasks: *//;s/"//g' | tr -d " '")
+APPROVAL_METHOD_TASKS=$(echo "$APPROVAL_METHODS" | grep -o '"approval_method_tasks": "[^"]*"' | cut -d'"' -f4)
 
 # Default to "manual" if field doesn't exist (backward compatibility)
 APPROVAL_METHOD_TASKS=${APPROVAL_METHOD_TASKS:-manual}
