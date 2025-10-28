@@ -45,22 +45,15 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 
 **Validation Steps:**
 
-1. **Locate the plan document**:
 ```bash
-PLAN_FILE=$(find .ai/task-manager/{plans,archive} -name "plan-[0-9][0-9]*--*.md" -type f -exec grep -l "^id: \?$1$" {} \;)
-PLAN_DIR=$(dirname "$PLAN_FILE")
-```
+# Validate plan exists and check for tasks/blueprint
+VALIDATION=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1)
 
-2. **Check for task files**:
-```bash
-setopt null_glob 2>/dev/null || true
-TASK_FILES=(${PLAN_DIR}/tasks/*.md)
-TASK_COUNT=${#TASK_FILES[@]}
-```
-
-3. **Check for execution blueprint section**:
-```bash
-BLUEPRINT_EXISTS=$(grep -q "^## Execution Blueprint" "$PLAN_FILE" && echo "yes" || echo "no")
+# Parse validation results
+PLAN_FILE=$(echo "$VALIDATION" | grep -o '"planFile": "[^"]*"' | cut -d'"' -f4)
+PLAN_DIR=$(echo "$VALIDATION" | grep -o '"planDir": "[^"]*"' | cut -d'"' -f4)
+TASK_COUNT=$(echo "$VALIDATION" | grep -o '"taskCount": [0-9]*' | awk '{print $2}')
+BLUEPRINT_EXISTS=$(echo "$VALIDATION" | grep -o '"blueprintExists": [a-z]*' | awk '{print $2}')
 ```
 
 4. **Automatic task generation**:
@@ -154,12 +147,11 @@ Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 First, extract both approval method fields from the plan document:
 
 ```bash
-# Find plan file by ID
-PLAN_FILE=$(find .ai/task-manager/{plans,archive} -name "plan-$1--*.md" -type f -exec grep -l "^id: \?$1$" {} \;)
+# Extract approval methods from plan metadata
+APPROVAL_METHODS=$(node .ai/task-manager/config/scripts/get-approval-methods.cjs $1)
 
-# Extract both approval method fields from YAML frontmatter
-APPROVAL_METHOD_PLAN=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method_plan:' | sed 's/approval_method_plan: *//;s/"//g' | tr -d " '")
-APPROVAL_METHOD_TASKS=$(sed -n '/^---$/,/^---$/p' "$PLAN_FILE" | grep '^approval_method_tasks:' | sed 's/approval_method_tasks: *//;s/"//g' | tr -d " '")
+APPROVAL_METHOD_PLAN=$(echo "$APPROVAL_METHODS" | grep -o '"approval_method_plan": "[^"]*"' | cut -d'"' -f4)
+APPROVAL_METHOD_TASKS=$(echo "$APPROVAL_METHODS" | grep -o '"approval_method_tasks": "[^"]*"' | cut -d'"' -f4)
 
 # Defaults to "manual" if fields don't exist
 APPROVAL_METHOD_PLAN=${APPROVAL_METHOD_PLAN:-manual}
