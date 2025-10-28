@@ -1,3 +1,7 @@
+## <small>1.18.7 (2025-10-28)</small>
+
+* fix: avoid issue with formatters and bash ([2c04062](https://github.com/e0ipso/ai-task-manager/commit/2c04062))
+
 ## <small>1.18.6 (2025-10-22)</small>
 
 * refactor: split approval method into plan and tasks fields ([f84cc42](https://github.com/e0ipso/ai-task-manager/commit/f84cc42))
