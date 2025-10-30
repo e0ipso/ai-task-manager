@@ -14,6 +14,35 @@ import * as path from 'path';
 import { init } from '../index';
 import { loadMetadata, calculateFileHash } from '../metadata';
 
+// Mock chalk before importing modules to avoid ESM issues in tests
+jest.mock('chalk', () => {
+  const createMockChain = () => {
+    const fn: any = jest.fn((str: string) => str);
+    fn.bold = jest.fn((str: string) => str);
+    return fn;
+  };
+
+  const mockChalk = {
+    cyan: createMockChain(),
+    green: jest.fn((str: string) => str),
+    blue: jest.fn((str: string) => str),
+    gray: jest.fn((str: string) => str),
+    yellow: jest.fn((str: string) => str),
+    red: jest.fn((str: string) => str),
+    white: jest.fn((str: string) => str),
+    bold: {
+      cyan: jest.fn((str: string) => str),
+      white: jest.fn((str: string) => str),
+    },
+  };
+
+  return {
+    __esModule: true,
+    default: mockChalk,
+    ...mockChalk,
+  };
+});
+
 // Mock the prompts module since it uses ESM and we can't test interactive prompts
 // in automated tests anyway. The key is to test the metadata and detection logic.
 jest.mock('../prompts', () => ({
@@ -23,15 +52,27 @@ jest.mock('../prompts', () => ({
 describe('Conflict Detection Integration Tests', () => {
   const testDir = path.join(__dirname, '../../test-temp-conflict-detection');
 
+  // Suppress console output during tests
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
+
   beforeEach(async () => {
     // Clean up test directory before each test
     await fs.remove(testDir);
     await fs.ensureDir(testDir);
+
+    // Suppress console output
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
 
   afterEach(async () => {
     // Clean up test directory after each test
     await fs.remove(testDir);
+
+    // Restore console
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   describe('First-time initialization', () => {

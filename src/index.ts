@@ -7,8 +7,8 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import chalk from 'chalk';
 import { InitOptions, Assistant, CommandResult, ConflictResolution } from './types';
-import * as logger from './logger';
 import {
   parseAssistants,
   validateAssistants,
@@ -19,6 +19,17 @@ import {
 import { calculateFileHash, loadMetadata, saveMetadata, getPackageVersion } from './metadata';
 import { detectConflicts } from './conflict-detector';
 import { promptForConflicts } from './prompts';
+
+// Visual formatting constants
+const TERM_WIDTH = 80;
+const DIVIDER = '─'.repeat(TERM_WIDTH);
+
+/**
+ * Format a section header with cyan styling
+ */
+function formatSectionHeader(title: string): string {
+  return `\n${chalk.cyan.bold(title)}\n${chalk.cyan(DIVIDER)}\n`;
+}
 
 /**
  * Get the absolute path to a template file
@@ -65,54 +76,75 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     const baseDir = options.destinationDirectory || '.';
     const resolvedBaseDir = resolvePath(baseDir);
 
-    // Log start of initialization
-    await logger.info(`Initializing AI Task Manager in: ${resolvedBaseDir}...`);
-
     // Parse and validate assistants
     const assistants = parseAssistants(options.assistants);
-    await logger.debug(`Parsed assistants: ${assistants.join(', ')}`);
-
-    // Validate assistants
     validateAssistants(assistants);
-    await logger.debug('Assistant validation passed');
+
+    // ========== HEADER SECTION ==========
+    console.log(chalk.bold.white('\nAI Task Manager Initialization'));
+    console.log(chalk.gray(DIVIDER));
+
+    // ========== CONFIGURATION SECTION ==========
+    console.log(formatSectionHeader('Configuration'));
+    console.log(`  ${chalk.cyan('●')} Target Directory: ${resolvedBaseDir}`);
+    console.log(`  ${chalk.cyan('●')} Assistants: ${assistants.join(', ')}`);
+
+    // ========== SETUP PROGRESS SECTION ==========
+    console.log(formatSectionHeader('Setup Progress'));
 
     // Create .ai/task-manager structure
-    await logger.info('📁 Creating .ai/task-manager directory structure...');
+    console.log(`  ${chalk.green('✓')} Creating .ai/task-manager directory structure`);
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
 
     // Copy common templates to .ai/task-manager with conflict detection
-    await logger.info('📋 Copying common template files...');
+    console.log(`  ${chalk.green('✓')} Copying common template files`);
     await copyCommonTemplates(baseDir, options.force || false);
 
     // Create assistant-specific directories and copy templates
     for (const assistant of assistants) {
-      await logger.info(`🤖 Setting up ${assistant} assistant configuration...`);
+      console.log(`  ${chalk.green('✓')} Setting up ${assistant} assistant configuration`);
       await createAssistantStructure(assistant, baseDir);
     }
 
-    // Show success message with created directories
-    await logger.success('🎉 AI Task Manager initialized successfully!');
+    // ========== CREATED FILES SECTION ==========
+    console.log(formatSectionHeader('Created Files'));
 
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/TASK_MANAGER.md')}`);
-    await logger.info(`  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md')}`);
-    await logger.info(
-      `  ✓ ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md')}`
+    // Common configuration files
+    console.log(chalk.cyan('  Common Configuration:'));
+    console.log(
+      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/TASK_MANAGER.md')}`
     );
+    console.log(
+      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md')}`
+    );
+    console.log(
+      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md')}`
+    );
+
+    // Assistant-specific files
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
       // Open Code uses 'command' (singular) instead of 'commands' (plural)
       const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
-      await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/create-plan.${templateFormat}`)}`
+
+      console.log(
+        chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Commands:`)
       );
-      await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/execute-blueprint.${templateFormat}`)}`
+      console.log(
+        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/create-plan.${templateFormat}`)}`
       );
-      await logger.info(
-        `  ✓ ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/generate-tasks.${templateFormat}`)}`
+      console.log(
+        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/execute-blueprint.${templateFormat}`)}`
+      );
+      console.log(
+        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/generate-tasks.${templateFormat}`)}`
       );
     }
+
+    // ========== FOOTER SECTION ==========
+    console.log(`\n${chalk.green('✓')} AI Task Manager initialized successfully!`);
+    console.log(chalk.gray(DIVIDER));
 
     // Show suggested workflow help text
     await displayWorkflowHelp();
@@ -125,7 +157,7 @@ export async function init(options: InitOptions): Promise<CommandResult> {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Initialization failed with unknown error';
-    await logger.error(`Initialization failed: ${errorMessage}`);
+    console.error(chalk.red(`\n✗ Initialization failed: ${errorMessage}\n`));
 
     return {
       success: false,
@@ -153,10 +185,7 @@ async function copyCommonTemplates(baseDir: string, force: boolean): Promise<voi
 
   // Scenario 1: First-time init (no metadata) - copy all files
   if (!existingMetadata) {
-    await logger.debug('First-time initialization detected');
     await fs.copy(sourceDir, destDir);
-    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
-
     // Create initial metadata
     await createMetadata(sourceDir, destDir, metadataPath);
     return;
@@ -164,32 +193,27 @@ async function copyCommonTemplates(baseDir: string, force: boolean): Promise<voi
 
   // Scenario 2: Force flag - overwrite all files
   if (force) {
-    await logger.debug('Force flag detected, overwriting all files');
     await fs.copy(sourceDir, destDir, { overwrite: true });
-    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
-
     // Update metadata
     await createMetadata(sourceDir, destDir, metadataPath);
     return;
   }
 
   // Scenario 3: Conflict detection - check for user modifications
-  await logger.debug('Checking for file conflicts...');
   const conflicts = await detectConflicts(destDir, sourceDir, existingMetadata);
 
   if (conflicts.length === 0) {
-    await logger.debug('No conflicts detected, updating files');
     await fs.copy(sourceDir, destDir, { overwrite: true });
-    await logger.debug(`📤 Copied ${sourceDir} to ${destDir}`);
-
     // Update metadata
     await createMetadata(sourceDir, destDir, metadataPath);
     return;
   }
 
   // Conflicts detected - prompt user for resolution
-  await logger.info(
-    `⚠️  Detected ${conflicts.length} modified file(s). Prompting for resolution...`
+  console.log(
+    chalk.yellow(
+      `\n⚠  Detected ${conflicts.length} modified file(s). Prompting for resolution...\n`
+    )
   );
   const resolutions = await promptForConflicts(conflicts);
 
@@ -260,7 +284,6 @@ async function createMetadata(
 
   // Save metadata
   await saveMetadata(metadataPath, metadata);
-  await logger.debug(`💾 Saved metadata to ${metadataPath}`);
 }
 
 /**
@@ -277,11 +300,8 @@ async function applyResolutions(
 
     if (resolution === 'overwrite') {
       await fs.copy(sourcePath, destPath, { overwrite: true });
-      await logger.debug(`📤 Overwrote ${relativePath}`);
-    } else if (resolution === 'keep') {
-      await logger.debug(`📌 Kept user version of ${relativePath}`);
-      // Do nothing, keep user's file
     }
+    // If 'keep', do nothing - keep user's file
   }
 }
 
@@ -299,7 +319,6 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
   // Copy entire template directory structure
   await fs.copy(sourceDir, assistantDir);
-  await logger.debug(`📤 Copied ${sourceDir} to ${assistantDir}`);
 
   // OpenCode uses 'command' (singular) instead of 'commands' (plural)
   if (assistant === 'opencode') {
@@ -308,13 +327,11 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
     if (await exists(commandsDir)) {
       await fs.move(commandsDir, commandDir);
-      await logger.debug(`📁 Renamed 'commands' to 'command' for ${assistant}`);
     }
   }
 
   // Determine template format based on assistant type
   const templateFormat = getTemplateFormat(assistant);
-  await logger.debug(`🎨 Using ${templateFormat} template format for ${assistant} assistant`);
 
   // If target format is different from source (md), process files in place
   if (templateFormat !== 'md') {
@@ -334,8 +351,6 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
       // Remove original .md file
       await fs.remove(mdPath);
-
-      await logger.debug(`⚡ Converted ${file} to ${templateFormat} format for ${assistant}`);
     }
   }
 }

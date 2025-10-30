@@ -11,7 +11,6 @@ import { init } from './index';
 import { status } from './status';
 import { showPlan, archivePlan, deletePlan } from './plan';
 import { InitOptions } from './types';
-import * as logger from './logger';
 
 const program = new Command();
 
@@ -31,9 +30,6 @@ program
   .option('--force', 'Force overwrite all files without prompting')
   .action(async (options: InitOptions) => {
     try {
-      // Initialize the logger to ensure colors are available
-      await logger.initLogger();
-
       // Execute the init command
       const result = await init(options);
 
@@ -44,9 +40,7 @@ program
         process.exit(1);
       }
     } catch (error) {
-      await logger.error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   });
@@ -56,22 +50,18 @@ program
   .description('Display dashboard with plans and task statistics')
   .action(async () => {
     try {
-      await logger.initLogger();
-
       const result = await status();
 
       if (result.success) {
         process.exit(0);
       } else {
         if (result.message) {
-          await logger.error(result.message);
+          console.error(result.message);
         }
         process.exit(1);
       }
     } catch (error) {
-      await logger.error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   });
@@ -87,11 +77,9 @@ planCommand
   .description('Display plan metadata, progress, and executive summary')
   .action(async (planId: string) => {
     try {
-      await logger.initLogger();
-
       const planIdNum = parseInt(planId, 10);
       if (isNaN(planIdNum)) {
-        await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+        console.error(`Invalid plan ID: ${planId}. Must be a number.`);
         process.exit(1);
       }
 
@@ -101,14 +89,12 @@ planCommand
         process.exit(0);
       } else {
         if (result.message) {
-          await logger.error(result.message);
+          console.error(result.message);
         }
         process.exit(1);
       }
     } catch (error) {
-      await logger.error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   });
@@ -119,11 +105,9 @@ planCommand
   .description('Move a plan from active to archive directory')
   .action(async (planId: string) => {
     try {
-      await logger.initLogger();
-
       const planIdNum = parseInt(planId, 10);
       if (isNaN(planIdNum)) {
-        await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+        console.error(`Invalid plan ID: ${planId}. Must be a number.`);
         process.exit(1);
       }
 
@@ -133,14 +117,12 @@ planCommand
         process.exit(0);
       } else {
         if (result.message) {
-          await logger.error(result.message);
+          console.error(result.message);
         }
         process.exit(1);
       }
     } catch (error) {
-      await logger.error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   });
@@ -151,11 +133,9 @@ planCommand
   .description('Permanently delete a plan and all its tasks')
   .action(async (planId: string) => {
     try {
-      await logger.initLogger();
-
       const planIdNum = parseInt(planId, 10);
       if (isNaN(planIdNum)) {
-        await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+        console.error(`Invalid plan ID: ${planId}. Must be a number.`);
         process.exit(1);
       }
 
@@ -165,14 +145,12 @@ planCommand
         process.exit(0);
       } else {
         if (result.message) {
-          await logger.error(result.message);
+          console.error(result.message);
         }
         process.exit(1);
       }
     } catch (error) {
-      await logger.error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
   });
@@ -184,11 +162,9 @@ planCommand
     // Only handle if planId is provided and no subcommand was matched
     if (planId) {
       try {
-        await logger.initLogger();
-
         const planIdNum = parseInt(planId, 10);
         if (isNaN(planIdNum)) {
-          await logger.error(`Invalid plan ID: ${planId}. Must be a number.`);
+          console.error(`Invalid plan ID: ${planId}. Must be a number.`);
           process.exit(1);
         }
 
@@ -198,12 +174,12 @@ planCommand
           process.exit(0);
         } else {
           if (result.message) {
-            await logger.error(result.message);
+            console.error(result.message);
           }
           process.exit(1);
         }
       } catch (error) {
-        await logger.error(
+        console.error(
           `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
         );
         process.exit(1);
@@ -211,16 +187,10 @@ planCommand
     }
   });
 
-// Handle case where no command is provided
-program.hook('preAction', async (_thisCommand, _actionCommand) => {
-  // Initialize logger for all commands
-  await logger.initLogger();
-});
-
 // Error handling for unknown commands
 program.on('command:*', async operands => {
-  await logger.error(`Unknown command: ${operands[0]}`);
-  await logger.info('Use --help to see available commands');
+  console.error(`Unknown command: ${operands[0]}`);
+  console.log('Use --help to see available commands');
   process.exit(1);
 });
 
