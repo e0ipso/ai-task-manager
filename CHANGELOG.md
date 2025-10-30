@@ -1,3 +1,8 @@
+## 1.19.0 (2025-10-30)
+
+* refactor: enhance workflow help display formatting ([83521d1](https://github.com/e0ipso/ai-task-manager/commit/83521d1))
+* feat: modernize init command aesthetics - phase 1 ([f9009e9](https://github.com/e0ipso/ai-task-manager/commit/f9009e9))
+
 ## <small>1.18.7 (2025-10-28)</small>
 
 * fix: avoid issue with formatters and bash ([2c04062](https://github.com/e0ipso/ai-task-manager/commit/2c04062))
