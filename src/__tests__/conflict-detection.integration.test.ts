@@ -16,30 +16,27 @@ import { loadMetadata, calculateFileHash } from '../metadata';
 
 // Mock chalk before importing modules to avoid ESM issues in tests
 jest.mock('chalk', () => {
-  const createMockChain = () => {
-    const fn: any = jest.fn((str: string) => str);
-    fn.bold = jest.fn((str: string) => str);
-    return fn;
-  };
+  // Simple function that returns its input (strips colors in tests)
+  const mockFn = (str: string) => str;
 
+  // Create mock that supports chaining: chalk.color.style() or chalk.style.color()
   const mockChalk = {
-    cyan: createMockChain(),
-    green: jest.fn((str: string) => str),
-    blue: jest.fn((str: string) => str),
-    gray: jest.fn((str: string) => str),
-    yellow: jest.fn((str: string) => str),
-    red: jest.fn((str: string) => str),
-    white: jest.fn((str: string) => str),
-    bold: {
-      cyan: jest.fn((str: string) => str),
-      white: jest.fn((str: string) => str),
-    },
+    cyan: Object.assign(mockFn, { bold: mockFn }),
+    green: mockFn,
+    blue: mockFn,
+    gray: mockFn,
+    yellow: mockFn,
+    red: mockFn,
+    white: mockFn,
+    bold: Object.assign(mockFn, {
+      cyan: mockFn,
+      white: mockFn,
+    }),
   };
 
   return {
     __esModule: true,
     default: mockChalk,
-    ...mockChalk,
   };
 });
 
