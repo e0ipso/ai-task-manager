@@ -413,6 +413,10 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(
     chalk.gray('  ────────────────────────────────────────────────────────────────────────────────')
   );
+  console.log('');
+  console.log(`  Execute:`);
+  console.log(`      ${chalk.gray('/tasks:full-workflow Update product page with...')}`);
+  console.log('');
   console.log(`  This automatically:`);
   console.log(`    ${chalk.green('✓')} Creates the plan (with clarification prompts)`);
   console.log(`    ${chalk.green('✓')} Generates tasks`);
