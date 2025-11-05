@@ -1,3 +1,11 @@
+## 1.20.0 (2025-11-05)
+
+* feat: improve full workflow command ([288db8b](https://github.com/e0ipso/ai-task-manager/commit/288db8b))
+* chore: add command example ([c072d21](https://github.com/e0ipso/ai-task-manager/commit/c072d21))
+* chore: restore full-workflow command ([99d7506](https://github.com/e0ipso/ai-task-manager/commit/99d7506))
+* chore: the full workflow is no longer ([0464568](https://github.com/e0ipso/ai-task-manager/commit/0464568))
+* chore: the full workflow will be again ([90a29df](https://github.com/e0ipso/ai-task-manager/commit/90a29df))
+
 ## 1.19.0 (2025-10-30)
 
 * refactor: enhance workflow help display formatting ([83521d1](https://github.com/e0ipso/ai-task-manager/commit/83521d1))
