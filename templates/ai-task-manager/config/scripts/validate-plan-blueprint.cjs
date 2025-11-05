@@ -233,17 +233,22 @@ function listAvailablePlans() {
 }
 
 /**
- * Validate plan blueprint and output JSON
+ * Validate plan blueprint and output JSON or specific field
  * @param {string|number} planId - Plan ID to validate
+ * @param {string} [fieldName] - Optional field name to extract (planFile, planDir, taskCount, blueprintExists)
  */
-function validatePlanBlueprint(planId) {
+function validatePlanBlueprint(planId, fieldName) {
   if (!planId) {
     errorLog('Plan ID is required');
     errorLog('');
-    errorLog('Usage: node validate-plan-blueprint.cjs <plan-id>');
+    errorLog('Usage: node validate-plan-blueprint.cjs <plan-id> [field-name]');
     errorLog('');
-    errorLog('Example:');
-    errorLog('  node validate-plan-blueprint.cjs 47');
+    errorLog('Examples:');
+    errorLog('  node validate-plan-blueprint.cjs 47                  # Output full JSON');
+    errorLog('  node validate-plan-blueprint.cjs 47 planFile         # Output just the plan file path');
+    errorLog('  node validate-plan-blueprint.cjs 47 planDir          # Output just the plan directory');
+    errorLog('  node validate-plan-blueprint.cjs 47 taskCount        # Output just the task count');
+    errorLog('  node validate-plan-blueprint.cjs 47 blueprintExists  # Output yes/no');
     process.exit(1);
   }
 
@@ -282,13 +287,27 @@ function validatePlanBlueprint(planId) {
     planFile,
     planDir,
     taskCount,
-    blueprintExists
+    blueprintExists: blueprintExists ? 'yes' : 'no'
   };
 
   debugLog('Validation complete:', result);
-  console.log(JSON.stringify(result, null, 2));
+
+  // If field name is provided, output just that field
+  if (fieldName) {
+    const validFields = ['planFile', 'planDir', 'taskCount', 'blueprintExists'];
+    if (!validFields.includes(fieldName)) {
+      errorLog(`Invalid field name: ${fieldName}`);
+      errorLog(`Valid fields: ${validFields.join(', ')}`);
+      process.exit(1);
+    }
+    console.log(result[fieldName]);
+  } else {
+    // Output full JSON for backward compatibility
+    console.log(JSON.stringify(result, null, 2));
+  }
 }
 
 // Main execution
 const planId = process.argv[2];
-validatePlanBlueprint(planId);
+const fieldName = process.argv[3];
+validatePlanBlueprint(planId, fieldName);
