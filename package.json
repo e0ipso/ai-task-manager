@@ -1,6 +1,6 @@
 {
   "name": "@e0ipso/ai-task-manager",
-  "version": "1.19.0",
+  "version": "1.20.0",
   "description": "Task management for AI coding assistants",
   "main": "dist/index.js",
   "bin": {
