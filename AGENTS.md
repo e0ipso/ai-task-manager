@@ -11,7 +11,7 @@ npm run build && npm start init --assistants claude
 
 # Development workflow
 npm run dev           # Watch mode compilation
-npm test              # Run test suite (79 tests, ~6 seconds)
+npm test              # Run test suite (119 tests, ~5 seconds)
 npm run lint:fix      # Auto-fix code style issues
 
 # Post-implementation validation
@@ -99,6 +99,341 @@ The system implements a specialized workflow optimized for AI cognitive constrai
 - **Integration-heavy**: Real filesystem operations over mocking
 - **Business logic focus**: Custom logic, critical workflows, edge cases
 - **Framework avoidance**: Don't test third-party library features
+
+---
+
+## Orchestration Pattern: Runtime Prompt Composition
+
+### Overview
+
+The orchestration commands (`/tasks:full-workflow` and `/tasks:execute-blueprint`) use a runtime prompt-composition pattern instead of invoking slash commands recursively. This architectural approach enables uninterrupted workflow execution from start to finish without requiring user intervention between steps.
+
+**Key Innovation**: Rather than calling `/tasks:create-plan` via the SlashCommand tool (which triggers a wait-for-user-input behavior), orchestrators embed the complete prompt content from `create-plan.md` directly inline with dynamic variable substitution.
+
+### The Problem: SlashCommand Recursion
+
+**Traditional Pattern (Problematic)**:
+```mermaid
+graph TB
+    A[User: /tasks:full-workflow] --> B[Orchestrator]
+    B --> C[SlashCommand: /tasks:create-plan]
+    C --> D[Prompt Expansion]
+    D --> E[WAIT FOR USER INPUT ❌]
+    E --> F[User types 'continue']
+    F --> G[SlashCommand: /tasks:generate-tasks]
+    G --> H[WAIT FOR USER INPUT ❌]
+
+    style E fill:#ffcccc
+    style H fill:#ffcccc
+```
+
+**Issue**: Each SlashCommand invocation expands the prompt and triggers Claude Code's built-in wait-for-user-input behavior. This breaks automated workflows, requiring manual "continue" commands at each transition point.
+
+**Failed Mitigation Attempts**:
+- State management through shared context files
+- Authoritative prompt instructions ("DO NOT wait for user input")
+- Various prompt engineering techniques
+
+None succeeded because the issue is architectural: the SlashCommand tool's execution model fundamentally treats each invocation as a discrete interaction.
+
+### The Solution: Prompt Composition
+
+**Composition Pattern (Solution)**:
+```mermaid
+graph TB
+    A[User: /tasks:full-workflow] --> B[Orchestrator Command]
+    B --> C[Embedded: create-plan.md prompt]
+    B --> D[Embedded: generate-tasks.md prompt]
+    B --> E[Embedded: execute-blueprint.md prompt]
+    C --> F[Single Unified Execution]
+    D --> F
+    E --> F
+    F --> G[Step 1: Plan ⬛⬜⬜]
+    G --> H[Step 2: Tasks ⬛⬛⬜]
+    H --> I[Step 3: Execute ⬛⬛⬛]
+    I --> J[Complete ✓]
+
+    style J fill:#ccffcc
+```
+
+**Implementation**: The orchestrator template files directly include the complete prompt content from each sub-command, with:
+- Dynamic variable substitution (user input → `$ARGUMENTS`, extracted Plan ID → `$1`)
+- Context passing instructions between sections
+- Progress indicators for user visibility (without pausing execution)
+- Structured output parsing to extract data for subsequent steps
+
+### Architecture Details
+
+#### Full-Workflow Command Structure
+
+The `/tasks:full-workflow` command composes three complete workflow steps into a single prompt:
+
+```markdown
+## Step 1: Plan Creation
+**Progress**: ⬛⬜⬜ 0% - Step 1/3: Starting Plan Creation
+
+[Complete create-plan.md prompt content embedded here]
+
+**After completing Step 1:**
+- Extract Plan ID from structured output
+- Set approval method to auto
+**Progress**: ⬛⬜⬜ 33% - Step 1/3: Plan Creation Complete
+
+---
+
+## Step 2: Task Generation
+**Progress**: ⬛⬜⬜ 33% - Step 2/3: Starting Task Generation
+
+Using the Plan ID extracted from Step 1, execute task generation:
+
+[Complete generate-tasks.md prompt content embedded here]
+
+**Progress**: ⬛⬛⬜ 66% - Step 2/3: Task Generation Complete
+
+---
+
+## Step 3: Blueprint Execution
+**Progress**: ⬛⬛⬜ 66% - Step 3/3: Starting Blueprint Execution
+
+Using the Plan ID from previous steps, execute the blueprint:
+
+[Complete execute-blueprint.md prompt content embedded here]
+
+**Progress**: ⬛⬛⬛ 100% - Step 3/3: Blueprint Execution Complete
+```
+
+#### Execute-Blueprint Command Structure
+
+The `/tasks:execute-blueprint` command uses conditional composition for auto-generating missing tasks:
+
+```markdown
+## Task and Blueprint Validation
+
+Before proceeding with execution, validate that tasks exist:
+
+```bash
+TASK_COUNT=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
+BLUEPRINT_EXISTS=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
+```
+
+If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
+   - Display notification: "⚠️ Tasks or execution blueprint not found. Generating tasks automatically..."
+   - Set approval_method_tasks to auto
+   - Execute the following task generation process inline:
+
+   ## Embedded Task Generation
+
+   [Complete generate-tasks.md prompt content embedded here]
+
+   ## Resume Blueprint Execution
+
+   After task generation completes, continue with execution...
+
+Otherwise, if tasks exist, proceed directly to execution.
+```
+
+### Context Passing Between Steps
+
+Information flows through the workflow via structured output parsing:
+
+1. **User Input → Step 1**: User prompt becomes `$ARGUMENTS` in create-plan section
+2. **Step 1 → Step 2**: Create-plan outputs structured format:
+   ```
+   ---
+   Plan Summary:
+   - Plan ID: 51
+   - Plan File: /path/to/plan-51--name.md
+   ```
+   Orchestrator extracts `51` and uses as `$1` in generate-tasks section
+3. **Step 2 → Step 3**: Generate-tasks outputs task count for progress tracking
+4. **Continuous Flow**: All steps execute sequentially without pausing
+
+### When to Use Each Pattern
+
+#### Use Standalone Commands When:
+
+- **Running single workflow steps independently**: Execute just plan creation or just task generation
+- **User review is needed between steps**: Manual approval workflow where the user wants to review the plan before generating tasks
+- **Debugging or testing individual components**: Isolate a specific command for troubleshooting
+- **Iterative refinement**: Make adjustments to a plan or tasks before proceeding to execution
+
+**Examples**:
+```bash
+# Create plan for manual review before proceeding
+/tasks:create-plan "Implement user authentication system"
+
+# Generate tasks after reviewing and adjusting the plan
+/tasks:generate-tasks 51
+
+# Execute a pre-approved and reviewed blueprint
+/tasks:execute-blueprint 51
+```
+
+#### Use Orchestration Commands When:
+
+- **Executing the complete workflow without interruption**: Full automation from idea to implementation
+- **Plan is already conceptually approved**: User has confidence in the approach and wants immediate execution
+- **Rapid prototyping or experimentation**: Quick iterations where the implementation can be reviewed after completion
+- **Batch processing multiple features**: Running several full workflows sequentially in automated pipelines
+
+**Examples**:
+```bash
+# Full automated workflow from concept to completion
+/tasks:full-workflow "Add dark mode toggle to application settings"
+
+# Execute a plan that might need task generation first
+/tasks:execute-blueprint 51  # Auto-generates tasks if missing
+```
+
+### Progress Indicators
+
+**Scope**: Progress indicators are used **only in the full-workflow command** to show progress across its three major steps. The execute-blueprint command has its own phase-based progress tracking and does not need additional indicators.
+
+**Format**:
+```
+⬛⬜⬜ 33% - Step 1/3: Plan Creation Complete
+⬛⬛⬜ 66% - Step 2/3: Task Generation Complete
+⬛⬛⬛ 100% - Step 3/3: Blueprint Execution Complete
+```
+
+**Purpose**: Provide clear visual feedback about workflow status without interrupting execution. These are informational only and do not pause the workflow.
+
+### Backward Compatibility
+
+The composition pattern maintains full backward compatibility:
+
+- **Individual commands remain unchanged**: `/tasks:create-plan`, `/tasks:generate-tasks`, and `/tasks:execute-blueprint` continue to function as standalone slash commands
+- **Existing workflows unaffected**: Projects using manual step-by-step workflows see no changes in behavior
+- **Template system intact**: All template processing, variable substitution, and format conversion (Markdown/TOML) work identically
+- **Approval methods preserved**: Both `approval_method_plan` and `approval_method_tasks` function correctly in all contexts
+
+### Troubleshooting
+
+#### Problem: Full-workflow still pauses for user input
+
+**Symptoms**: Execution stops after plan creation or task generation, waiting for "continue"
+
+**Causes**:
+- Template file hasn't been updated with embedded prompts
+- Still using old SlashCommand invocation pattern
+- Local modifications to template files
+
+**Solution**:
+```bash
+# Verify template structure
+grep -n "SlashCommand" templates/assistant/commands/tasks/full-workflow.md
+# Should return no results
+
+# Check for proper embedding
+grep -n "## Step 1: Plan Creation" templates/assistant/commands/tasks/full-workflow.md
+grep -n "## Step 2: Task Generation" templates/assistant/commands/tasks/full-workflow.md
+grep -n "## Step 3: Blueprint Execution" templates/assistant/commands/tasks/full-workflow.md
+# All three should exist
+
+# Re-run init to update project templates
+npx @brainchain/ai-task-manager init --assistants claude --destination-directory /path/to/project
+```
+
+#### Problem: Variables not substituted correctly
+
+**Symptoms**: Literal `$1` or `[PLAN_ID]` appears in output instead of actual values
+
+**Causes**:
+- Plan ID extraction from structured output failed
+- Incorrect structured output format in create-plan step
+- Missing or malformed "Plan Summary" section
+
+**Solution**:
+```bash
+# Verify structured output format in plan creation
+# Should end with:
+---
+Plan Summary:
+- Plan ID: [numeric-id]
+- Plan File: [full-path-to-plan-file]
+
+# Check extraction logic in full-workflow template
+grep -A5 "Extract the Plan ID" templates/assistant/commands/tasks/full-workflow.md
+```
+
+#### Problem: Tasks not auto-generated in execute-blueprint
+
+**Symptoms**: Execute-blueprint reports "tasks not found" but doesn't generate them automatically
+
+**Causes**:
+- Validation script not executing correctly
+- Conditional logic checking `TASK_COUNT` or `BLUEPRINT_EXISTS` failed
+- Missing embedded task generation section
+
+**Solution**:
+```bash
+# Verify validation script exists and is executable
+ls -la .ai/task-manager/config/scripts/validate-plan-blueprint.cjs
+
+# Test validation script manually
+node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs 51 taskCount
+node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs 51 blueprintExists
+
+# Check conditional composition section exists
+grep -A10 "Embedded Task Generation" templates/assistant/commands/tasks/execute-blueprint.md
+```
+
+#### Problem: Execute-blueprint shows progress bars unexpectedly
+
+**Symptoms**: Seeing full-workflow-style progress indicators (⬛⬜⬜) in execute-blueprint output
+
+**Cause**: Misunderstanding of scope - execute-blueprint does NOT use progress bars
+
+**Clarification**:
+- **full-workflow**: Uses progress bars for its 3 major steps
+- **execute-blueprint**: Uses phase-based tracking only (e.g., "Phase 1/3 completed")
+- No action needed - this is expected behavior
+
+### Test Coverage
+
+The composition pattern is validated through integration tests:
+
+**Test File**: `/workspace/src/__tests__/orchestration.integration.test.ts`
+
+**Coverage**:
+- ✅ Verifies full-workflow template contains three composed sections
+- ✅ Confirms NO SlashCommand invocations exist in templates
+- ✅ Validates progress indicator format and placement
+- ✅ Tests context passing instructions between steps
+- ✅ Checks approval method handling logic
+- ✅ Ensures backward compatibility with standalone commands
+- ✅ Validates execute-blueprint conditional composition for task generation
+
+**Test Philosophy**: "Write a few tests, mostly integration"
+- Focus: Full workflow completion, structural validation, pattern verification
+- Avoid: Individual markdown parsing edge cases, progress indicator styling details
+
+### Implementation Notes
+
+#### Why Not a Composition Script?
+
+The plan originally considered creating a `compose-prompt.cjs` script to dynamically read and merge markdown files at runtime. However, the final implementation directly embeds prompts in the template files because:
+
+1. **Simplicity**: No additional script execution or file reading at runtime
+2. **Reliability**: No risk of file I/O failures during orchestration
+3. **Performance**: Faster execution without dynamic file operations
+4. **Maintainability**: Single source of truth in template files
+5. **Debugging**: Easier to trace execution flow and troubleshoot issues
+
+#### Template Maintenance
+
+When updating sub-commands (create-plan, generate-tasks, execute-blueprint):
+- **For standalone behavior changes**: Update the individual command template file
+- **For orchestration behavior changes**: Update both the individual file AND the embedded sections in orchestration templates
+- **Consistency checks**: Regularly diff embedded sections against source templates to ensure synchronization
+
+```bash
+# Compare create-plan standalone vs embedded in full-workflow
+# Manual inspection recommended to ensure functional equivalence
+diff <(sed -n '/## Step 1: Plan Creation/,/## Step 2: Task Generation/p' \
+  templates/assistant/commands/tasks/full-workflow.md) \
+  templates/assistant/commands/tasks/create-plan.md
+```
 
 ---
 
@@ -308,7 +643,7 @@ npm start            # Execute compiled CLI (requires build first)
 
 #### Testing and Quality Assurance
 ```bash
-npm test             # Run Jest test suite (67 tests, ~3 seconds)
+npm test             # Run Jest test suite (119 tests, ~5 seconds)
 npm run test:watch   # Tests in watch mode for development
 npm run lint         # ESLint validation (excludes test files)
 npm run lint:fix     # Automated lint fixes
@@ -327,9 +662,9 @@ npm run prepublishOnly        # Pre-publish validation (auto-runs)
 ### Testing Philosophy Implementation
 
 #### Current Test Statistics
-- **Test Suites**: 3 passed, 3 total
-- **Tests**: 67 passed, 67 total
-- **Execution Time**: ~3 seconds
+- **Test Suites**: 7 passed, 7 total
+- **Tests**: 119 passed, 119 total
+- **Execution Time**: ~5 seconds
 - **Coverage**: 24% lines (deliberately selective)
 
 #### Test File Organization

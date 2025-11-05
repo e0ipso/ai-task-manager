@@ -296,35 +296,10 @@ Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 ### Output Requirements
 
-**Context-Aware Output Behavior:**
+**Output Behavior:**
 
-**Extract approval method from plan metadata:**
-
-First, extract the approval_method from the plan document:
-
-```bash
-# Extract approval method from plan metadata
-APPROVAL_METHODS=$(node .ai/task-manager/config/scripts/get-approval-methods.cjs $1)
-
-APPROVAL_METHOD_TASKS=$(echo "$APPROVAL_METHODS" | grep -o '"approval_method_tasks": "[^"]*"' | cut -d'"' -f4)
-
-# Default to "manual" if field doesn't exist (backward compatibility)
-APPROVAL_METHOD_TASKS=${APPROVAL_METHOD_TASKS:-manual}
-```
-
-Then adjust output based on the extracted approval method:
-
-- **If `APPROVAL_METHOD_TASKS="auto"` (automated workflow mode)**:
-  - Simply confirm task generation with task count
-  - Do NOT instruct user to review the tasks
-  - Do NOT add any prompts that would pause execution
-  - Example output: "Tasks generated for plan [id]: [count] tasks created"
-
-- **If `APPROVAL_METHOD_TASKS="manual"` or empty (standalone mode)**:
-  - Be concise but helpful
-  - Tell the user that you are done
-  - Instruct them to review the tasks with file paths
-  - Example output: "Task generation complete. Review tasks in: `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
+Provide a concise completion message with task count and location:
+- Example: "Task generation complete. Created [count] tasks in `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 

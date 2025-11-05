@@ -146,6 +146,9 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     console.log(`\n${chalk.green('✓')} AI Task Manager initialized successfully!`);
     console.log(chalk.gray(DIVIDER));
 
+    // Add documentation link
+    console.log(`\n  📚 Documentation: ${chalk.cyan('https://mateuaguilo.com/ai-task-manager')}\n`);
+
     // Show suggested workflow help text
     await displayWorkflowHelp();
 

@@ -83,17 +83,15 @@ Only after confirming sufficient context, create a plan that includes:
 
 Remember that a plan needs to be reviewed by a human. Be concise and to the point. Also, include mermaid diagrams to illustrate the plan.
 
-##### Output Format
-Structure your response as follows:
-- If context is insufficient: List specific clarifying questions
-- If context is sufficient: Provide the comprehensive plan using the structure above. Use the information in @TASK_MANAGER.md for the directory structure and additional information about plans.
+##### CRITICAL: Output Format
 
 **Output Behavior: CRITICAL - Structured Output for Command Coordination**
 
-Always end your output with a standardized summary in this exact format:
+Always end your output with a standardized summary in this exact format, for command coordination:
 
 ```
 ---
+
 Plan Summary:
 - Plan ID: [numeric-id]
 - Plan File: [full-path-to-plan-file]
@@ -118,12 +116,8 @@ Example:
 id: 1
 summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing"
 created: 2025-09-01
-approval_method_plan: "manual"
-approval_method_tasks: "manual"
 ---
 ```
-
-**Important**: Always set both `approval_method_plan` and `approval_method_tasks` to "manual" when creating a plan. The full-workflow command will modify these fields to "auto" after creation if running in automated mode.
 
 The schema for this frontmatter is:
 ```json
@@ -143,16 +137,6 @@ The schema for this frontmatter is:
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "description": "Creation date in YYYY-MM-DD format"
-    },
-    "approval_method_plan": {
-      "type": "string",
-      "enum": ["auto", "manual"],
-      "description": "Workflow approval mode for plan review: auto for automated workflows, manual for standalone execution"
-    },
-    "approval_method_tasks": {
-      "type": "string",
-      "enum": ["auto", "manual"],
-      "description": "Workflow approval mode for task generation review: auto when tasks auto-generated in workflow, manual for standalone execution"
     }
   },
   "additionalProperties": false
@@ -169,19 +153,3 @@ node .ai/task-manager/config/scripts/get-next-plan-id.cjs
 **Key formatting:**
 - **Front-matter**: Use numeric values (`id: 7`)
 - **Directory names**: Use zero-padded strings (`07--plan-name`)
-
-This Node.js script provides robust plan ID generation with comprehensive error handling:
-
-**Features:**
-- **Flexible Whitespace Handling**: Supports various frontmatter patterns
-- **Validation Layer**: Only processes files with valid numeric ID fields in YAML frontmatter
-- **Error Resilience**: Gracefully handles empty directories, corrupted files, and parsing failures
-- **Fallback Logic**: Returns ID 1 when no valid plans found, ensuring script never fails
-- **Dual ID Detection**: Checks both filename patterns and frontmatter for maximum reliability
-
-**Handles Edge Cases:**
-- Empty plans/archive directories → Returns 1
-- Corrupted or malformed YAML frontmatter → Skips invalid files
-- Non-numeric ID values → Filters out automatically
-- Missing frontmatter → Uses filename fallback
-- File system errors → Gracefully handled
