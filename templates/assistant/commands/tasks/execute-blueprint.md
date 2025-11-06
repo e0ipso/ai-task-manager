@@ -1,5 +1,5 @@
 ---
-argument-hint: [plan-ID]
+argument-hint: "[plan-ID]"
 description: Execute the task in the plan
 ---
 # Task Execution

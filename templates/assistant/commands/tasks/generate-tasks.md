@@ -1,5 +1,5 @@
 ---
-argument-hint: [plan-ID]
+argument-hint: "[plan-ID]"
 description: Generate tasks to implement the plan with the provided ID.
 ---
 

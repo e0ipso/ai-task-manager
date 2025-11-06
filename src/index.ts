@@ -320,17 +320,17 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     throw new Error(`Template directory not found: ${sourceDir}`);
   }
 
-  // Copy entire template directory structure
-  await fs.copy(sourceDir, assistantDir);
+  // Determine correct commands directory name based on assistant type
+  // OpenCode uses 'command' (singular) while Claude and Gemini use 'commands' (plural)
+  const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
 
-  // OpenCode uses 'command' (singular) instead of 'commands' (plural)
-  if (assistant === 'opencode') {
-    const commandsDir = resolvePath(assistantDir, 'commands');
-    const commandDir = resolvePath(assistantDir, 'command');
+  // Copy template structure with correct directory naming
+  const sourceCommandsDir = resolvePath(sourceDir, 'commands');
+  const targetCommandsDir = resolvePath(assistantDir, commandsPath);
 
-    if (await exists(commandsDir)) {
-      await fs.move(commandsDir, commandDir);
-    }
+  // Copy the commands directory to the correct location
+  if (await exists(sourceCommandsDir)) {
+    await fs.copy(sourceCommandsDir, targetCommandsDir);
   }
 
   // Determine template format based on assistant type
@@ -338,7 +338,6 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
 
   // If target format is different from source (md), process files in place
   if (templateFormat !== 'md') {
-    const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
     const tasksDir = resolvePath(assistantDir, `${commandsPath}/tasks`);
     const files = await fs.readdir(tasksDir);
 

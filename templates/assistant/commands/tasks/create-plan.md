@@ -1,5 +1,5 @@
 ---
-argument-hint: [user-prompt]
+argument-hint: "[user-prompt]"
 description: Create a comprehensive plan to accomplish the request from the user.
 ---
 # Comprehensive Plan Creation
