@@ -94,6 +94,16 @@ function findPlanById(planId) {
 
   debugLog(`Task manager root found: ${taskManagerRoot}`);
 
+  // Convert planId to numeric for flexible matching (handles both "2" and "02")
+  const numericPlanId = parseInt(planId, 10);
+
+  if (isNaN(numericPlanId)) {
+    errorLog(`Invalid plan ID: ${planId}. Plan ID must be numeric.`);
+    return null;
+  }
+
+  debugLog(`Searching for plan with numeric ID: ${numericPlanId} (input was: ${planId})`);
+
   const plansDir = path.join(taskManagerRoot, 'plans');
   const archiveDir = path.join(taskManagerRoot, 'archive');
 
@@ -111,30 +121,38 @@ function findPlanById(planId) {
       debugLog(`Found ${entries.length} entries in ${dir}`);
 
       for (const entry of entries) {
-        // Match directory pattern: [plan-id]--*
-        if (entry.isDirectory() && entry.name.match(new RegExp(`^${planId}--`))) {
-          const planDirPath = path.join(dir, entry.name);
-          debugLog(`Found matching plan directory: ${planDirPath}`);
+        // Match directory pattern: [plan-id]--* (with flexible ID matching)
+        if (entry.isDirectory()) {
+          // Extract numeric ID from directory name, stripping leading zeros
+          const dirMatch = entry.name.match(/^0*(\d+)--/);
+          if (dirMatch && parseInt(dirMatch[1], 10) === numericPlanId) {
+            const planDirPath = path.join(dir, entry.name);
+            debugLog(`Found matching plan directory: ${planDirPath} (extracted ID: ${dirMatch[1]} matches input: ${numericPlanId})`);
 
           try {
             const planDirEntries = fs.readdirSync(planDirPath, { withFileTypes: true });
 
-            // Look for plan file: plan-[plan-id]--*.md
+            // Look for plan file: plan-[plan-id]--*.md (with flexible ID matching)
             for (const planEntry of planDirEntries) {
-              if (planEntry.isFile() && planEntry.name.match(new RegExp(`^plan-${planId}--.*\\.md$`))) {
-                const planFilePath = path.join(planDirPath, planEntry.name);
-                debugLog(`Found plan file: ${planFilePath}`);
+              if (planEntry.isFile()) {
+                // Extract numeric ID from filename, stripping leading zeros
+                const fileMatch = planEntry.name.match(/^plan-0*(\d+)--.*\.md$/);
+                if (fileMatch && parseInt(fileMatch[1], 10) === numericPlanId) {
+                  const planFilePath = path.join(planDirPath, planEntry.name);
+                  debugLog(`Found plan file: ${planFilePath} (extracted ID: ${fileMatch[1]} matches input: ${numericPlanId})`);
 
-                return {
-                  planFile: planFilePath,
-                  planDir: planDirPath
-                };
+                  return {
+                    planFile: planFilePath,
+                    planDir: planDirPath
+                  };
+                }
               }
             }
 
             debugLog(`No plan file found in directory: ${planDirPath}`);
           } catch (err) {
             errorLog(`Failed to read plan directory ${planDirPath}: ${err.message}`);
+          }
           }
         }
       }
