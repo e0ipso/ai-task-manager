@@ -51,15 +51,40 @@ const printInfo = (message) => {
 
 // Function to find plan directory
 const findPlanDirectory = (planId) => {
-    try {
-        // Use find command similar to bash script
-        const findCommand = `find .ai/task-manager/plans .ai/task-manager/archive -type d -name "${planId}--*" 2>/dev/null || true`;
-        const result = execSync(findCommand, { encoding: 'utf8' }).trim();
-        const directories = result.split('\n').filter(dir => dir.length > 0);
-        return directories.length > 0 ? directories[0] : null;
-    } catch (error) {
-        return null;
+    const searchLocations = [
+        '.ai/task-manager/plans',
+        '.ai/task-manager/archive'
+    ];
+
+    // Generate ID variations to try (exact, padded, unpadded)
+    const idVariations = [
+        planId,                           // Try exact match first
+        planId.padStart(2, '0'),          // Try padded version (3 → 03)
+        planId.replace(/^0+/, '') || '0'  // Try unpadded version (03 → 3)
+    ];
+
+    // Remove duplicates from variations array
+    const uniqueVariations = [...new Set(idVariations)];
+
+    // Search for each variation in each location
+    for (const id of uniqueVariations) {
+        for (const location of searchLocations) {
+            try {
+                const findCommand = `find ${location} -type d -name "${id}--*" 2>/dev/null || true`;
+                const result = execSync(findCommand, { encoding: 'utf8' }).trim();
+                const directories = result.split('\n').filter(dir => dir.length > 0);
+
+                if (directories.length > 0) {
+                    return directories[0]; // Early return on first match
+                }
+            } catch (error) {
+                // Continue trying other variations/locations
+                continue;
+            }
+        }
     }
+
+    return null; // No matches found
 };
 
 // Function to find task file with padded/unpadded ID handling
