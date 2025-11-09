@@ -318,7 +318,9 @@ function validatePlanBlueprint(planId, fieldName) {
       errorLog(`Valid fields: ${validFields.join(', ')}`);
       process.exit(1);
     }
-    console.log(result[fieldName]);
+    // Use process.stdout.write to avoid util.inspect colorization
+    // Convert to string explicitly to ensure plain text output
+    process.stdout.write(String(result[fieldName]) + '\n');
   } else {
     // Output full JSON for backward compatibility
     console.log(JSON.stringify(result, null, 2));
