@@ -1,6 +1,6 @@
 ---
 argument-hint: "[user-prompt]"
-description: Execute the full workflow from plan creation to blueprint execution
+description: Execute the full workflow from plan creation to blueprint execution.
 ---
 # Full Workflow Execution
 

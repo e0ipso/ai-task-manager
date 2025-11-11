@@ -1,6 +1,6 @@
 ---
 argument-hint: "[plan-ID] [task-ID]"
-description: Execute a single task with dependency validation and status management
+description: Execute a single task with dependency validation and status management.
 ---
 # Single Task Execution
 
