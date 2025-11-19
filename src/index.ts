@@ -355,6 +355,16 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
       await fs.remove(mdPath);
     }
   }
+
+  // Copy agent files for Claude (agents are Claude-specific)
+  if (assistant === 'claude') {
+    const sourceAgentsDir = resolvePath(sourceDir, 'agents');
+    const targetAgentsDir = resolvePath(assistantDir, 'agents');
+
+    if (await exists(sourceAgentsDir)) {
+      await fs.copy(sourceAgentsDir, targetAgentsDir);
+    }
+  }
 }
 
 /**
