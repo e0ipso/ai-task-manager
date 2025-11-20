@@ -54,38 +54,6 @@ Eliminate these anti-patterns:
 - Specific variable names or file paths
 - Speculative "nice to have" features
 
-## Mermaid Diagram Types
-
-```mermaid
-graph TB
-    A[Client] --> B[Gateway]
-    B --> C[Service]
-```
-
-```mermaid
-sequenceDiagram
-    User->>Client: Action
-    Client->>Service: Request
-    Service-->>Client: Response
-```
-
-```mermaid
-stateDiagram-v2
-    [*] --> State1
-    State1 --> State2: Event
-```
-
-```mermaid
-erDiagram
-    USER ||--o{ SESSION : has
-    USER {
-        string id PK
-        string email
-    }
-```
-
-Keep diagrams simple (7-10 nodes max), use clear labels, show critical paths only.
-
 ## Template Compliance Checklist
 
 - [ ] YAML frontmatter: id, summary, created
