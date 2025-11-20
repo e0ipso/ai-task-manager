@@ -104,7 +104,7 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Create assistant-specific directories and copy templates
     for (const assistant of assistants) {
       console.log(`  ${chalk.green('✓')} Setting up ${assistant} assistant configuration`);
-      await createAssistantStructure(assistant, baseDir, options.force || false);
+      await createAssistantStructure(assistant, baseDir);
     }
 
     // ========== CREATED FILES SECTION ==========
@@ -140,24 +140,13 @@ export async function init(options: InitOptions): Promise<CommandResult> {
       console.log(
         `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/generate-tasks.${templateFormat}`)}`
       );
-    }
 
-    // Display agent files for Claude
-    if (assistants.includes('claude')) {
-      console.log(chalk.cyan('  Claude Agents:'));
-
-      const agentsDir = resolvePath(baseDir, '.claude/agents');
-
-      // List all .md files in agents directory
-      if (await exists(agentsDir)) {
-        const agentFiles = await fs.readdir(agentsDir);
-        const mdFiles = agentFiles.filter(f => f.endsWith('.md'));
-
-        for (const file of mdFiles.sort()) {
-          const fullPath = resolvePath(agentsDir, file);
-          console.log(`    ${chalk.blue('●')} ${fullPath}`);
-        }
-      }
+      console.log(
+        chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Agents:`)
+      );
+      console.log(
+        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/agents/plan-creator.${templateFormat}`)}`
+      );
     }
 
     // ========== FOOTER SECTION ==========
@@ -327,118 +316,9 @@ async function applyResolutions(
 }
 
 /**
- * Copy agent template files to .claude/agents directory with conflict detection
- */
-async function copyAgentTemplates(
-  assistantDir: string,
-  sourceDir: string,
-  force: boolean
-): Promise<void> {
-  const sourceAgentsDir = resolvePath(sourceDir, 'agents');
-  const destAgentsDir = resolvePath(assistantDir, 'agents');
-  const metadataPath = resolvePath(destAgentsDir, '.init-metadata.json');
-
-  // Check if source agents directory exists
-  if (!(await exists(sourceAgentsDir))) {
-    return; // No agents to copy
-  }
-
-  // Load existing metadata if present
-  const existingMetadata = await loadMetadata(metadataPath);
-
-  // Scenario 1: First-time init (no metadata) - copy all files
-  if (!existingMetadata) {
-    await fs.copy(sourceAgentsDir, destAgentsDir);
-    await createAgentMetadata(sourceAgentsDir, destAgentsDir, metadataPath);
-    return;
-  }
-
-  // Scenario 2: Force flag - overwrite all files
-  if (force) {
-    await fs.copy(sourceAgentsDir, destAgentsDir, { overwrite: true });
-    await createAgentMetadata(sourceAgentsDir, destAgentsDir, metadataPath);
-    return;
-  }
-
-  // Scenario 3: Conflict detection - check for user modifications
-  const conflicts = await detectConflicts(destAgentsDir, sourceAgentsDir, existingMetadata);
-
-  if (conflicts.length === 0) {
-    await fs.copy(sourceAgentsDir, destAgentsDir, { overwrite: true });
-    await createAgentMetadata(sourceAgentsDir, destAgentsDir, metadataPath);
-    return;
-  }
-
-  // Conflicts detected - prompt user for resolution
-  console.log(
-    chalk.yellow(
-      `\n⚠  Detected ${conflicts.length} modified agent file(s). Prompting for resolution...\n`
-    )
-  );
-  const resolutions = await promptForConflicts(conflicts);
-
-  // Apply resolutions
-  await applyResolutions(sourceAgentsDir, destAgentsDir, resolutions);
-
-  // Update metadata for all files (including resolved conflicts)
-  await createAgentMetadata(sourceAgentsDir, destAgentsDir, metadataPath);
-}
-
-/**
- * Create or update metadata file for agent directory with current file hashes
- */
-async function createAgentMetadata(
-  sourceDir: string,
-  destDir: string,
-  metadataPath: string
-): Promise<void> {
-  const files: Record<string, string> = {};
-
-  // Get all .md files in agents directory
-  async function walkDir(dir: string): Promise<void> {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-
-      // Skip metadata file itself
-      if (entry.name === '.init-metadata.json') {
-        continue;
-      }
-
-      if (entry.isDirectory()) {
-        await walkDir(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        const relativePath = path.relative(destDir, fullPath);
-        const hash = await calculateFileHash(fullPath);
-        files[relativePath] = hash;
-      }
-    }
-  }
-
-  if (await exists(destDir)) {
-    await walkDir(destDir);
-  }
-
-  // Create metadata object
-  const metadata = {
-    version: getPackageVersion(),
-    timestamp: new Date().toISOString(),
-    files,
-  };
-
-  // Save metadata
-  await saveMetadata(metadataPath, metadata);
-}
-
-/**
  * Create directory structure and copy templates for a specific assistant
  */
-async function createAssistantStructure(
-  assistant: Assistant,
-  baseDir: string,
-  force: boolean = false
-): Promise<void> {
+async function createAssistantStructure(assistant: Assistant, baseDir: string): Promise<void> {
   const sourceDir = getTemplatePath('assistant');
   const assistantDir = resolvePath(baseDir, `.${assistant}`);
 
@@ -460,15 +340,24 @@ async function createAssistantStructure(
     await fs.copy(sourceCommandsDir, targetCommandsDir);
   }
 
+  // Copy the agents directory
+  const sourceAgentsDir = resolvePath(sourceDir, 'agents');
+  const targetAgentsDir = resolvePath(assistantDir, 'agents');
+
+  if (await exists(sourceAgentsDir)) {
+    await fs.copy(sourceAgentsDir, targetAgentsDir);
+  }
+
   // Determine template format based on assistant type
   const templateFormat = getTemplateFormat(assistant);
 
   // If target format is different from source (md), process files in place
   if (templateFormat !== 'md') {
+    // Process command files
     const tasksDir = resolvePath(assistantDir, `${commandsPath}/tasks`);
-    const files = await fs.readdir(tasksDir);
+    const taskFiles = await fs.readdir(tasksDir);
 
-    for (const file of files.filter(f => f.endsWith('.md'))) {
+    for (const file of taskFiles.filter(f => f.endsWith('.md'))) {
       const mdPath = resolvePath(tasksDir, file);
       const newPath = resolvePath(tasksDir, file.replace('.md', `.${templateFormat}`));
 
@@ -481,11 +370,26 @@ async function createAssistantStructure(
       // Remove original .md file
       await fs.remove(mdPath);
     }
-  }
 
-  // Copy agent files for Claude with conflict detection
-  if (assistant === 'claude') {
-    await copyAgentTemplates(assistantDir, sourceDir, force);
+    // Process agent files
+    const agentsDir = resolvePath(assistantDir, 'agents');
+    if (await exists(agentsDir)) {
+      const agentFiles = await fs.readdir(agentsDir);
+
+      for (const file of agentFiles.filter(f => f.endsWith('.md'))) {
+        const mdPath = resolvePath(agentsDir, file);
+        const newPath = resolvePath(agentsDir, file.replace('.md', `.${templateFormat}`));
+
+        // Read and process the template
+        const processedContent = await readAndProcessTemplate(mdPath, templateFormat);
+
+        // Write processed content to new file
+        await writeProcessedTemplate(processedContent, newPath);
+
+        // Remove original .md file
+        await fs.remove(mdPath);
+      }
+    }
   }
 }
 
