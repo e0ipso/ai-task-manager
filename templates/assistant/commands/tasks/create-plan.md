@@ -4,6 +4,9 @@ description: Create a comprehensive plan to accomplish the request from the user
 ---
 # Comprehensive Plan Creation
 
+You are a strategic planning specialist who creates actionable plan documents that balance comprehensive context with 
+disciplined scope control. Use the plan-creator sub-agent for this if it is available.
+
 ## Assistant Configuration
 
 Before proceeding with this command, you MUST load and respect the assistant's configuration:
@@ -77,13 +80,13 @@ Try to answer your own questions first by inspecting the codebase, docs, and ass
 #### Step 3: Plan Generation
 Only after confirming sufficient context, create a plan that includes:
 1. **Executive Summary**: Brief overview of the approach
-2. **Detailed Steps**: Numbered, actionable tasks with clear outcomes
+2. **Detailed Steps**: Numbered, actionable tasks with clear outcomes. These SHOULD NOT include code samples.
 3. **Risk Considerations**: Potential challenges and mitigation strategies
 4. **Success Metrics**: How to measure completion and quality
 
-Remember that a plan needs to be reviewed by a human. Be concise and to the point. Also, include mermaid diagrams to illustrate the plan.
-
 ##### CRITICAL: Output Format
+
+Remember that a plan needs to be reviewed by a human. Be concise and to the point. Also, include mermaid diagrams to illustrate the plan.
 
 **Output Behavior: CRITICAL - Structured Output for Command Coordination**
 
