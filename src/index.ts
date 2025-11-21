@@ -460,7 +460,7 @@ async function displayWorkflowHelp(): Promise<void> {
   console.log(`  ${chalk.blue('2.')} Provide additional context if the assistant needs it`);
   console.log('');
   console.log(
-    `  ${chalk.blue('3.')} ${chalk.yellow.bold('MANUALLY REVIEW THE PLAN')} ${chalk.yellow("(don't skip this!")}`
+    `  ${chalk.blue('3.')} ${chalk.yellow.bold('MANUALLY REVIEW THE PLAN')} ${chalk.yellow("(don't skip this!)")}`
   );
   console.log(`      ${chalk.gray('Find it in: .ai/task-manager/plans/01--*/plan-[0-9]*--*.md')}`);
   console.log('');
