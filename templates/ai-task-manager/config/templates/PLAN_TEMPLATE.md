@@ -21,28 +21,32 @@ created: [YYYY-MM-DD]
 
 ## Context
 
-### Current State
-[Describe the existing situation, problems, or gaps that this plan addresses. Include specific details about what exists now, current limitations, and why change is needed.]
+### Current State vs Target State
+[Create a table that compares the current state with the target state in the different aspects of the implementation. Include a column on why the change is necessary.]
 
-### Target State
-[Describe the desired end state after plan completion. Be specific about the expected outcomes and how success will be measured.]
+Example:
+
+| Current State            | Target State | Why?                      |
+|--------------------------| ------------ |---------------------------|
+| Users have to click twice | Users can click once | We want to improve the UX |
+| The button is small | The button is bigger | Fix site design           |
+| ... | ... | ...                       |
 
 ### Background
 [Any additional context, requirements, constraints, any solutions that we tried that didn't work, or relevant history that informs the implementation approach.]
 
-## Technical Implementation Approach
+## Architectural Approach
+[Provide an overview of the implementation strategy, key architectural decisions, and technical approach. Break down into major components or phases using ### subheadings. Add a mermaid diagram summary.]
 
-[Provide an overview of the implementation strategy, key architectural decisions, and technical approach. Break down into major components or phases using ### subheadings.]
-
-### [Component/Phase 1 Name]
+### [Component/Stage 1 Name]
 **Objective**: [What this component accomplishes and why it's important]
 
-[Detailed explanation of implementation approach, key technical decisions, specifications, and rationale for design choices.]
+[Detailed & concise explanation of implementation approach, key technical decisions, specifications, and rationale for design choices.]
 
-### [Component/Phase 2 Name]
+### [Component/Stage 2 Name]
 **Objective**: [What this component accomplishes and why it's important]
 
-[Detailed explanation of implementation approach, key technical decisions, specifications, and rationale for design choices.]
+[Detailed & concise explanation of implementation approach, key technical decisions, specifications, and rationale for design choices.]
 
 ### [Additional Components as Needed]
 [Continue with additional technical components or phases following the same pattern]
@@ -61,8 +65,7 @@ created: [YYYY-MM-DD]
     - **Mitigation**: [Specific strategy to address this implementation risk]
 </details>
 
-[Additional Risk Categories as Needed]
-[Continue with other risk categories such as Integration Risks, Quality Risks, Resource Risks, etc.]
+[Additional Risk Categories as Needed: continue with other risk categories such as Integration Risks, Quality Risks, Resource Risks, etc.]
 
 ## Success Criteria
 
@@ -70,11 +73,6 @@ created: [YYYY-MM-DD]
 1. [Measurable outcome 1]
 2. [Measurable outcome 2]
 3. [Measurable outcome 3]
-
-### Quality Assurance Metrics
-1. [Quality measure 1]
-2. [Quality measure 2]
-3. [Quality measure 3]
 
 ## Resource Requirements
 
