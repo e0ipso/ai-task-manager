@@ -125,6 +125,27 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Assistant-specific files
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
+
+      // Codex uses flat directory structure with renamed files
+      if (assistant === 'codex') {
+        console.log(
+          chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Prompts:`)
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-create-plan.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-execute-blueprint.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-generate-tasks.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-full-workflow.md')}`
+        );
+        continue;
+      }
+
       // Open Code uses 'command' (singular) instead of 'commands' (plural)
       const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
 
@@ -158,6 +179,26 @@ export async function init(options: InitOptions): Promise<CommandResult> {
 
     // Add documentation link
     console.log(`\n  📚 Documentation: ${chalk.cyan('https://mateuaguilo.com/ai-task-manager')}\n`);
+
+    // Add Codex-specific post-init message
+    if (assistants.includes('codex')) {
+      console.log(formatSectionHeader('Codex CLI Setup Instructions'));
+      console.log(chalk.yellow('  For Codex CLI users:'));
+      console.log(
+        `    ${chalk.blue('●')} Copy or symlink files from .codex/prompts/ to ~/.codex/prompts/`
+      );
+      console.log(`    ${chalk.blue('●')} Restart your Codex session to load the new commands`);
+      console.log('');
+      console.log(chalk.cyan('  Commands will be available as:'));
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-create-plan`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-generate-tasks`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-execute-blueprint`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-full-workflow`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-refine-plan`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-execute-task`);
+      console.log(`    ${chalk.gray('●')} /prompts:tasks-fix-broken-tests`);
+      console.log('');
+    }
 
     // Show suggested workflow help text
     await displayWorkflowHelp();
@@ -330,6 +371,40 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     throw new Error(`Template directory not found: ${sourceDir}`);
   }
 
+  // Codex uses flat directory structure with renamed files
+  if (assistant === 'codex') {
+    // Create flat directory structure
+    const promptsDir = resolvePath(baseDir, '.codex', 'prompts');
+    await fs.ensureDir(promptsDir);
+
+    // Copy and rename templates
+    const templateFiles = [
+      'create-plan.md',
+      'generate-tasks.md',
+      'execute-blueprint.md',
+      'execute-task.md',
+      'fix-broken-tests.md',
+      'full-workflow.md',
+      'refine-plan.md',
+    ];
+
+    const templateFormat = getTemplateFormat(assistant);
+
+    for (const file of templateFiles) {
+      const sourcePath = resolvePath(sourceDir, 'commands', 'tasks', file);
+      const destFileName = `tasks-${file}`;
+      const destPath = resolvePath(promptsDir, destFileName);
+
+      // Read and process the template
+      const processedContent = await readAndProcessTemplate(sourcePath, templateFormat);
+
+      // Write processed content to destination
+      await writeProcessedTemplate(processedContent, destPath);
+    }
+
+    return;
+  }
+
   // Determine correct commands directory name based on assistant type
   // OpenCode uses 'command' (singular) while Claude and Gemini use 'commands' (plural)
   const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
@@ -393,6 +468,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
   hasClaudeConfig: boolean;
   hasGeminiConfig: boolean;
   hasOpencodeConfig: boolean;
+  hasCodexConfig: boolean;
   assistants: Assistant[];
 }> {
   const targetDir = baseDir || '.';
@@ -400,17 +476,20 @@ export async function getInitInfo(baseDir?: string): Promise<{
   const hasClaudeConfig = await exists(resolvePath(targetDir, '.claude/commands/tasks'));
   const hasGeminiConfig = await exists(resolvePath(targetDir, '.gemini/commands/tasks'));
   const hasOpencodeConfig = await exists(resolvePath(targetDir, '.opencode/command/tasks'));
+  const hasCodexConfig = await exists(resolvePath(targetDir, '.codex/prompts'));
 
   const assistants: Assistant[] = [];
   if (hasClaudeConfig) assistants.push('claude');
   if (hasGeminiConfig) assistants.push('gemini');
   if (hasOpencodeConfig) assistants.push('opencode');
+  if (hasCodexConfig) assistants.push('codex');
 
   return {
     hasAiTaskManager,
     hasClaudeConfig,
     hasGeminiConfig,
     hasOpencodeConfig,
+    hasCodexConfig,
     assistants,
   };
 }
