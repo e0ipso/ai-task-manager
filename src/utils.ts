@@ -16,7 +16,7 @@ import { Assistant, TemplateFormat } from './types';
  * @throws Error if invalid assistant names are provided
  */
 export function parseAssistants(value: string): Assistant[] {
-  const validAssistants: Assistant[] = ['claude', 'gemini', 'opencode'];
+  const validAssistants: Assistant[] = ['claude', 'codex', 'gemini', 'opencode'];
 
   if (!value.trim()) {
     throw new Error('Assistants parameter cannot be empty');
@@ -48,7 +48,7 @@ export function parseAssistants(value: string): Assistant[] {
  * @throws Error if any assistant is invalid or array is empty
  */
 export function validateAssistants(assistants: Assistant[]): void {
-  const validAssistants: Assistant[] = ['claude', 'gemini', 'opencode'];
+  const validAssistants: Assistant[] = ['claude', 'codex', 'gemini', 'opencode'];
 
   if (assistants.length === 0) {
     throw new Error('At least one assistant must be specified');
@@ -71,6 +71,8 @@ export function validateAssistants(assistants: Assistant[]): void {
 export function getTemplateFormat(assistant: Assistant): TemplateFormat {
   switch (assistant) {
     case 'claude':
+      return 'md';
+    case 'codex':
       return 'md';
     case 'gemini':
       return 'toml';
