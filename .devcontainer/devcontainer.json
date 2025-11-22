@@ -55,8 +55,10 @@
     "source=${localWorkspaceFolder}/../worktrees,target=/worktrees,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/node/.claude/CLAUDE.md,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gemini/GEMINI.md,target=/home/node/.gemini/GEMINI.md,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.codex/AGENTS.md,target=/home/node/.codex/AGENTS.md,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/settings.json,target=/home/node/.claude/settings.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.codex/config.toml,target=/home/node/.codex/config.toml,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh/hosts.yml,target=/home/node/.config/gh/hosts.yml,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached",
     "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
@@ -69,7 +71,7 @@
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "sudo chown -R node:node /home/node/.claude /home/node/.gemini || true",
-  "postStartCommand": "npm update -g @anthropic-ai/claude-code && npm update -g @google/gemini-cli",
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude /home/node/.gemini /home/node/.codex || true",
+  "postStartCommand": "npm update -g @anthropic-ai/claude-code && npm update -g @google/gemini-cli && npm update -g @openai/codex",
   "waitFor": "postStartCommand"
 }
