@@ -552,6 +552,120 @@ describe('CLI Integration Tests - Consolidated', () => {
     });
   });
 
+  describe('Codex Assistant Support', () => {
+    it('should create .codex/prompts/ directory with flat structure', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants codex`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify flat directory structure (no nested tasks/ subdirectory)
+      const promptsDir = path.join(testDir, '.codex/prompts');
+      expect(await fs.pathExists(promptsDir)).toBe(true);
+
+      // Verify no nested structure exists
+      expect(await fs.pathExists(path.join(testDir, '.codex/prompts/tasks'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.codex/commands'))).toBe(false);
+    });
+
+    it('should rename template files with tasks- prefix', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants codex`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify files have tasks- prefix
+      const promptsDir = path.join(testDir, '.codex/prompts');
+      const expectedFiles = [
+        'tasks-create-plan.md',
+        'tasks-generate-tasks.md',
+        'tasks-execute-blueprint.md',
+        'tasks-execute-task.md',
+        'tasks-fix-broken-tests.md',
+        'tasks-full-workflow.md',
+        'tasks-refine-plan.md',
+      ];
+
+      for (const file of expectedFiles) {
+        const filePath = path.join(promptsDir, file);
+        expect(await fs.pathExists(filePath)).toBe(true);
+
+        // Verify files have content
+        const content = await fs.readFile(filePath, 'utf8');
+        expect(content.length).toBeGreaterThan(0);
+        expect(content).toContain('---'); // YAML frontmatter
+      }
+
+      // Verify original names don't exist (they should be renamed)
+      expect(await fs.pathExists(path.join(promptsDir, 'create-plan.md'))).toBe(false);
+      expect(await fs.pathExists(path.join(promptsDir, 'generate-tasks.md'))).toBe(false);
+    });
+
+    it('should copy all 7 command templates', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants codex`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify exactly 7 files exist
+      const promptsDir = path.join(testDir, '.codex/prompts');
+      const files = await fs.readdir(promptsDir);
+      const mdFiles = files.filter(f => f.endsWith('.md'));
+
+      expect(mdFiles.length).toBe(7);
+      expect(mdFiles.sort()).toEqual([
+        'tasks-create-plan.md',
+        'tasks-execute-blueprint.md',
+        'tasks-execute-task.md',
+        'tasks-fix-broken-tests.md',
+        'tasks-full-workflow.md',
+        'tasks-generate-tasks.md',
+        'tasks-refine-plan.md',
+      ]);
+    });
+
+    it('should work with multi-assistant initialization including codex', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants claude,codex,gemini`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify Codex structure
+      const codexDir = path.join(testDir, '.codex/prompts');
+      expect(await fs.pathExists(codexDir)).toBe(true);
+
+      // Verify Codex files with tasks- prefix
+      expect(await fs.pathExists(path.join(codexDir, 'tasks-create-plan.md'))).toBe(true);
+
+      // Verify Claude structure (nested)
+      const claudeDir = path.join(testDir, '.claude/commands/tasks');
+      expect(await fs.pathExists(claudeDir)).toBe(true);
+      expect(await fs.pathExists(path.join(claudeDir, 'create-plan.md'))).toBe(true);
+
+      // Verify Gemini structure (nested, TOML)
+      const geminiDir = path.join(testDir, '.gemini/commands/tasks');
+      expect(await fs.pathExists(geminiDir)).toBe(true);
+      expect(await fs.pathExists(path.join(geminiDir, 'create-plan.toml'))).toBe(true);
+
+      // Verify no cross-contamination
+      expect(await fs.pathExists(path.join(testDir, '.codex/commands'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.claude/prompts'))).toBe(false);
+    });
+
+    it('should use Markdown format for Codex templates', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants codex`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify Markdown format (not TOML)
+      const createPlanPath = path.join(testDir, '.codex/prompts/tasks-create-plan.md');
+      const content = await fs.readFile(createPlanPath, 'utf8');
+
+      // Should contain Markdown/YAML frontmatter
+      expect(content).toContain('---');
+      expect(content).toContain('$ARGUMENTS');
+      expect(content).toContain('argument-hint: "[user-prompt]"');
+
+      // Should NOT contain TOML formatting
+      expect(content).not.toContain('[metadata]');
+      expect(content).not.toContain('{{args}}');
+      expect(content).not.toContain('content = """');
+    });
+  });
+
   describe('Comprehensive End-to-End Workflow', () => {
     it('should complete full workflow with all assistants and verify comprehensive functionality', async () => {
       // Test complete workflow: multiple assistants + custom directory + comprehensive verification
