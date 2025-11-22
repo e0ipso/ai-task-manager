@@ -49,10 +49,11 @@ Comprehensive guides covering:
 
 **Manual Workflow (Full Control):**
 1. **📝 Create a plan** → `/tasks:create-plan Create user authentication system`
-2. **📋 Generate tasks** → `/tasks:generate-tasks 1`
-3. **🚀 Execute blueprint** → `/tasks:execute-blueprint 1`
-4. **📊 Monitor progress** → `npx @e0ipso/ai-task-manager status`
-5. **🗂️ Manage plans** → `npx @e0ipso/ai-task-manager plan show 1`
+2. **🔍 Refine the plan** → `/tasks:refine-plan 1` (have a second assistant review the plan, ask clarifying questions, and update the document before tasks are created)
+3. **📋 Generate tasks** → `/tasks:generate-tasks 1`
+4. **🚀 Execute blueprint** → `/tasks:execute-blueprint 1`
+5. **📊 Monitor progress** → `npx @e0ipso/ai-task-manager status`
+6. **🗂️ Manage plans** → `npx @e0ipso/ai-task-manager plan show 1`
 
 ## 🤖 Supported Assistants
 

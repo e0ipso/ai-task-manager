@@ -80,6 +80,11 @@ The system implements a specialized workflow optimized for AI cognitive constrai
 - **Output**: Working functionality with validation gates
 - **Implements**: Dependency-aware parallelism and quality control
 
+#### Plan Review Loop (`/tasks:refine-plan`)
+- **Focus**: Run a feedback cycle between assistants by interrogating an existing plan
+- **Output**: Updated plan document with clarified requirements, refreshed diagrams, and documented outstanding questions
+- **Purpose**: Acts as the bridge between plan creation and task generation when you want a second assistant to "red team" the plan, ask questions, and immediately apply the refinements
+
 ### Key Design Principles
 
 #### Atomic Task Decomposition
@@ -256,11 +261,15 @@ Information flows through the workflow via structured output parsing:
 - **User review is needed between steps**: Manual approval workflow where the user wants to review the plan before generating tasks
 - **Debugging or testing individual components**: Isolate a specific command for troubleshooting
 - **Iterative refinement**: Make adjustments to a plan or tasks before proceeding to execution
+- **Cross-assistant plan reviews are required**: Have a second assistant interrogate an existing plan with `/tasks:refine-plan [plan-ID]` before kicking off task generation
 
 **Examples**:
 ```bash
 # Create plan for manual review before proceeding
 /tasks:create-plan "Implement user authentication system"
+
+# Run a plan refinement session before generating tasks
+/tasks:refine-plan 51
 
 # Generate tasks after reviewing and adjusting the plan
 /tasks:generate-tasks 51
@@ -302,138 +311,10 @@ Information flows through the workflow via structured output parsing:
 
 The composition pattern maintains full backward compatibility:
 
-- **Individual commands remain unchanged**: `/tasks:create-plan`, `/tasks:generate-tasks`, and `/tasks:execute-blueprint` continue to function as standalone slash commands
+- **Individual commands remain unchanged**: `/tasks:create-plan`, `/tasks:refine-plan`, `/tasks:generate-tasks`, and `/tasks:execute-blueprint` continue to function as standalone slash commands
 - **Existing workflows unaffected**: Projects using manual step-by-step workflows see no changes in behavior
 - **Template system intact**: All template processing, variable substitution, and format conversion (Markdown/TOML) work identically
 - **Approval methods preserved**: Both `approval_method_plan` and `approval_method_tasks` function correctly in all contexts
-
-### Troubleshooting
-
-#### Problem: Full-workflow still pauses for user input
-
-**Symptoms**: Execution stops after plan creation or task generation, waiting for "continue"
-
-**Causes**:
-- Template file hasn't been updated with embedded prompts
-- Still using old SlashCommand invocation pattern
-- Local modifications to template files
-
-**Solution**:
-```bash
-# Verify template structure
-grep -n "SlashCommand" templates/assistant/commands/tasks/full-workflow.md
-# Should return no results
-
-# Check for proper embedding
-grep -n "## Step 1: Plan Creation" templates/assistant/commands/tasks/full-workflow.md
-grep -n "## Step 2: Task Generation" templates/assistant/commands/tasks/full-workflow.md
-grep -n "## Step 3: Blueprint Execution" templates/assistant/commands/tasks/full-workflow.md
-# All three should exist
-
-# Re-run init to update project templates
-npx @brainchain/ai-task-manager init --assistants claude --destination-directory /path/to/project
-```
-
-#### Problem: Variables not substituted correctly
-
-**Symptoms**: Literal `$1` or `[PLAN_ID]` appears in output instead of actual values
-
-**Causes**:
-- Plan ID extraction from structured output failed
-- Incorrect structured output format in create-plan step
-- Missing or malformed "Plan Summary" section
-
-**Solution**:
-```bash
-# Verify structured output format in plan creation
-# Should end with:
----
-Plan Summary:
-- Plan ID: [numeric-id]
-- Plan File: [full-path-to-plan-file]
-
-# Check extraction logic in full-workflow template
-grep -A5 "Extract the Plan ID" templates/assistant/commands/tasks/full-workflow.md
-```
-
-#### Problem: Tasks not auto-generated in execute-blueprint
-
-**Symptoms**: Execute-blueprint reports "tasks not found" but doesn't generate them automatically
-
-**Causes**:
-- Validation script not executing correctly
-- Conditional logic checking `TASK_COUNT` or `BLUEPRINT_EXISTS` failed
-- Missing embedded task generation section
-
-**Solution**:
-```bash
-# Verify validation script exists and is executable
-ls -la .ai/task-manager/config/scripts/validate-plan-blueprint.cjs
-
-# Test validation script manually
-node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs 51 taskCount
-node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs 51 blueprintExists
-
-# Check conditional composition section exists
-grep -A10 "Embedded Task Generation" templates/assistant/commands/tasks/execute-blueprint.md
-```
-
-#### Problem: Execute-blueprint shows progress bars unexpectedly
-
-**Symptoms**: Seeing full-workflow-style progress indicators (⬛⬜⬜) in execute-blueprint output
-
-**Cause**: Misunderstanding of scope - execute-blueprint does NOT use progress bars
-
-**Clarification**:
-- **full-workflow**: Uses progress bars for its 3 major steps
-- **execute-blueprint**: Uses phase-based tracking only (e.g., "Phase 1/3 completed")
-- No action needed - this is expected behavior
-
-### Test Coverage
-
-The composition pattern is validated through integration tests:
-
-**Test File**: `/workspace/src/__tests__/orchestration.integration.test.ts`
-
-**Coverage**:
-- ✅ Verifies full-workflow template contains three composed sections
-- ✅ Confirms NO SlashCommand invocations exist in templates
-- ✅ Validates progress indicator format and placement
-- ✅ Tests context passing instructions between steps
-- ✅ Checks approval method handling logic
-- ✅ Ensures backward compatibility with standalone commands
-- ✅ Validates execute-blueprint conditional composition for task generation
-
-**Test Philosophy**: "Write a few tests, mostly integration"
-- Focus: Full workflow completion, structural validation, pattern verification
-- Avoid: Individual markdown parsing edge cases, progress indicator styling details
-
-### Implementation Notes
-
-#### Why Not a Composition Script?
-
-The plan originally considered creating a `compose-prompt.cjs` script to dynamically read and merge markdown files at runtime. However, the final implementation directly embeds prompts in the template files because:
-
-1. **Simplicity**: No additional script execution or file reading at runtime
-2. **Reliability**: No risk of file I/O failures during orchestration
-3. **Performance**: Faster execution without dynamic file operations
-4. **Maintainability**: Single source of truth in template files
-5. **Debugging**: Easier to trace execution flow and troubleshoot issues
-
-#### Template Maintenance
-
-When updating sub-commands (create-plan, generate-tasks, execute-blueprint):
-- **For standalone behavior changes**: Update the individual command template file
-- **For orchestration behavior changes**: Update both the individual file AND the embedded sections in orchestration templates
-- **Consistency checks**: Regularly diff embedded sections against source templates to ensure synchronization
-
-```bash
-# Compare create-plan standalone vs embedded in full-workflow
-# Manual inspection recommended to ensure functional equivalence
-diff <(sed -n '/## Step 1: Plan Creation/,/## Step 2: Task Generation/p' \
-  templates/assistant/commands/tasks/full-workflow.md) \
-  templates/assistant/commands/tasks/create-plan.md
-```
 
 ---
 
@@ -529,16 +410,19 @@ project/
 │       └── TASK_TEMPLATE.md       # Customizable task template
 ├── .claude/commands/tasks/        # Claude commands (Markdown)
 │   ├── create-plan.md
+│   ├── refine-plan.md             # NEW: Plan feedback/refinement loop
 │   ├── generate-tasks.md
 │   ├── execute-blueprint.md
 │   └── fix-broken-tests.md        # NEW: Test integrity command
 ├── .gemini/commands/tasks/        # Gemini commands (TOML)
 │   ├── create-plan.toml
+│   ├── refine-plan.toml           # NEW: Plan feedback/refinement loop
 │   ├── generate-tasks.toml
 │   ├── execute-blueprint.toml
 │   └── fix-broken-tests.toml      # NEW: Test integrity command
 └── .opencode/command/tasks/       # Open Code commands (Markdown)
     ├── create-plan.md
+    ├── refine-plan.md             # NEW: Plan feedback/refinement loop
     ├── generate-tasks.md
     ├── execute-blueprint.md
     └── fix-broken-tests.md        # NEW: Test integrity command
@@ -564,6 +448,34 @@ DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
 ---
 
 ## Enhanced Features and Commands
+
+### Refine-Plan Command
+
+#### Why It Exists
+
+The `/tasks:refine-plan [plan-ID]` command enables a feedback loop between multiple LLMs (or between an LLM and a human). One assistant creates the initial plan, then the refine-plan command lets another assistant:
+- Load the plan context safely via `detect-assistant.cjs` and `read-assistant-config.cjs`
+- Inspect the document section-by-section, highlighting gaps, contradictions, or gold-plated scope
+- Ask targeted clarifying questions and log the answers back into the "Plan Clarifications" table
+- Apply edits directly in the plan file while preserving the original plan ID and template structure
+- Append a change log so downstream assistants understand what changed during refinement
+
+#### Usage Workflow
+
+```bash
+# Have another assistant interrogate Plan 41
+/tasks:refine-plan 41
+```
+
+During the session the assistant should:
+1. Run `.ai/task-manager/config/hooks/PRE_PLAN.md`
+2. Provide a baseline summary plus a gap analysis (context, technical, risk, scope)
+3. Loop on clarification questions until blockers are resolved or explicitly noted
+4. Update the plan file using `.ai/task-manager/config/templates/PLAN_TEMPLATE.md` as the guardrail
+5. Re-run `.ai/task-manager/config/hooks/POST_PLAN.md`
+6. Output the structured **Plan Refinement Summary** so orchestrators can continue with `/tasks:generate-tasks`
+
+This command is ideal when you want a "red team" review before task generation, ensuring scope discipline and better downstream execution.
 
 ### Fix-Broken-Tests Command
 
@@ -912,4 +824,4 @@ This CLAUDE.md is structured to provide Claude Code with:
 4. **Collaboration**: Multi-assistant support with consistent workflows
 5. **Documentation**: Self-maintaining documentation through structured templates
 
-This comprehensive guide ensures Claude Code has optimal context for effective collaboration on this AI task management CLI project.
+This comprehensive guide ensures agents have optimal context for effective collaboration on this AI task management CLI project.

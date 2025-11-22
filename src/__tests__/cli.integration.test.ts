@@ -73,7 +73,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(await fs.pathExists(assistantDir)).toBe(true);
 
       const extension = assistant === 'gemini' ? 'toml' : 'md';
-      const templateFiles = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const templateFiles = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
 
       for (const template of templateFiles) {
         const templatePath = path.join(assistantDir, `${template}.${extension}`);
@@ -478,7 +478,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(opencodeCreatePlan).toBe(claudeCreatePlan);
 
       // Verify all template files for Open Code
-      const templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const templates = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
       for (const template of templates) {
         const opencodeTemplatePath = path.join(testDir, `.opencode/command/tasks/${template}.md`);
         const claudeTemplatePath = path.join(testDir, `.claude/commands/tasks/${template}.md`);
@@ -570,11 +570,12 @@ describe('CLI Integration Tests - Consolidated', () => {
       const baseDir = path.join(testDir, customDir);
 
       // Verify template variable conversion works correctly across all files
-      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
       const variableTests = [
         { template: 'create-plan', claudeVar: '$ARGUMENTS', geminiVar: '{{args}}' },
         { template: 'execute-blueprint', claudeVar: '$1', geminiVar: '{{plan_id}}' },
         { template: 'generate-tasks', claudeVar: '$1', geminiVar: '{{plan_id}}' },
+        { template: 'refine-plan', claudeVar: '$1', geminiVar: '{{plan_id}}' },
       ];
 
       for (const test of variableTests) {
@@ -615,11 +616,12 @@ describe('CLI Integration Tests - Consolidated', () => {
       const baseDir = path.join(testDir, customDir);
 
       // Verify template variable handling for all assistants
-      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks'];
+      const _templates = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
       const variableTests = [
         { template: 'create-plan', markdownVar: '$ARGUMENTS', tomlVar: '{{args}}' },
         { template: 'execute-blueprint', markdownVar: '$1', tomlVar: '{{plan_id}}' },
         { template: 'generate-tasks', markdownVar: '$1', tomlVar: '{{plan_id}}' },
+        { template: 'refine-plan', markdownVar: '$1', tomlVar: '{{plan_id}}' },
       ];
 
       for (const test of variableTests) {

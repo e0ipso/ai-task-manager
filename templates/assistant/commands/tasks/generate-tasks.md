@@ -23,7 +23,7 @@ Think harder and use tools.
 
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
-Include /TASK_MANAGER.md for the directory structure of tasks.
+Include `.ai/task-manager/config/TASK_MANAGER.md` for the directory structure of tasks.
 
 ## Instructions
 
@@ -36,8 +36,13 @@ Use your internal Todo task tool to track the following process:
 - [ ] Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 ### Input
-- A plan document. See .ai/task-manager/config/TASK_MANAGER.md fo find the plan with ID $1
-- The plan contains high-level objectives and implementation steps
+
+- A plan document. Extract it with the following command.
+
+```bash
+# Extract validation results directly from script
+PLAN_FILE=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+```
 
 ### Input Error Handling
 If the plan does not exist. Stop immediately and show an error to the user.

@@ -92,7 +92,24 @@ The authentication should:
 
 AI updates the plan with this additional context.
 
-### Step 3: ⚠️ Review the Plan (CRITICAL)
+### Step 3: Invite a Plan Reviewer (Optional but Recommended)
+
+Run the plan refinement loop whenever you want a second assistant to interrogate the plan and apply updates automatically:
+
+```bash
+/tasks:refine-plan 1
+```
+
+**What happens:**
+- Loads assistant configuration and validates the plan path
+- Reviews every section for gaps (context, technical design, risks, scope creep)
+- Asks targeted clarifying questions and logs answers inside the "Plan Clarifications" table
+- Updates diagrams/sections directly in the plan using the standard template
+- Adds a change log entry so you know what changed before task generation
+
+Use this step to enable a "two LLMs" feedback loop: one assistant drafts the plan, another challenges it and tightens the scope.
+
+### Step 4: ⚠️ Review the Plan (CRITICAL)
 
 **Do not skip this step!**
 
@@ -104,7 +121,7 @@ Open the plan document and verify:
 
 **Edit the plan directly** if anything needs adjustment. This is YOUR plan, not just the AI's.
 
-### Step 4: Generate Tasks
+### Step 5: Generate Tasks
 
 Once the plan is reviewed and approved:
 
@@ -120,7 +137,7 @@ Once the plan is reviewed and approved:
 
 **Tasks location**: `.ai/task-manager/plans/01--user-authentication/tasks/`
 
-### Step 5: ⚠️ Review Tasks (CRITICAL)
+### Step 6: ⚠️ Review Tasks (CRITICAL)
 
 **This step prevents scope creep and ensures quality.**
 
@@ -136,7 +153,7 @@ Review all generated tasks in `.ai/task-manager/plans/01--user-authentication/ta
 - Clarify vague acceptance criteria
 - Add project-specific validation steps
 
-### Step 6: Execute the Blueprint
+### Step 7: Execute the Blueprint
 
 After reviewing and approving tasks:
 
@@ -153,7 +170,7 @@ After reviewing and approving tasks:
 
 **Note**: If you forgot to run `/tasks:generate-tasks`, execute-blueprint will automatically generate tasks and the blueprint for you before starting execution.
 
-### Step 7: Monitor Progress
+### Step 8: Monitor Progress
 
 Check implementation status anytime:
 
@@ -169,7 +186,7 @@ npx @e0ipso/ai-task-manager status
 
 ![Dashboard](img/dashboard.svg)
 
-### Step 8: Fix Broken Tests (If Needed)
+### Step 9: Fix Broken Tests (If Needed)
 
 If tests fail after implementation:
 
@@ -190,7 +207,7 @@ If tests fail after implementation:
 
 See [Customization Guide](customization.html) for fix-broken-tests details.
 
-### Step 9: Review Implementation
+### Step 10: Review Implementation
 
 After execution completes:
 - Review generated code for quality

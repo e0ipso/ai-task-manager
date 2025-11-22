@@ -93,6 +93,7 @@ project-root/
 ├── .claude/                       # Claude files (if --assistants claude)
 │   └── commands/tasks/
 │       ├── create-plan.md
+│       ├── refine-plan.md
 │       ├── generate-tasks.md
 │       ├── execute-blueprint.md
 │       ├── execute-task.md
@@ -100,6 +101,7 @@ project-root/
 ├── .gemini/                       # Gemini files (if --assistants gemini)
 │   └── commands/tasks/
 │       ├── create-plan.toml       # TOML format for Gemini
+│       ├── refine-plan.toml
 │       ├── generate-tasks.toml
 │       ├── execute-blueprint.toml
 │       ├── execute-task.toml
@@ -107,6 +109,7 @@ project-root/
 └── .opencode/                     # Open Code files (if --assistants opencode)
     └── commands/tasks/
         ├── create-plan.md
+        ├── refine-plan.md
         ├── generate-tasks.md
         ├── execute-blueprint.md
         ├── execute-task.md

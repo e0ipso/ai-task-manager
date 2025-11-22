@@ -269,7 +269,7 @@ describe('Orchestration Workflows', () => {
 
   describe('structured output formats', () => {
     it('should verify all commands maintain consistent structured output formats', async () => {
-      const commands = ['create-plan', 'generate-tasks', 'execute-blueprint', 'full-workflow'];
+      const commands = ['create-plan', 'generate-tasks', 'execute-blueprint', 'refine-plan', 'full-workflow'];
 
       for (const command of commands) {
         const templatePath = path.resolve(
@@ -371,7 +371,7 @@ describe('Orchestration Workflows', () => {
 
   describe('assistant configuration integration', () => {
     it('should verify commands load assistant configuration before execution', async () => {
-      const commands = ['full-workflow', 'execute-blueprint'];
+      const commands = ['full-workflow', 'execute-blueprint', 'refine-plan'];
 
       for (const command of commands) {
         const templatePath = path.resolve(

@@ -87,6 +87,13 @@ AI Task Manager now:
 - Documents technical decisions
 - Identifies risks and success criteria
 
+**Step 4b: Refine the Plan with a Second Assistant (Optional)**
+```bash
+/tasks:refine-plan 1
+```
+
+Let another assistant interrogate the plan, ask for missing context, and immediately apply refinements before generating tasks. This keeps the plan consistent while enabling a "two-agent" feedback loop.
+
 **Step 5: Continue with Standard Workflow**
 ```bash
 # Review plan at .ai/task-manager/plans/01--blog-api/
@@ -157,6 +164,9 @@ flowchart TD
 ```bash
 # Create initial plan
 /tasks:create-plan "Build user dashboard with analytics"
+
+# Run a plan refinement session to capture clarifications and tighten scope
+/tasks:refine-plan 1
 
 # Review generated plan
 # Edit .ai/task-manager/plans/01--dashboard/plan-01--dashboard.md
