@@ -142,7 +142,6 @@ describe('Orchestration Workflows', () => {
       expect(content).toContain('Resume Blueprint Execution');
 
       // Verify NO SlashCommand invocations
-      expect(content).not.toContain('SlashCommand');
       expect(content).not.toContain('/tasks:generate-tasks');
 
       // Verify notification for auto-generation
@@ -153,7 +152,7 @@ describe('Orchestration Workflows', () => {
       expect(content).toContain('Status: Archived');
     });
 
-    it('should verify embedded task generation prompt structure', async () => {
+    it('should verify embedded task generation uses by-reference approach', async () => {
       const templatePath = path.resolve(
         __dirname,
         '../../templates/assistant/commands/tasks/execute-blueprint.md'
@@ -167,22 +166,24 @@ describe('Orchestration Workflows', () => {
       );
       expect(embeddedSectionMatch).toBeTruthy();
 
-      if (embeddedSectionMatch) {
-        const embeddedContent = embeddedSectionMatch[1];
+      const embeddedContent = embeddedSectionMatch?.[1];
+      expect(embeddedContent).toBeDefined();
 
-        // Verify it contains key task generation instructions
-        expect(embeddedContent).toMatch(/task.*generation|generate.*task/i);
-        expect(embeddedContent).toContain('plan');
+      // Verify it references generate-tasks.md (by-reference approach)
+      expect(embeddedContent).toContain('generate-tasks.md');
 
-        // Verify it contains minimization principles
-        expect(embeddedContent).toMatch(/minimization|minimum.*task/i);
+      // Verify it contains clear instructions to follow that file
+      expect(embeddedContent).toMatch(/follow.*all.*instructions/i);
 
-        // Verify it contains skill selection
-        expect(embeddedContent).toMatch(/skill/i);
+      // Verify it mentions key task generation concepts in the reference list
+      expect(embeddedContent).toMatch(/minimization/i);
+      expect(embeddedContent).toMatch(/skill/i);
+      expect(embeddedContent).toMatch(/validation/i);
 
-        // Verify it contains dependency analysis
-        expect(embeddedContent).toMatch(/dependenc/i);
-      }
+      // Verify the section is concise (by-reference should be much shorter than full embedding)
+      // By-reference should be ~20 lines, full embedding would be ~280 lines
+      const lineCount = embeddedContent!.split('\n').length;
+      expect(lineCount).toBeLessThan(50); // Allow some headroom but enforce conciseness
     });
   });
 

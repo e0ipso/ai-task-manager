@@ -57,7 +57,23 @@ BLUEPRINT_EXISTS=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.
 
 If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
    - Display notification to user: "⚠️ Tasks or execution blueprint not found. Generating tasks automatically..."
-   - Execute the steps in [./generate-tasks.md](@generate-tasks.md) to generate the tasks, and proceed to execution.
+   - Execute the embedded task generation process below
+
+   ## Embedded Task Generation
+
+   Follow ALL instructions from `generate-tasks.md` exactly for plan ID $1.
+
+   This includes:
+   - Reading and processing the plan document
+   - Applying task minimization principles (20-30% reduction target)
+   - Creating atomic tasks with 1-2 skills each
+   - Generating proper task files with frontmatter and body structure
+   - Running all validation checklists
+   - Executing the POST_TASK_GENERATION_ALL hook
+
+   ## Resume Blueprint Execution
+
+   After task generation completes, continue with execution below.
 
 Otherwise, if tasks exist, proceed directly to execution.
 
