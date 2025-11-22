@@ -24,7 +24,10 @@ npm run lint:fix      # Auto-fix code style issues
 npx . init --assistants claude --destination-directory /path/to/project
 
 # Initialize for multiple assistants
-npx . init --assistants claude,gemini,opencode --destination-directory /path/to/project
+npx . init --assistants claude,gemini,opencode,codex --destination-directory /path/to/project
+
+# Initialize for Codex
+npx . init --assistants codex --destination-directory /path/to/project
 
 # Re-run init to update configuration files
 # Your customizations are automatically detected and protected
@@ -33,6 +36,8 @@ npx . init --assistants claude --destination-directory /path/to/project
 # Force overwrite all files (bypass conflict detection)
 npx . init --assistants claude --destination-directory /path/to/project --force
 ```
+
+**Codex CLI Workflow**: After initialization, Codex requires an additional step. Copy the generated files from `.codex/prompts/` to `~/.codex/prompts/` in your home directory, then restart Codex to load the commands. Commands are invoked as `/prompts:tasks-create-plan`, `/prompts:tasks-generate-tasks`, etc.
 
 ### File Conflict Detection
 
@@ -55,7 +60,7 @@ This CLI tool initializes AI-assisted development environments with hierarchical
 - **Cognitive Load Management**: Prevents AI context overload through staged processing
 - **Scope Control**: Enforces YAGNI principles and prevents feature creep
 - **Quality Assurance**: Ensures working code through integrity-focused testing
-- **Multi-Assistant Support**: Unified workflow across Claude, Gemini, and Open Code platforms
+- **Multi-Assistant Support**: Unified workflow across Claude, Gemini, Open Code, and Codex platforms
 
 ---
 
@@ -352,7 +357,7 @@ The composition pattern maintains full backward compatibility:
 #### Type System (`src/types.ts`)
 ```typescript
 // Type definitions:
-- Assistant type: 'claude' | 'gemini' | 'opencode'
+- Assistant type: 'claude' | 'gemini' | 'opencode' | 'codex'
 - TemplateFormat: 'md' | 'toml'
 - Custom error classes: FileSystemError, ConfigError
 - Interface definitions for configurations and results
@@ -420,12 +425,64 @@ project/
 │   ├── generate-tasks.toml
 │   ├── execute-blueprint.toml
 │   └── fix-broken-tests.toml      # NEW: Test integrity command
-└── .opencode/command/tasks/       # Open Code commands (Markdown)
-    ├── create-plan.md
-    ├── refine-plan.md             # NEW: Plan feedback/refinement loop
-    ├── generate-tasks.md
-    ├── execute-blueprint.md
-    └── fix-broken-tests.md        # NEW: Test integrity command
+├── .opencode/command/tasks/       # Open Code commands (Markdown)
+│   ├── create-plan.md
+│   ├── refine-plan.md             # NEW: Plan feedback/refinement loop
+│   ├── generate-tasks.md
+│   ├── execute-blueprint.md
+│   └── fix-broken-tests.md        # NEW: Test integrity command
+└── .codex/prompts/                # Codex commands (Markdown, flat structure)
+    ├── tasks-create-plan.md
+    ├── tasks-refine-plan.md       # NEW: Plan feedback/refinement loop
+    ├── tasks-generate-tasks.md
+    ├── tasks-execute-blueprint.md
+    ├── tasks-execute-task.md
+    ├── tasks-fix-broken-tests.md  # NEW: Test integrity command
+    └── tasks-full-workflow.md
+```
+
+### Assistant-Specific Differences
+
+#### Codex CLI Workflow
+
+Codex has unique requirements due to its architecture:
+
+**Directory Structure**:
+- Uses flat file structure in `.codex/prompts/` (no nested `tasks/` subdirectory)
+- File naming pattern: `tasks-{command-name}.md` (e.g., `tasks-create-plan.md`)
+- All files stored in single directory for Codex's command discovery
+
+**User Workflow**:
+1. Run initialization: `npx . init --assistants codex --destination-directory /path/to/project`
+2. Copy generated files to home directory: `cp -r .codex/prompts/* ~/.codex/prompts/`
+3. Restart Codex CLI to load the new commands
+4. Invoke commands using `/prompts:` prefix: `/prompts:tasks-create-plan`, `/prompts:tasks-generate-tasks`, etc.
+
+**Key Differences**:
+- **Manual file copy required**: Unlike other assistants, Codex reads commands from `~/.codex/prompts/` in the user's home directory
+- **Session restart needed**: Changes to prompts require restarting Codex
+- **Flat structure**: No hierarchical organization; all files in one directory
+- **Naming convention**: Hyphenated prefixes (`tasks-`) instead of directory nesting
+
+**Command Invocation Examples**:
+```bash
+# Create a new plan
+/prompts:tasks-create-plan "Implement user authentication system"
+
+# Refine an existing plan
+/prompts:tasks-refine-plan 51
+
+# Generate tasks from a plan
+/prompts:tasks-generate-tasks 51
+
+# Execute the blueprint
+/prompts:tasks-execute-blueprint 51
+
+# Full automated workflow
+/prompts:tasks-full-workflow "Add dark mode toggle to application settings"
+
+# Fix broken tests
+/prompts:tasks-fix-broken-tests "npm test"
 ```
 
 ### Archive System and Lifecycle Management
@@ -601,18 +658,81 @@ npm run prepublishOnly        # Pre-publish validation (auto-runs)
 
 ### Adding New Assistant Support
 
+To add a new AI assistant (like Codex was added to the existing Claude, Gemini, and Open Code support), follow these steps:
+
 1. **Type System**: Update `Assistant` type in `src/types.ts`
+   ```typescript
+   // Add new assistant to the union type
+   export type Assistant = 'claude' | 'gemini' | 'opencode' | 'codex' | 'newassistant';
+   ```
+
 2. **Format Mapping**: Add template format in `getTemplateFormat()` (`src/utils.ts`)
-3. **Conversion Logic**: Extend `convertMdToToml()` if needed
-4. **Directory Structure**: Create template directories
-5. **Testing**: Add integration tests for new assistant
+   ```typescript
+   export function getTemplateFormat(assistant: Assistant): TemplateFormat {
+     if (assistant === 'gemini') return 'toml';
+     return 'md';  // Default for Claude, Open Code, Codex, and new assistants
+   }
+   ```
+
+3. **Directory Structure Mapping**: Add directory configuration in `getAssistantConfig()` (`src/utils.ts`)
+   ```typescript
+   export function getAssistantConfig(assistant: Assistant) {
+     const configs = {
+       claude: { dir: '.claude/commands', subdir: 'tasks' },
+       gemini: { dir: '.gemini/commands', subdir: 'tasks' },
+       opencode: { dir: '.opencode/command', subdir: 'tasks' },
+       codex: { dir: '.codex/prompts', subdir: null },  // Flat structure example
+       newassistant: { dir: '.newassistant/commands', subdir: 'tasks' }
+     };
+     return configs[assistant];
+   }
+   ```
+
+4. **File Naming Convention**: Update `getCommandFileName()` if needed (`src/utils.ts`)
+   ```typescript
+   export function getCommandFileName(assistant: Assistant, command: string): string {
+     // Codex uses hyphenated naming (tasks-create-plan.md)
+     if (assistant === 'codex') {
+       return `tasks-${command}.${getTemplateFormat(assistant)}`;
+     }
+     // Others use plain names (create-plan.md, create-plan.toml)
+     return `${command}.${getTemplateFormat(assistant)}`;
+   }
+   ```
+
+5. **Template Directories**: Create template files in `templates/commands/tasks/` (if needed for custom formats)
+
+6. **Testing**: Add integration tests for new assistant in `src/__tests__/`
+   - Test directory creation
+   - Test template processing and format conversion
+   - Test end-to-end initialization workflow
+   - Verify file naming conventions
+   - Validate variable substitution
+
+7. **Documentation**: Update `AGENTS.md` with:
+   - Assistant name in "Core Value Proposition"
+   - Initialization examples
+   - Directory structure diagram
+   - Any assistant-specific workflow requirements
+   - Command invocation examples
+
+**Example: Codex Implementation**
+
+The Codex assistant was added with these characteristics:
+- **Flat directory structure**: `.codex/prompts/` with no subdirectories
+- **Hyphenated file naming**: `tasks-create-plan.md` instead of nested `tasks/create-plan.md`
+- **Markdown format**: Uses `.md` files like Claude and Open Code
+- **Special workflow**: Requires copying files to `~/.codex/prompts/` and restarting Codex
+- **Command prefix**: `/prompts:tasks-*` instead of `/tasks:*`
+
+These unique requirements were handled through conditional logic in `getAssistantConfig()` and `getCommandFileName()` without needing changes to the core template system.
 
 ### Template Development Workflow
 
 1. **Source Creation**: Author Markdown templates in `templates/commands/tasks/`
 2. **Metadata**: Use standard YAML frontmatter format
 3. **Variable Testing**: Verify substitution across all formats
-4. **Output Validation**: Check Claude (.md), Gemini (.toml), Open Code (.md)
+4. **Output Validation**: Check Claude (.md), Gemini (.toml), Open Code (.md), Codex (.md)
 5. **Integration Testing**: Validate end-to-end template processing
 
 ---
@@ -678,7 +798,7 @@ skills: ["skill-1", "skill-2"]
 ```bash
 # Test template processing for all formats
 npm run build
-node dist/cli.js init --assistants claude,gemini,opencode --destination-directory /tmp/test
+node dist/cli.js init --assistants claude,gemini,opencode,codex --destination-directory /tmp/test
 ```
 
 ---
