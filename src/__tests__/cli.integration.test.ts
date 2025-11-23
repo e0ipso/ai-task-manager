@@ -67,6 +67,41 @@ describe('CLI Integration Tests - Consolidated', () => {
 
     // Assistant-specific directories and files
     for (const assistant of assistants) {
+      // GitHub uses .github/prompts/ with .prompt.md extension
+      if (assistant === 'github') {
+        const githubPromptsDir = path.join(baseDir, '.github/prompts');
+        expect(await fs.pathExists(githubPromptsDir)).toBe(true);
+
+        const promptFiles = [
+          'tasks-create-plan.prompt.md',
+          'tasks-refine-plan.prompt.md',
+          'tasks-generate-tasks.prompt.md',
+          'tasks-execute-task.prompt.md',
+          'tasks-execute-blueprint.prompt.md',
+          'tasks-fix-broken-tests.prompt.md',
+          'tasks-full-workflow.prompt.md',
+        ];
+
+        for (const promptFile of promptFiles) {
+          const promptPath = path.join(githubPromptsDir, promptFile);
+          expect(await fs.pathExists(promptPath)).toBe(true);
+
+          const content = await fs.readFile(promptPath, 'utf8');
+          expect(content.length).toBeGreaterThan(0);
+          // Verify GitHub prompt format
+          expect(content).toContain('---'); // YAML frontmatter
+          expect(content).toContain('$ARGUMENTS'); // GitHub Copilot placeholder
+        }
+        continue;
+      }
+
+      // Codex uses flat structure in .codex/prompts/
+      if (assistant === 'codex') {
+        const codexPromptsDir = path.join(baseDir, '.codex/prompts');
+        expect(await fs.pathExists(codexPromptsDir)).toBe(true);
+        continue;
+      }
+
       // Open Code uses 'command' (singular), others use 'commands' (plural)
       const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
       const assistantDir = path.join(baseDir, `.${assistant}/${commandsPath}/tasks`);
@@ -119,6 +154,14 @@ describe('CLI Integration Tests - Consolidated', () => {
         );
         expect(createPlan).toContain('$ARGUMENTS');
         expect(createPlan).toContain('---'); // YAML frontmatter
+      } else if (assistant === 'github') {
+        const createPlan = await fs.readFile(
+          path.join(baseDir, '.github/prompts/tasks-create-plan.prompt.md'),
+          'utf8'
+        );
+        expect(createPlan).toContain('$ARGUMENTS');
+        expect(createPlan).toContain('---'); // YAML frontmatter
+        expect(createPlan).toContain('description:'); // GitHub prompt metadata
       }
     }
   };
@@ -663,6 +706,85 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(content).not.toContain('[metadata]');
       expect(content).not.toContain('{{args}}');
       expect(content).not.toContain('content = """');
+    });
+  });
+
+  describe('GitHub Copilot Assistant Support', () => {
+    it('should create .github/prompts/ directory with prompt files', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants github`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify .github/prompts directory structure
+      const promptsDir = path.join(testDir, '.github/prompts');
+      expect(await fs.pathExists(promptsDir)).toBe(true);
+
+      // Verify no nested tasks/ subdirectory
+      expect(await fs.pathExists(path.join(testDir, '.github/prompts/tasks'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.github/commands'))).toBe(false);
+    });
+
+    it('should create prompt files with .prompt.md extension', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants github`);
+      expect(result.exitCode).toBe(0);
+
+      const promptsDir = path.join(testDir, '.github/prompts');
+      const expectedFiles = [
+        'tasks-create-plan.prompt.md',
+        'tasks-refine-plan.prompt.md',
+        'tasks-generate-tasks.prompt.md',
+        'tasks-execute-task.prompt.md',
+        'tasks-execute-blueprint.prompt.md',
+        'tasks-fix-broken-tests.prompt.md',
+        'tasks-full-workflow.prompt.md',
+      ];
+
+      for (const file of expectedFiles) {
+        const filePath = path.join(promptsDir, file);
+        expect(await fs.pathExists(filePath)).toBe(true);
+
+        const content = await fs.readFile(filePath, 'utf8');
+        expect(content.length).toBeGreaterThan(0);
+        expect(content).toContain('---'); // YAML frontmatter
+        expect(content).toContain('description:'); // GitHub prompt metadata
+        expect(content).toContain('$ARGUMENTS'); // GitHub Copilot placeholder
+      }
+    });
+
+    it('should use GitHub prompt format with minimal frontmatter', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants github`);
+      expect(result.exitCode).toBe(0);
+
+      const createPlanPath = path.join(testDir, '.github/prompts/tasks-create-plan.prompt.md');
+      const content = await fs.readFile(createPlanPath, 'utf8');
+
+      // Should contain minimal YAML frontmatter
+      expect(content).toContain('---');
+      expect(content).toContain('description:');
+      expect(content).toContain('$ARGUMENTS');
+
+      // Should NOT contain other assistant-specific formats
+      expect(content).not.toContain('[metadata]');
+      expect(content).not.toContain('{{args}}');
+      expect(content).not.toContain('argument-hint:');
+    });
+
+    it('should work with multi-assistant initialization including github', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants claude,github`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify GitHub structure
+      const githubDir = path.join(testDir, '.github/prompts');
+      expect(await fs.pathExists(githubDir)).toBe(true);
+      expect(await fs.pathExists(path.join(githubDir, 'tasks-create-plan.prompt.md'))).toBe(true);
+
+      // Verify Claude structure
+      const claudeDir = path.join(testDir, '.claude/commands/tasks');
+      expect(await fs.pathExists(claudeDir)).toBe(true);
+
+      // Verify no cross-contamination
+      expect(await fs.pathExists(path.join(testDir, '.github/commands'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.claude/prompts'))).toBe(false);
     });
   });
 
