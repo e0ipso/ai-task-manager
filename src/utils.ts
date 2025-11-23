@@ -194,6 +194,28 @@ export function convertMdToToml(mdContent: string): string {
 }
 
 /**
+ * Convert markdown template content to GitHub Copilot prompt file format
+ * @param mdContent - The markdown template content
+ * @returns The converted prompt file content
+ */
+export function convertMdToGitHubPrompt(mdContent: string): string {
+  const { frontmatter, body } = parseFrontmatter(mdContent);
+
+  // Build GitHub prompt frontmatter
+  let promptContent = '---\n';
+  promptContent += `description: ${frontmatter.description || 'Task management command'}\n`;
+  promptContent += '---\n\n';
+
+  // Add $ARGUMENTS placeholder
+  promptContent += '$ARGUMENTS\n\n';
+
+  // Add template body (no variable conversion needed - GitHub supports $ARGUMENTS natively)
+  promptContent += body;
+
+  return promptContent;
+}
+
+/**
  * Read a markdown template file and optionally convert to TOML
  * @param templatePath - Path to the markdown template
  * @param targetFormat - Target format ('md' or 'toml')
