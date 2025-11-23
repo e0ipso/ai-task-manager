@@ -431,14 +431,22 @@ project/
 │   ├── generate-tasks.md
 │   ├── execute-blueprint.md
 │   └── fix-broken-tests.md        # NEW: Test integrity command
-└── .codex/prompts/                # Codex commands (Markdown, flat structure)
-    ├── tasks-create-plan.md
-    ├── tasks-refine-plan.md       # NEW: Plan feedback/refinement loop
-    ├── tasks-generate-tasks.md
-    ├── tasks-execute-blueprint.md
-    ├── tasks-execute-task.md
-    ├── tasks-fix-broken-tests.md  # NEW: Test integrity command
-    └── tasks-full-workflow.md
+├── .codex/prompts/                # Codex commands (Markdown, flat structure)
+│   ├── tasks-create-plan.md
+│   ├── tasks-refine-plan.md       # NEW: Plan feedback/refinement loop
+│   ├── tasks-generate-tasks.md
+│   ├── tasks-execute-blueprint.md
+│   ├── tasks-execute-task.md
+│   ├── tasks-fix-broken-tests.md  # NEW: Test integrity command
+│   └── tasks-full-workflow.md
+└── .github/prompts/               # GitHub Copilot prompts (Markdown, flat structure)
+    ├── tasks-create-plan.prompt.md
+    ├── tasks-refine-plan.prompt.md
+    ├── tasks-generate-tasks.prompt.md
+    ├── tasks-execute-task.prompt.md
+    ├── tasks-execute-blueprint.prompt.md
+    ├── tasks-fix-broken-tests.prompt.md
+    └── tasks-full-workflow.prompt.md
 ```
 
 ### Assistant-Specific Differences
@@ -489,6 +497,61 @@ Codex has unique requirements due to its architecture:
 - **Use lowercase bash variables**: Codex has issues with uppercase bash variable names (e.g., `TASK_COUNT`)
 - **Prefer lowercase convention**: Use `task_count`, `plan_id`, etc. instead of uppercase equivalents
 - This applies to all bash scripts and command templates to ensure cross-assistant compatibility
+
+#### GitHub Copilot Workflow
+
+GitHub Copilot uses prompt files for IDE integration:
+
+**Directory Structure**:
+- Uses `.github/prompts/` directory for prompt file storage
+- File naming pattern: `tasks-{command-name}.prompt.md` (e.g., `tasks-create-plan.prompt.md`)
+- Prompt files use minimal YAML frontmatter with `description` field
+- Native `$ARGUMENTS` placeholder support (no variable transformation needed)
+
+**User Workflow**:
+1. Run initialization: `npx . init --assistants github --destination-directory /path/to/project`
+2. Prompt files are automatically discovered by GitHub Copilot in VS Code and JetBrains IDEs
+3. Invoke commands using `/tasks-{command}` syntax in GitHub Copilot chat
+
+**IDE Requirements**:
+- **Supported**: VS Code with GitHub Copilot extension, JetBrains IDEs with GitHub Copilot plugin
+- **Not Supported**: GitHub Copilot CLI (command line interface)
+- Requires active GitHub Copilot subscription
+
+**Command Invocation Examples**:
+```bash
+# Create a new plan
+/tasks-create-plan Implement user authentication system
+
+# Refine an existing plan
+/tasks-refine-plan 51
+
+# Generate tasks from a plan
+/tasks-generate-tasks 51
+
+# Execute a single task
+/tasks-execute-task 51 3
+
+# Execute the complete blueprint
+/tasks-execute-blueprint 51
+
+# Full automated workflow
+/tasks-full-workflow Add dark mode toggle to application settings
+
+# Fix broken tests
+/tasks-fix-broken-tests npm test
+```
+
+**Key Features**:
+- **Minimal Frontmatter**: Simple YAML metadata with `description` field only
+- **Native Placeholder Support**: `$ARGUMENTS` works natively in GitHub Copilot (no conversion needed)
+- **IDE Integration**: Commands appear automatically in Copilot chat interface
+- **No Manual Setup**: Unlike Codex, no file copying or session restart required
+
+**Limitations**:
+- Prompt files are in public preview and subject to change
+- Only works in IDE environments (VS Code, JetBrains), not in terminal/CLI
+- Seven commands supported: create-plan, refine-plan, generate-tasks, execute-task, execute-blueprint, fix-broken-tests, full-workflow
 
 ### Archive System and Lifecycle Management
 
