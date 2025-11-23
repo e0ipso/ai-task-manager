@@ -1,5 +1,5 @@
 ---
-argument-hint: "[plan-ID] [task-ID]"
+argument-hint: "[planId] [taskId]"
 description: Execute a single task with dependency validation and status management.
 ---
 # Single Task Execution
@@ -36,7 +36,7 @@ First, validate that both arguments are provided:
 ```bash
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Error: Both plan ID and task ID are required"
-    echo "Usage: /tasks:execute-task [plan-ID] [task-ID]"
+    echo "Usage: /tasks:execute-task [planId] [taskId]"
     echo "Example: /tasks:execute-task 16 03"
     exit 1
 fi
@@ -49,20 +49,20 @@ fi
 Locate the plan directory using the established find pattern:
 
 ```bash
-PLAN_ID="$1"
-TASK_ID="$2"
+plan_id="$1"
+task_id="$2"
 
 # Find plan directory
-PLAN_DIR=$(find .ai/task-manager/{plans,archive} -type d -name "${PLAN_ID}--*" 2>/dev/null | head -1)
+plan_dir=$(find .ai/task-manager/{plans,archive} -type d -name "${plan_id}--*" 2>/dev/null | head -1)
 
-if [ -z "$PLAN_DIR" ]; then
-    echo "Error: Plan with ID ${PLAN_ID} not found"
+if [ -z "$plan_dir" ]; then
+    echo "Error: Plan with ID ${plan_id} not found"
     echo "Available plans:"
     find .ai/task-manager/plans -name "*--*" -type d | head -5
     exit 1
 fi
 
-echo "Found plan: $PLAN_DIR"
+echo "Found plan: $plan_dir"
 ```
 
 ### 2. Task File Validation
@@ -71,21 +71,21 @@ Locate and validate the specific task file:
 
 ```bash
 # Handle both padded (01, 02) and unpadded (1, 2) task IDs
-TASK_FILE=""
-if [ -f "${PLAN_DIR}/tasks/${TASK_ID}--"*.md ]; then
-    TASK_FILE=$(ls "${PLAN_DIR}/tasks/${TASK_ID}--"*.md 2>/dev/null | head -1)
-elif [ -f "${PLAN_DIR}/tasks/0${TASK_ID}--"*.md ]; then
-    TASK_FILE=$(ls "${PLAN_DIR}/tasks/0${TASK_ID}--"*.md 2>/dev/null | head -1)
+task_file=""
+if [ -f "${plan_dir}/tasks/${task_id}--"*.md ]; then
+    task_file=$(ls "${plan_dir}/tasks/${task_id}--"*.md 2>/dev/null | head -1)
+elif [ -f "${plan_dir}/tasks/0${task_id}--"*.md ]; then
+    task_file=$(ls "${plan_dir}/tasks/0${task_id}--"*.md 2>/dev/null | head -1)
 fi
 
-if [ -z "$TASK_FILE" ] || [ ! -f "$TASK_FILE" ]; then
-    echo "Error: Task with ID ${TASK_ID} not found in plan ${PLAN_ID}"
+if [ -z "$task_file" ] || [ ! -f "$task_file" ]; then
+    echo "Error: Task with ID ${task_id} not found in plan ${plan_id}"
     echo "Available tasks in plan:"
-    find "$PLAN_DIR/tasks" -name "*.md" -type f | head -5
+    find "$plan_dir/tasks" -name "*.md" -type f | head -5
     exit 1
 fi
 
-echo "Found task: $(basename "$TASK_FILE")"
+echo "Found task: $(basename "$task_file")"
 ```
 
 ### 3. Task Status Validation
@@ -94,7 +94,7 @@ Check current task status to ensure it can be executed:
 
 ```bash
 # Extract current status from task frontmatter
-CURRENT_STATUS=$(awk '
+current_status=$(awk '
     /^---$/ { if (++delim == 2) exit }
     /^status:/ {
         gsub(/^status:[ \t]*/, "")
@@ -103,19 +103,19 @@ CURRENT_STATUS=$(awk '
         print
         exit
     }
-' "$TASK_FILE")
+' "$task_file")
 
-echo "Current task status: ${CURRENT_STATUS:-unknown}"
+echo "Current task status: ${current_status:-unknown}"
 
 # Validate status allows execution
-case "$CURRENT_STATUS" in
+case "$current_status" in
     "completed")
-        echo "Error: Task ${TASK_ID} is already completed"
+        echo "Error: Task ${task_id} is already completed"
         echo "Use execute-blueprint to re-execute the entire plan if needed"
         exit 1
         ;;
     "in-progress")
-        echo "Error: Task ${TASK_ID} is already in progress"
+        echo "Error: Task ${task_id} is already in progress"
         echo "Wait for current execution to complete or check for stale processes"
         exit 1
         ;;
@@ -123,7 +123,7 @@ case "$CURRENT_STATUS" in
         echo "Task status allows execution - proceeding..."
         ;;
     *)
-        echo "Warning: Unknown task status '${CURRENT_STATUS}' - proceeding with caution..."
+        echo "Warning: Unknown task status '${current_status}' - proceeding with caution..."
         ;;
 esac
 ```
@@ -134,7 +134,7 @@ Use the dependency checking script to validate all dependencies:
 
 ```bash
 # Call the dependency checking script
-if ! node .ai/task-manager/config/scripts/check-task-dependencies.cjs "$PLAN_ID" "$TASK_ID"; then
+if ! node .ai/task-manager/config/scripts/check-task-dependencies.cjs "$plan_id" "$task_id"; then
     echo ""
     echo "Task execution blocked by unresolved dependencies."
     echo "Please complete the required dependencies first."
@@ -159,7 +159,7 @@ Update task status before execution:
 echo "Updating task status to in-progress..."
 
 # Create temporary file with updated status
-TEMP_FILE=$(mktemp)
+temp_file=$(mktemp)
 awk '
     /^---$/ {
         if (++delim == 1) {
@@ -176,10 +176,10 @@ awk '
         next
     }
     { print }
-' "$TASK_FILE" > "$TEMP_FILE"
+' "$task_file" > "$temp_file"
 
 # Replace original file
-mv "$TEMP_FILE" "$TASK_FILE"
+mv "$temp_file" "$task_file"
 
 echo "✓ Task status updated to in-progress"
 ```
@@ -189,9 +189,9 @@ echo "✓ Task status updated to in-progress"
 Deploy the task using the Task tool with full context:
 
 **Task Deployment**: Use your internal Task tool to execute the task with the following context:
-- Task file path: `$TASK_FILE`
-- Plan directory: `$PLAN_DIR`
-- Required skills: `$TASK_SKILLS`
+- Task file path: `$task_file`
+- Plan directory: `$plan_dir`
+- Required skills: `$task_skills`
 - Agent selection: Based on skills analysis or general-purpose agent
 
 Read the complete task file and execute according to its requirements. The task includes:
@@ -204,7 +204,7 @@ Read the complete task file and execute according to its requirements. The task 
 After task completion, update the status based on execution outcome:
 
 ```bash
-TEMP_FILE=$(mktemp)
+temp_file=$(mktemp)
 awk '
     /^---$/ {
         if (++delim == 1) {
@@ -221,11 +221,11 @@ awk '
         next
     }
     { print }
-' "$TASK_FILE" > "$TEMP_FILE"
+' "$task_file" > "$temp_file"
 
-mv "$TEMP_FILE" "$TASK_FILE"
+mv "$temp_file" "$task_file"
 
-echo "✓ Task ${TASK_ID} completed successfully"
+echo "✓ Task ${task_id} completed successfully"
 echo ""
 echo "You can now execute dependent tasks or continue with the full blueprint execution."
 ```

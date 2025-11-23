@@ -176,8 +176,10 @@ export function convertMdToToml(mdContent: string): string {
     if (key === 'argument-hint') {
       // Special handling for argument-hint - convert to {{}} format
       const convertedHint = String(value)
-        .replace(/\[plan-ID\]/g, '{{plan_id}}')
-        .replace(/\[user-prompt\]/g, '{{args}}');
+        .replace(/\[planId\]/g, '{{plan_id}}')
+        .replace(/\[taskId\]/g, '{{task_id}}')
+        .replace(/\[userPrompt\]/g, '{{args}}')
+        .replace(/\[testCommand\]/g, '{{test_command}}');
       tomlContent += `argument-hint = "${escapeTomlString(convertedHint)}"\n`;
     } else {
       tomlContent += `${key} = "${escapeTomlString(String(value))}"\n`;

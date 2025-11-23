@@ -1,5 +1,5 @@
 ---
-argument-hint: "[test-command]"
+argument-hint: "[testCommand]"
 description: Fix the tests your task execution broke.
 ---
 Fix all failing tests in this repository. Think harder and use tools.

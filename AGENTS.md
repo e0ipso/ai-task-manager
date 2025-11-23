@@ -222,11 +222,11 @@ The `/tasks:execute-blueprint` command uses conditional composition for auto-gen
 Before proceeding with execution, validate that tasks exist:
 
 ```bash
-TASK_COUNT=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
-BLUEPRINT_EXISTS=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
+task_count=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
+blueprint_exists=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
 ```
 
-If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
+If either `$task_count` is 0 or `$blueprint_exists` is "no":
    - Display notification: "⚠️ Tasks or execution blueprint not found. Generating tasks automatically..."
    - Set approval_method_tasks to auto
    - Execute the following task generation process inline:
@@ -266,7 +266,7 @@ Information flows through the workflow via structured output parsing:
 - **User review is needed between steps**: Manual approval workflow where the user wants to review the plan before generating tasks
 - **Debugging or testing individual components**: Isolate a specific command for troubleshooting
 - **Iterative refinement**: Make adjustments to a plan or tasks before proceeding to execution
-- **Cross-assistant plan reviews are required**: Have a second assistant interrogate an existing plan with `/tasks:refine-plan [plan-ID]` before kicking off task generation
+- **Cross-assistant plan reviews are required**: Have a second assistant interrogate an existing plan with `/tasks:refine-plan [planId]` before kicking off task generation
 
 **Examples**:
 ```bash
@@ -383,8 +383,8 @@ The composition pattern maintains full backward compatibility:
 Markdown → TOML
 $ARGUMENTS → {{args}}
 $1 → {{plan_id}}
-[plan-ID] → {{plan_id}} (frontmatter)
-[user-prompt] → {{args}} (frontmatter)
+[planId] → {{plan_id}} (frontmatter)
+[userPrompt] → {{args}} (frontmatter)
 ```
 
 ---
@@ -485,6 +485,11 @@ Codex has unique requirements due to its architecture:
 /prompts:tasks-fix-broken-tests "npm test"
 ```
 
+**Important Codex Compatibility Note**:
+- **Use lowercase bash variables**: Codex has issues with uppercase bash variable names (e.g., `TASK_COUNT`)
+- **Prefer lowercase convention**: Use `task_count`, `plan_id`, etc. instead of uppercase equivalents
+- This applies to all bash scripts and command templates to ensure cross-assistant compatibility
+
 ### Archive System and Lifecycle Management
 
 #### Purpose and Benefits
@@ -510,7 +515,7 @@ DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
 
 #### Why It Exists
 
-The `/tasks:refine-plan [plan-ID]` command enables a feedback loop between multiple LLMs (or between an LLM and a human). One assistant creates the initial plan, then the refine-plan command lets another assistant:
+The `/tasks:refine-plan [planId]` command enables a feedback loop between multiple LLMs (or between an LLM and a human). One assistant creates the initial plan, then the refine-plan command lets another assistant:
 - Load the plan context safely via `detect-assistant.cjs` and `read-assistant-config.cjs`
 - Inspect the document section-by-section, highlighting gaps, contradictions, or gold-plated scope
 - Ask targeted clarifying questions and log the answers back into the "Plan Clarifications" table
@@ -735,6 +740,12 @@ These unique requirements were handled through conditional logic in `getAssistan
 4. **Output Validation**: Check Claude (.md), Gemini (.toml), Open Code (.md), Codex (.md)
 5. **Integration Testing**: Validate end-to-end template processing
 
+**Important Bash Variable Naming Convention**:
+- **Always use lowercase** for bash variables in templates (e.g., `task_count`, `plan_id`, `blueprint_exists`)
+- **Never use uppercase** bash variable names (e.g., `TASK_COUNT`, `PLAN_ID`) - this causes compatibility issues with Codex
+- Template placeholders like `$ARGUMENTS` and `$1` are exceptions as they're not bash variables
+- This convention ensures cross-assistant compatibility and prevents execution issues
+
 ---
 
 ## Template Customization Guide
@@ -743,8 +754,8 @@ These unique requirements were handled through conditional logic in `getAssistan
 
 **YAML Frontmatter**:
 ```yaml
-id: [plan-ID]
-summary: "[user-prompt]"
+id: [planId]
+summary: "[userPrompt]"
 created: "YYYY-MM-DD"
 ```
 

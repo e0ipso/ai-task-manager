@@ -1,5 +1,5 @@
 ---
-argument-hint: "[plan-ID]"
+argument-hint: "[planId]"
 description: Review the plan with the provided ID, gather clarifications, and refine it.
 ---
 # Plan Review and Refinement
@@ -15,8 +15,8 @@ Before proceeding with this command, you MUST load and respect the assistant's c
 
 **Run the following scripts:**
 ```bash
-ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
 ```
 
 The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
@@ -39,7 +39,7 @@ Obtain the plan using the plan ID using the following script:
 
 ```bash
 # Extract validation results directly from script
-PLAN_FILE=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
 ```
 
 ## Process Checklist
@@ -55,7 +55,7 @@ Use your internal Todo tool to track the entire refinement workflow:
 - [ ] Use the "Total Clarification Algorithm" to get the missing clarification from the user
 - [ ] Apply refinements using `.ai/task-manager/config/templates/PLAN_TEMPLATE.md` as the structural baseline
 - [ ] Update the "Plan Clarifications" table with the latest Q&A
-- [ ] Update the plan file ($PLAN_FILE) with the refinements from steps above
+- [ ] Update the plan file (stored in `plan_file`) with the refinements from steps above
 - [ ] Re-run `.ai/task-manager/config/hooks/POST_PLAN.md`
 
 ## Stage 1: Baseline Review

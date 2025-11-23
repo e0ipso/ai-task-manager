@@ -1,5 +1,5 @@
 ---
-argument-hint: "[plan-ID]"
+argument-hint: "[planId]"
 description: Execute the task in the plan.
 ---
 # Task Execution
@@ -10,8 +10,8 @@ Before proceeding with this command, you MUST load and respect the assistant's c
 
 **Run the following scripts:**
 ```bash
-ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
 ```
 
 The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
@@ -47,15 +47,15 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 
 ```bash
 # Extract validation results directly from script
-PLAN_FILE=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
-PLAN_DIR=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planDir)
-TASK_COUNT=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
-BLUEPRINT_EXISTS=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
+plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_dir=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planDir)
+task_count=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
+blueprint_exists=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
 ```
 
 4. **Automatic task generation**:
 
-If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
+If either `$task_count` is 0 or `$blueprint_exists` is "no":
    - Display notification to user: "⚠️ Tasks or execution blueprint not found. Generating tasks automatically..."
    - Execute the embedded task generation process below
 

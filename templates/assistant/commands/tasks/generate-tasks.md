@@ -1,5 +1,5 @@
 ---
-argument-hint: "[plan-ID]"
+argument-hint: "[planId]"
 description: Generate tasks to implement the plan with the provided ID.
 ---
 
@@ -11,8 +11,8 @@ Before proceeding with this command, you MUST load and respect the assistant's c
 
 **Run the following scripts:**
 ```bash
-ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
 ```
 
 The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
@@ -41,7 +41,7 @@ Use your internal Todo task tool to track the following process:
 
 ```bash
 # Extract validation results directly from script
-PLAN_FILE=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
 ```
 
 ### Input Error Handling

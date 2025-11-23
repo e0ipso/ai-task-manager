@@ -1,5 +1,5 @@
 ---
-argument-hint: "[user-prompt]"
+argument-hint: "[userPrompt]"
 description: Create a comprehensive plan to accomplish the request from the user.
 ---
 # Comprehensive Plan Creation
@@ -14,8 +14,8 @@ Before proceeding with this command, you MUST load and respect the assistant's c
 
 **Run the following scripts:**
 ```bash
-ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
 ```
 
 The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.

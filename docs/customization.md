@@ -170,8 +170,8 @@ Templates provide consistent structure for plans, tasks, and execution artifacts
 
 **Frontmatter** (Required):
 ```yaml
-id: [plan-ID]
-summary: "[user-prompt]"
+id: [planId]
+summary: "[userPrompt]"
 created: "YYYY-MM-DD"
 ```
 

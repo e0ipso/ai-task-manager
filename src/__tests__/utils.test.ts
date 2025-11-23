@@ -199,7 +199,7 @@ But $10 should not be transformed.`;
     it('should handle argument-hint field specially', () => {
       const md = `---
 title: Test
-argument-hint: "[plan-ID] [user-prompt]"
+argument-hint: "[planId] [userPrompt]"
 ---
 Content`;
 

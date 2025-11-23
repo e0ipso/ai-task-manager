@@ -188,7 +188,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       );
       expect(createPlan).toContain('$ARGUMENTS'); // Should preserve original format
       expect(createPlan).toContain('---'); // YAML frontmatter
-      expect(createPlan).toContain('argument-hint: "[user-prompt]"');
+      expect(createPlan).toContain('argument-hint: "[userPrompt]"');
       expect(createPlan).not.toContain('{{args}}'); // Should NOT be converted to TOML format
       expect(createPlan).not.toContain('[metadata]'); // Should NOT have TOML sections
     });
@@ -436,7 +436,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       );
       expect(claudeCreatePlan).toContain('---'); // YAML frontmatter
       expect(claudeCreatePlan).toContain('$ARGUMENTS');
-      expect(claudeCreatePlan).toContain('argument-hint: "[user-prompt]"');
+      expect(claudeCreatePlan).toContain('argument-hint: "[userPrompt]"');
 
       // Verify Gemini TOML template structure and conversion
       const geminiCreatePlan = await fs.readFile(
@@ -468,7 +468,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       );
       expect(opencodeCreatePlan).toContain('---'); // YAML frontmatter
       expect(opencodeCreatePlan).toContain('$ARGUMENTS');
-      expect(opencodeCreatePlan).toContain('argument-hint: "[user-prompt]"');
+      expect(opencodeCreatePlan).toContain('argument-hint: "[userPrompt]"');
 
       // Verify Open Code template is identical to Claude template (both Markdown)
       const claudeCreatePlan = await fs.readFile(
@@ -657,7 +657,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       // Should contain Markdown/YAML frontmatter
       expect(content).toContain('---');
       expect(content).toContain('$ARGUMENTS');
-      expect(content).toContain('argument-hint: "[user-prompt]"');
+      expect(content).toContain('argument-hint: "[userPrompt]"');
 
       // Should NOT contain TOML formatting
       expect(content).not.toContain('[metadata]');

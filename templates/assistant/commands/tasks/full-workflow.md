@@ -1,5 +1,5 @@
 ---
-argument-hint: "[user-prompt]"
+argument-hint: "[userPrompt]"
 description: Execute the full workflow from plan creation to blueprint execution.
 ---
 # Full Workflow Execution
@@ -12,8 +12,8 @@ Before proceeding with this command, you MUST load and respect the assistant's c
 
 **Run the following scripts:**
 ```bash
-ASSISTANT=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$ASSISTANT"
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
 ```
 
 The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
@@ -340,13 +340,13 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 
 ```bash
 # Extract validation results directly from script
-PLAN_FILE=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [PLAN_ID] planFile)
-PLAN_DIR=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [PLAN_ID] planDir)
-TASK_COUNT=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [PLAN_ID] taskCount)
-BLUEPRINT_EXISTS=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [PLAN_ID] blueprintExists)
+plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] planFile)
+plan_dir=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] planDir)
+task_count=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] taskCount)
+blueprint_exists=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] blueprintExists)
 ```
 
-If either `$TASK_COUNT` is 0 or `$BLUEPRINT_EXISTS` is "no":
+If either `$task_count` is 0 or `$blueprint_exists` is "no":
    - Display notification to user: "⚠️ Tasks or execution blueprint not found. Generating tasks automatically..."
 
 ### Execution Process

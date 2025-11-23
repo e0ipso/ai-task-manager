@@ -133,11 +133,11 @@ describe('Orchestration Workflows', () => {
 
       // Verify task validation exists
       expect(content).toContain('validate-plan-blueprint.cjs');
-      expect(content).toContain('TASK_COUNT');
-      expect(content).toContain('BLUEPRINT_EXISTS');
+      expect(content).toContain('task_count');
+      expect(content).toContain('blueprint_exists');
 
       // Verify conditional task generation section
-      expect(content).toMatch(/If either.*TASK_COUNT.*0.*BLUEPRINT_EXISTS.*no/is);
+      expect(content).toMatch(/If either.*task_count.*0.*blueprint_exists.*no/is);
       expect(content).toContain('Embedded Task Generation');
       expect(content).toContain('Resume Blueprint Execution');
 
@@ -256,7 +256,7 @@ describe('Orchestration Workflows', () => {
       // Verify standard command structure
       expect(content).toMatch(/^---[\s\S]*?---/);
       expect(content).toContain('argument-hint');
-      expect(content).toContain('[plan-ID]');
+      expect(content).toContain('[planId]');
 
       // Verify execution process
       expect(content).toMatch(/execution.*process|execute.*task/i);
