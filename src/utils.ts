@@ -76,6 +76,8 @@ export function getTemplateFormat(assistant: Assistant): TemplateFormat {
       return 'md';
     case 'gemini':
       return 'toml';
+    case 'github':
+      return 'md'; // GitHub prompt files use Markdown
     case 'opencode':
       return 'md';
     default:
@@ -216,21 +218,27 @@ export function convertMdToGitHubPrompt(mdContent: string): string {
 }
 
 /**
- * Read a markdown template file and optionally convert to TOML
+ * Read a markdown template file and optionally convert to TOML or GitHub prompt format
  * @param templatePath - Path to the markdown template
  * @param targetFormat - Target format ('md' or 'toml')
+ * @param assistant - Optional assistant type for format-specific processing
  * @returns The template content in the requested format
  */
 export async function readAndProcessTemplate(
   templatePath: string,
-  targetFormat: TemplateFormat
+  targetFormat: TemplateFormat,
+  assistant?: Assistant
 ): Promise<string> {
   const mdContent = await fs.readFile(templatePath, 'utf-8');
 
   if (targetFormat === 'md') {
-    return mdContent;
+    // Check if GitHub assistant needs special processing
+    if (assistant === 'github') {
+      return convertMdToGitHubPrompt(mdContent);
+    }
+    return mdContent; // Claude and OpenCode use raw Markdown
   } else if (targetFormat === 'toml') {
-    return convertMdToToml(mdContent);
+    return convertMdToToml(mdContent); // Gemini conversion
   } else {
     throw new Error(`Unsupported template format: ${targetFormat}`);
   }
