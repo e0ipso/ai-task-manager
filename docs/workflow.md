@@ -355,6 +355,18 @@ Same commands, TOML format configuration
 **Open Code:**
 Same commands, Markdown format configuration
 
+**Codex CLI:**
+- `/prompts:tasks-create-plan` - Start new plan
+- `/prompts:tasks-generate-tasks [id]` - Generate tasks for plan
+- `/prompts:tasks-execute-blueprint [id]` - Execute plan
+- `/prompts:tasks-fix-broken-tests [command]` - Fix test failures
+
+**GitHub Copilot (VS Code/JetBrains):**
+- `/tasks-create-plan` - Start new plan
+- `/tasks-generate-tasks [id]` - Generate tasks for plan
+- `/tasks-execute-blueprint [id]` - Execute plan
+- `/tasks-fix-broken-tests [command]` - Fix test failures
+
 ## Plan Management Commands
 
 Inspect and manage plans using CLI commands:

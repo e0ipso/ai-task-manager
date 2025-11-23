@@ -16,10 +16,11 @@ Transform complex AI prompts into organized, executable workflows through custom
 npx @e0ipso/ai-task-manager init --assistants claude
 npx @e0ipso/ai-task-manager init --assistants gemini
 npx @e0ipso/ai-task-manager init --assistants opencode
+npx @e0ipso/ai-task-manager init --assistants codex
 npx @e0ipso/ai-task-manager init --assistants github
 
 # Or configure multiple assistants
-npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,github
+npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,codex,github
 ```
 
 ## ✨ Key Benefits
@@ -63,6 +64,7 @@ Comprehensive guides covering:
 | 🎭 **Claude** | [claude.ai/code](https://claude.ai/code) | < 30 seconds |
 | 💎 **Gemini** | Gemini CLI | < 30 seconds |
 | 📝 **Open Code** | Open source | < 30 seconds |
+| 🔮 **Codex** | Codex CLI | < 30 seconds |
 | 🐙 **GitHub Copilot** | VS Code / JetBrains IDEs | < 30 seconds |
 
 ## 📄 License

@@ -14,7 +14,7 @@ AI Task Manager initializes quickly with a single command, creating all necessar
 
 - **Node.js**: Version 14.0 or higher
 - **npm**: Comes with Node.js
-- **AI Assistant**: Active subscription to Claude, Gemini, or access to Open Code
+- **AI Assistant**: Active subscription to Claude, Gemini, GitHub Copilot, Codex, or access to Open Code
 
 ## Installation
 
@@ -39,6 +39,12 @@ npx @e0ipso/ai-task-manager init --assistants gemini
 
 # Open Code only (for open source assistants)
 npx @e0ipso/ai-task-manager init --assistants opencode
+
+# Codex only (for use with Codex CLI)
+npx @e0ipso/ai-task-manager init --assistants codex
+
+# GitHub Copilot only (for use in VS Code/JetBrains IDEs)
+npx @e0ipso/ai-task-manager init --assistants github
 ```
 
 ### Multiple Assistants
@@ -46,10 +52,12 @@ npx @e0ipso/ai-task-manager init --assistants opencode
 Configure multiple assistants for team flexibility:
 
 ```bash
-npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
+npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,codex,github
 ```
 
 All assistants share the same task management structure (plans, tasks, configurations) while using assistant-specific command formats.
+
+**Note**: For Codex-specific workflow and GitHub Copilot IDE requirements, see [AGENTS.md](https://github.com/e0ipso/ai-task-manager/blob/main/AGENTS.md) in the repository.
 
 ### Custom Destination Directory
 
@@ -106,14 +114,32 @@ project-root/
 │       ├── execute-blueprint.toml
 │       ├── execute-task.toml
 │       └── fix-broken-tests.toml
-└── .opencode/                     # Open Code files (if --assistants opencode)
-    └── commands/tasks/
-        ├── create-plan.md
-        ├── refine-plan.md
-        ├── generate-tasks.md
-        ├── execute-blueprint.md
-        ├── execute-task.md
-        └── fix-broken-tests.md
+├── .opencode/                     # Open Code files (if --assistants opencode)
+│   └── commands/tasks/
+│       ├── create-plan.md
+│       ├── refine-plan.md
+│       ├── generate-tasks.md
+│       ├── execute-blueprint.md
+│       ├── execute-task.md
+│       └── fix-broken-tests.md
+├── .codex/                        # Codex files (if --assistants codex)
+│   └── prompts/
+│       ├── tasks-create-plan.md
+│       ├── tasks-refine-plan.md
+│       ├── tasks-generate-tasks.md
+│       ├── tasks-execute-blueprint.md
+│       ├── tasks-execute-task.md
+│       ├── tasks-fix-broken-tests.md
+│       └── tasks-full-workflow.md
+└── .github/                       # GitHub Copilot files (if --assistants github)
+    └── prompts/
+        ├── tasks-create-plan.prompt.md
+        ├── tasks-refine-plan.prompt.md
+        ├── tasks-generate-tasks.prompt.md
+        ├── tasks-execute-blueprint.prompt.md
+        ├── tasks-execute-task.prompt.md
+        ├── tasks-fix-broken-tests.prompt.md
+        └── tasks-full-workflow.prompt.md
 ```
 
 ## Updating Configuration
@@ -170,6 +196,16 @@ ls -la .claude/commands/tasks/
 ls -la .gemini/commands/tasks/
 ```
 
+**For Codex:**
+```bash
+ls -la .codex/prompts/
+```
+
+**For GitHub Copilot:**
+```bash
+ls -la .github/prompts/
+```
+
 ### 3. Test Status Command
 
 ```bash
@@ -210,6 +246,12 @@ See the [Customization Guide](customization.html) for:
 Ready to create your first plan:
 
 ```bash
-# In your AI assistant (Claude, Gemini, or Open Code):
+# In Claude, Gemini, or Open Code:
 /tasks:create-plan "Your project description here"
+
+# In Codex:
+/prompts:tasks-create-plan "Your project description here"
+
+# In GitHub Copilot (VS Code/JetBrains):
+/tasks-create-plan Your project description here
 ```

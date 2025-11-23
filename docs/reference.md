@@ -26,7 +26,7 @@ In this section:
 AI Task Manager introduces **mandatory human review gates** between distinct phases, giving you control over scope and quality at each step.
 
 ### Subscription-Based Model
-Works within your existing AI assistant subscriptions (Claude Pro/Max, Gemini). No additional API keys, no pay-per-token charges, no external service dependencies.
+Works within your existing AI assistant subscriptions (Claude Pro/Max, Gemini, GitHub Copilot, Codex). No additional API keys, no pay-per-token charges, no external service dependencies.
 
 ### Extensibility Architecture
 Fully customizable through hooks, templates, and configuration files. Every aspect of the workflow can be tailored to your project's specific needs.

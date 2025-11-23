@@ -12,7 +12,7 @@ AI Task Manager takes a fundamentally different architectural approach compared 
 
 ## Plan Mode vs AI Task Manager
 
-Most coding assistants (Claude, Gemini, etc.) offer a "plan mode" feature where the AI creates a plan before implementing. While useful, this approach has significant limitations:
+Most coding assistants (Claude, Gemini, GitHub Copilot, etc.) offer a "plan mode" feature where the AI creates a plan before implementing. While useful, this approach has significant limitations:
 
 ### Common Plan Mode Issues
 
@@ -260,7 +260,7 @@ AI Task Manager leverages research-backed principles:
 
 **Architectural Difference:**
 - **Plandex/Conductor/Others**: API-based tools requiring separate service, pay-per-token pricing
-- **AI Task Manager**: Works within existing AI subscription interfaces (Claude Pro/Max, Gemini)
+- **AI Task Manager**: Works within existing AI subscription interfaces (Claude Pro/Max, Gemini, GitHub Copilot, Codex)
 
 **Cost Model Comparison:**
 
@@ -287,7 +287,7 @@ AI Task Manager leverages research-backed principles:
 - You want to integrate with external services directly
 
 **When to Use AI Task Manager:**
-- You work primarily in AI assistant interfaces (Claude Code, Gemini CLI)
+- You work primarily in AI assistant interfaces (Claude Code, Gemini CLI, GitHub Copilot, Codex)
 - You want to avoid additional API costs
 - You prefer file-based customization over API configuration
 - You want offline capability
@@ -299,6 +299,8 @@ AI Task Manager leverages research-backed principles:
 **No.** AI Task Manager works within your existing AI assistant subscriptions:
 - **Claude**: Works with Claude Pro or Claude Max via [claude.ai/code](https://claude.ai/code)
 - **Gemini**: Works with Gemini subscriptions via Gemini CLI
+- **GitHub Copilot**: Works with GitHub Copilot in VS Code/JetBrains IDEs
+- **Codex**: Works with Codex CLI
 - **Open Code**: Free and open source
 
 No API keys, no pay-per-token charges, no additional service subscriptions required.
@@ -306,7 +308,7 @@ No API keys, no pay-per-token charges, no additional service subscriptions requi
 ### What file formats does it support?
 
 AI Task Manager uses:
-- **Markdown (.md)** for Claude and Open Code commands
+- **Markdown (.md)** for Claude, Open Code, Codex, and GitHub Copilot commands
 - **TOML (.toml)** for Gemini commands
 - **Markdown (.md)** for all configuration files (hooks, templates, plans, tasks)
 
@@ -344,10 +346,12 @@ npx @e0ipso/ai-task-manager init --assistants claude
 
 **Yes.** Initialize with multiple assistants:
 ```bash
-npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode
+npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,codex,github
 ```
 
 All assistants share the same plans, tasks, and configuration. Team members can use different assistants while collaborating on the same project.
+
+**Note**: See [AGENTS.md](https://github.com/e0ipso/ai-task-manager/blob/main/AGENTS.md) for assistant-specific setup requirements.
 
 ### How does it integrate with Git?
 

@@ -18,6 +18,8 @@ AI Task Manager transforms complex development requests into organized, executab
 2. **📋 Generate Tasks**: Break plan into atomic tasks with dependencies
 3. **🚀 Execute Blueprint**: Implement tasks with validation gates
 
+Works with Claude, Gemini, Open Code, Codex, and GitHub Copilot. See [AGENTS.md](https://github.com/e0ipso/ai-task-manager/blob/main/AGENTS.md) for assistant-specific setup details.
+
 ## What You'll Learn
 
 In this section:

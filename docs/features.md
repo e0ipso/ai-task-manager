@@ -52,8 +52,12 @@ Configure support for multiple coding assistants simultaneously:
 - **🎭 Claude**: Anthropic's Claude AI via [claude.ai/code](https://claude.ai/code) - Markdown-based commands
 - **💎 Gemini**: Google's Gemini AI via CLI - TOML-based commands
 - **📝 Open Code**: Open source assistants - Markdown-based commands
+- **🔧 Codex**: Codex CLI - Markdown-based prompts with flat structure
+- **🐙 GitHub Copilot**: VS Code/JetBrains IDE integration - Prompt files
 
 All assistants share the same task management structure while using assistant-specific command formats. Initialize multiple assistants in a single project for team flexibility.
+
+**Note**: See [AGENTS.md](https://github.com/e0ipso/ai-task-manager/blob/main/AGENTS.md) for detailed setup instructions, especially for Codex-specific workflow and GitHub Copilot IDE requirements.
 
 ## 🔄 Workflow Orchestration
 
@@ -198,6 +202,8 @@ Organized workspace with clear separation of concerns:
 .claude/commands/       # Claude-specific commands (if configured)
 .gemini/commands/       # Gemini-specific commands (if configured)
 .opencode/commands/     # Open Code commands (if configured)
+.codex/prompts/         # Codex prompts (if configured)
+.github/prompts/        # GitHub Copilot prompts (if configured)
 ```
 
 ## 🚀 Performance & Scalability

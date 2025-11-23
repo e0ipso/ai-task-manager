@@ -29,7 +29,7 @@ Traditional AI assistant "plan mode" features create plans and immediately execu
 ## Quick Start
 
 ```bash
-# Initialize for your preferred AI assistant
+# Initialize for your preferred AI assistant (claude, gemini, opencode, codex, or github)
 npx @e0ipso/ai-task-manager init --assistants claude
 
 # The init command creates:
@@ -38,6 +38,8 @@ npx @e0ipso/ai-task-manager init --assistants claude
 # - Customizable templates for plans and tasks
 # - Directory structure for task management
 ```
+
+Supports Claude, Gemini, Open Code, Codex, and GitHub Copilot. See [AGENTS.md](https://github.com/e0ipso/ai-task-manager/blob/main/AGENTS.md) for detailed assistant-specific instructions.
 
 ## The Three-Phase Workflow
 
