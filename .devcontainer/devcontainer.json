@@ -3,6 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
+      "BASE_IMAGE": "node:20",
       "TZ": "${localEnv:TZ:Europe/Madrid}",
       "CLAUDE_CODE_VERSION": "latest",
       "GEMINI_VERSION": "latest",
@@ -59,6 +60,7 @@
     "source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/settings.json,target=/home/node/.claude/settings.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.codex/config.toml,target=/home/node/.codex/config.toml,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.codex/prompts,target=/home/node/.codex/prompts,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh/hosts.yml,target=/home/node/.config/gh/hosts.yml,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached",
     "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"

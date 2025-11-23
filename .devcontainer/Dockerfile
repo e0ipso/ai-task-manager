@@ -1,4 +1,5 @@
-FROM node:20
+ARG BASE_IMAGE=node:20
+FROM ${BASE_IMAGE}
 
 ARG TZ=Europe/Madrid
 ENV TZ="$TZ"
@@ -47,8 +48,8 @@ RUN mkdir -p /worktrees \
   && chown -R $USERNAME /worktrees
 
 # Pre-create directories that will be needed for bind mounts
-RUN mkdir -p /home/$USERNAME/.claude/debug /home/$USERNAME/.gemini \
-  && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude /home/$USERNAME/.gemini
+RUN mkdir -p /home/$USERNAME/.claude/debug /home/$USERNAME/.gemini /home/$USERNAME/.codex \
+  && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude /home/$USERNAME/.gemini /home/$USERNAME/.codex
 
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
