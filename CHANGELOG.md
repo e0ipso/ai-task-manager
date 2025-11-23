@@ -1,3 +1,9 @@
+## 1.22.0 (2025-11-22)
+
+* fix: address test failures ([8cd7a96](https://github.com/e0ipso/ai-task-manager/commit/8cd7a96))
+* feat: add plan refinement feature ([18d86a0](https://github.com/e0ipso/ai-task-manager/commit/18d86a0))
+* chore: remove unnecessary file ([1a4bae1](https://github.com/e0ipso/ai-task-manager/commit/1a4bae1))
+
 ## 1.21.0 (2025-11-22)
 
 * Merge remote-tracking branch 'origin/main' ([aa280d5](https://github.com/e0ipso/ai-task-manager/commit/aa280d5))
