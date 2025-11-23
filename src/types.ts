@@ -8,7 +8,7 @@
 /**
  * Supported AI assistants for task management
  */
-export type Assistant = 'claude' | 'codex' | 'gemini' | 'opencode';
+export type Assistant = 'claude' | 'codex' | 'gemini' | 'github' | 'opencode';
 
 /**
  * Template format types for different assistants
