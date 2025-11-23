@@ -1,3 +1,13 @@
+## 1.23.0 (2025-11-23)
+
+* Merge remote-tracking branch 'origin/main' ([51fbd08](https://github.com/e0ipso/ai-task-manager/commit/51fbd08))
+* chore: improve devcontainer ([b0307a4](https://github.com/e0ipso/ai-task-manager/commit/b0307a4))
+* docs(codex): add comprehensive codex documentation ([9d9efee](https://github.com/e0ipso/ai-task-manager/commit/9d9efee))
+* test(codex): add integration tests for codex support ([cd53527](https://github.com/e0ipso/ai-task-manager/commit/cd53527))
+* feat(codex): add codex to assistant type system ([14e565a](https://github.com/e0ipso/ai-task-manager/commit/14e565a))
+* feat(codex): add template format mapping for codex ([1b6d4ea](https://github.com/e0ipso/ai-task-manager/commit/1b6d4ea))
+* feat(codex): implement flat directory structure with file renaming ([385121e](https://github.com/e0ipso/ai-task-manager/commit/385121e))
+
 ## 1.22.0 (2025-11-22)
 
 * fix: address test failures ([8cd7a96](https://github.com/e0ipso/ai-task-manager/commit/8cd7a96))
