@@ -1,3 +1,14 @@
+## 1.24.0 (2025-11-23)
+
+* Merge remote-tracking branch 'origin/main' ([903b9f1](https://github.com/e0ipso/ai-task-manager/commit/903b9f1))
+* docs: add GitHub Copilot and Codex support references ([44484c6](https://github.com/e0ipso/ai-task-manager/commit/44484c6))
+* docs: add GitHub Copilot documentation to AGENTS.md and README.md ([387f56c](https://github.com/e0ipso/ai-task-manager/commit/387f56c))
+* test: add integration tests for GitHub Copilot support ([5257d23](https://github.com/e0ipso/ai-task-manager/commit/5257d23))
+* feat: add GitHub assistant type to type system ([5275d26](https://github.com/e0ipso/ai-task-manager/commit/5275d26))
+* feat: implement GitHub directory and file creation logic ([1dcd6e0](https://github.com/e0ipso/ai-task-manager/commit/1dcd6e0))
+* feat: implement GitHub prompt file conversion function ([21c3b21](https://github.com/e0ipso/ai-task-manager/commit/21c3b21))
+* feat: integrate GitHub format routing in template processing ([7c9d288](https://github.com/e0ipso/ai-task-manager/commit/7c9d288))
+
 ## <small>1.23.1 (2025-11-23)</small>
 
 * Merge remote-tracking branch 'origin/main' ([174096f](https://github.com/e0ipso/ai-task-manager/commit/174096f))
