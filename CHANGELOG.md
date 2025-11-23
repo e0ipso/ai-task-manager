@@ -1,3 +1,8 @@
+## <small>1.23.1 (2025-11-23)</small>
+
+* Merge remote-tracking branch 'origin/main' ([174096f](https://github.com/e0ipso/ai-task-manager/commit/174096f))
+* fix: uppercase vars trips codex ([ec664de](https://github.com/e0ipso/ai-task-manager/commit/ec664de))
+
 ## 1.23.0 (2025-11-23)
 
 * Merge remote-tracking branch 'origin/main' ([51fbd08](https://github.com/e0ipso/ai-task-manager/commit/51fbd08))
