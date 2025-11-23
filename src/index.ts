@@ -126,6 +126,33 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     for (const assistant of assistants) {
       const templateFormat = getTemplateFormat(assistant);
 
+      // GitHub uses .github/prompts/ with .prompt.md extension
+      if (assistant === 'github') {
+        console.log(chalk.cyan('  GitHub Copilot Prompts:'));
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-create-plan.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-refine-plan.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-generate-tasks.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-execute-task.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-execute-blueprint.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-fix-broken-tests.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-full-workflow.prompt.md')}`
+        );
+        continue;
+      }
+
       // Codex uses flat directory structure with renamed files
       if (assistant === 'codex') {
         console.log(
@@ -371,6 +398,41 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     throw new Error(`Template directory not found: ${sourceDir}`);
   }
 
+  // GitHub uses .github/prompts/ directory with .prompt.md extension
+  if (assistant === 'github') {
+    // Create .github/prompts directory
+    const promptsDir = resolvePath(baseDir, '.github', 'prompts');
+    await fs.ensureDir(promptsDir);
+
+    // Copy and process all template files
+    const templateFiles = [
+      'create-plan.md',
+      'refine-plan.md',
+      'generate-tasks.md',
+      'execute-task.md',
+      'execute-blueprint.md',
+      'fix-broken-tests.md',
+      'full-workflow.md',
+    ];
+
+    const templateFormat = getTemplateFormat(assistant);
+
+    for (const file of templateFiles) {
+      const sourcePath = resolvePath(sourceDir, 'commands', 'tasks', file);
+      const commandName = file.replace('.md', '');
+      const destFileName = `tasks-${commandName}.prompt.md`;
+      const destPath = resolvePath(promptsDir, destFileName);
+
+      // Read and process the template with GitHub-specific conversion
+      const processedContent = await readAndProcessTemplate(sourcePath, templateFormat, assistant);
+
+      // Write processed content to destination
+      await writeProcessedTemplate(processedContent, destPath);
+    }
+
+    return;
+  }
+
   // Codex uses flat directory structure with renamed files
   if (assistant === 'codex') {
     // Create flat directory structure
@@ -469,6 +531,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
   hasGeminiConfig: boolean;
   hasOpencodeConfig: boolean;
   hasCodexConfig: boolean;
+  hasGithubConfig: boolean;
   assistants: Assistant[];
 }> {
   const targetDir = baseDir || '.';
@@ -477,12 +540,14 @@ export async function getInitInfo(baseDir?: string): Promise<{
   const hasGeminiConfig = await exists(resolvePath(targetDir, '.gemini/commands/tasks'));
   const hasOpencodeConfig = await exists(resolvePath(targetDir, '.opencode/command/tasks'));
   const hasCodexConfig = await exists(resolvePath(targetDir, '.codex/prompts'));
+  const hasGithubConfig = await exists(resolvePath(targetDir, '.github/prompts'));
 
   const assistants: Assistant[] = [];
   if (hasClaudeConfig) assistants.push('claude');
   if (hasGeminiConfig) assistants.push('gemini');
   if (hasOpencodeConfig) assistants.push('opencode');
   if (hasCodexConfig) assistants.push('codex');
+  if (hasGithubConfig) assistants.push('github');
 
   return {
     hasAiTaskManager,
@@ -490,6 +555,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
     hasGeminiConfig,
     hasOpencodeConfig,
     hasCodexConfig,
+    hasGithubConfig,
     assistants,
   };
 }
