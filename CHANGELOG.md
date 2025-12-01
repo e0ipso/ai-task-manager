@@ -1,3 +1,7 @@
+## 1.25.0 (2025-12-01)
+
+* feat: engage Claude Skills ([3ae7f20](https://github.com/e0ipso/ai-task-manager/commit/3ae7f20))
+
 ## 1.24.0 (2025-11-23)
 
 * Merge remote-tracking branch 'origin/main' ([903b9f1](https://github.com/e0ipso/ai-task-manager/commit/903b9f1))
