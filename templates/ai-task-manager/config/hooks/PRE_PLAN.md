@@ -2,6 +2,21 @@
 
 This hook provides pre-planning guidance to ensure scope control, simplicity principles, and proper validation requirements are established before comprehensive plan creation.
 
+
+Run this script to detect the assistant:
+
+```bash
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+```
+
+<details>
+<summary>
+[IMPORTANT] Only for assistants that support assistant skills: Claude
+</summary>
+
+Analyze the current prompt in order to engage any relevant skills as necessary (either global or project skills).
+</details>
+
 ## Scope Control Guidelines
 
 **Critical: Implement ONLY what is explicitly requested**

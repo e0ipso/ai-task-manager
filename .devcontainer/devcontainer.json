@@ -59,6 +59,8 @@
     "source=${localEnv:HOME}/.codex/AGENTS.md,target=/home/node/.codex/AGENTS.md,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/settings.json,target=/home/node/.claude/settings.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude/skills,target=/home/node/.claude/skills,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude/hooks,target=/home/node/.claude/hooks,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.codex/config.toml,target=/home/node/.codex/config.toml,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.codex/prompts,target=/home/node/.codex/prompts,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh/hosts.yml,target=/home/node/.config/gh/hosts.yml,type=bind,consistency=cached",

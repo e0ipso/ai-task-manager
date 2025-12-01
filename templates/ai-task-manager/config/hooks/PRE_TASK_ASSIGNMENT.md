@@ -11,6 +11,21 @@ This hook executes before task assignment to determine the most appropriate agen
     - Select the most appropriate sub-agent (if any are available). If no sub-agent is appropriate, use the general-purpose one.
     - Consider task-specific requirements from the task document
 
+Run this script to detect the assistant:
+
+```bash
+assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
+```
+
+<details>
+<summary>
+[IMPORTANT] Only for assistants that support assistant skills: Claude
+</summary>
+
+Analyze the set of tasks skills in order to engage any relevant assistant skills as necessary (either global or project skills).
+</details>
+
+
 ## Available Sub-Agents
 Analyze the sub-agents available in your current assistant's agents directory. If none are available
 or the available ones do not match the task's requirements, then use a generic
