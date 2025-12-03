@@ -14,7 +14,7 @@ AI Task Manager initializes quickly with a single command, creating all necessar
 
 - **Node.js**: Version 14.0 or higher
 - **npm**: Comes with Node.js
-- **AI Assistant**: Active subscription to Claude, Gemini, GitHub Copilot, Codex, or access to Open Code
+- **AI Assistant**: Active subscription to Claude, Cursor, Gemini, GitHub Copilot, Codex, or access to Open Code
 
 ## Installation
 
@@ -34,6 +34,9 @@ The `--assistants` flag is **required** when initializing. You must specify whic
 # Claude only (for use with claude.ai/code)
 npx @e0ipso/ai-task-manager init --assistants claude
 
+# Cursor only (for use with Cursor IDE)
+npx @e0ipso/ai-task-manager init --assistants cursor
+
 # Gemini only (for use with Gemini CLI)
 npx @e0ipso/ai-task-manager init --assistants gemini
 
@@ -52,7 +55,7 @@ npx @e0ipso/ai-task-manager init --assistants github
 Configure multiple assistants for team flexibility:
 
 ```bash
-npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,codex,github
+npx @e0ipso/ai-task-manager init --assistants claude,cursor,gemini,opencode,codex,github
 ```
 
 All assistants share the same task management structure (plans, tasks, configurations) while using assistant-specific command formats.
@@ -99,6 +102,14 @@ project-root/
 │       │       └── get-next-task-id.cjs
 │       └── .init-metadata.json    # File conflict detection tracking
 ├── .claude/                       # Claude files (if --assistants claude)
+│   └── commands/tasks/
+│       ├── create-plan.md
+│       ├── refine-plan.md
+│       ├── generate-tasks.md
+│       ├── execute-blueprint.md
+│       ├── execute-task.md
+│       └── fix-broken-tests.md
+├── .cursor/                       # Cursor files (if --assistants cursor)
 │   └── commands/tasks/
 │       ├── create-plan.md
 │       ├── refine-plan.md
@@ -191,6 +202,11 @@ You should see: `plans/`, `archive/`, `config/`
 ls -la .claude/commands/tasks/
 ```
 
+**For Cursor:**
+```bash
+ls -la .cursor/commands/tasks/
+```
+
 **For Gemini:**
 ```bash
 ls -la .gemini/commands/tasks/
@@ -248,6 +264,9 @@ Ready to create your first plan:
 ```bash
 # In Claude, Gemini, or Open Code:
 /tasks:create-plan "Your project description here"
+
+# In Cursor:
+/tasks/create-plan Your project description here
 
 # In Codex:
 /prompts:tasks-create-plan "Your project description here"

@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   nano \
   vim \
   tree \
+  python3-yaml \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure default node user has access to /usr/local/share

@@ -107,6 +107,24 @@ describe('CLI Integration Tests - Consolidated', () => {
       const assistantDir = path.join(baseDir, `.${assistant}/${commandsPath}/tasks`);
       expect(await fs.pathExists(assistantDir)).toBe(true);
 
+      // Cursor uses same structure as claude (.cursor/commands/tasks)
+      if (assistant === 'cursor') {
+        const templateFiles = [
+          'create-plan',
+          'refine-plan',
+          'generate-tasks',
+          'execute-task',
+          'execute-blueprint',
+          'fix-broken-tests',
+          'full-workflow',
+        ];
+        for (const template of templateFiles) {
+          const templatePath = path.join(assistantDir, `${template}.md`);
+          expect(await fs.pathExists(templatePath)).toBe(true);
+        }
+        continue;
+      }
+
       const extension = assistant === 'gemini' ? 'toml' : 'md';
       const templateFiles = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
 
@@ -135,6 +153,13 @@ describe('CLI Integration Tests - Consolidated', () => {
       if (assistant === 'claude') {
         const createPlan = await fs.readFile(
           path.join(baseDir, '.claude/commands/tasks/create-plan.md'),
+          'utf8'
+        );
+        expect(createPlan).toContain('$ARGUMENTS');
+        expect(createPlan).toContain('---'); // YAML frontmatter
+      } else if (assistant === 'cursor') {
+        const createPlan = await fs.readFile(
+          path.join(baseDir, '.cursor/commands/tasks/create-plan.md'),
           'utf8'
         );
         expect(createPlan).toContain('$ARGUMENTS');
@@ -198,6 +223,39 @@ describe('CLI Integration Tests - Consolidated', () => {
       await verifyFileContent(['claude']);
     });
 
+    it('should successfully initialize with cursor and verify structure', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants cursor`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify directory structure
+      expect(await fs.pathExists(path.join(testDir, '.cursor/commands/tasks'))).toBe(true);
+
+      // Verify all 7 command files exist
+      const templateFiles = [
+        'create-plan.md',
+        'refine-plan.md',
+        'generate-tasks.md',
+        'execute-task.md',
+        'execute-blueprint.md',
+        'fix-broken-tests.md',
+        'full-workflow.md',
+      ];
+
+      for (const file of templateFiles) {
+        const filePath = path.join(testDir, '.cursor/commands/tasks', file);
+        expect(await fs.pathExists(filePath)).toBe(true);
+      }
+
+      // Verify file content (sample check on one file)
+      const planContent = await fs.readFile(
+        path.join(testDir, '.cursor/commands/tasks/create-plan.md'),
+        'utf-8'
+      );
+      expect(planContent).toContain('$ARGUMENTS'); // Markdown format uses $ARGUMENTS
+      expect(planContent).not.toContain('{{args}}'); // Should NOT have TOML format
+    });
+
     it('should successfully initialize with gemini and verify TOML conversion', async () => {
       const result = executeCommand(`node "${cliPath}" init --assistants gemini`);
       expect(result.exitCode).toBe(0);
@@ -253,6 +311,30 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks/create-plan.md'))).toBe(
         false
       );
+    });
+
+    it('should initialize with cursor and other assistants', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants claude,cursor,gemini`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify all assistant directories exist
+      expect(await fs.pathExists(path.join(testDir, '.claude/commands/tasks'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.cursor/commands/tasks'))).toBe(true);
+      expect(await fs.pathExists(path.join(testDir, '.gemini/commands/tasks'))).toBe(true);
+
+      // Verify Cursor uses Markdown format
+      const cursorFile = await fs.readFile(
+        path.join(testDir, '.cursor/commands/tasks/create-plan.md'),
+        'utf-8'
+      );
+      expect(cursorFile).toContain('$ARGUMENTS');
+
+      // Verify Gemini uses TOML format (for comparison)
+      const geminiFile = await fs.readFile(
+        path.join(testDir, '.gemini/commands/tasks/create-plan.toml'),
+        'utf-8'
+      );
+      expect(geminiFile).toContain('{{args}}');
     });
 
     it('should handle mixed assistants including opencode with correct format isolation', async () => {
@@ -706,6 +788,150 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(content).not.toContain('[metadata]');
       expect(content).not.toContain('{{args}}');
       expect(content).not.toContain('content = """');
+    });
+  });
+
+  describe('Cursor Assistant Support', () => {
+    it('should create .cursor/commands/tasks/ directory with correct structure', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants cursor`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify directory structure
+      const commandsDir = path.join(testDir, '.cursor/commands/tasks');
+      expect(await fs.pathExists(commandsDir)).toBe(true);
+    });
+
+    it('should create all 7 command files with correct names', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants cursor`);
+      expect(result.exitCode).toBe(0);
+
+      const commandsDir = path.join(testDir, '.cursor/commands/tasks');
+      const expectedFiles = [
+        'create-plan.md',
+        'refine-plan.md',
+        'generate-tasks.md',
+        'execute-task.md',
+        'execute-blueprint.md',
+        'fix-broken-tests.md',
+        'full-workflow.md',
+      ];
+
+      for (const file of expectedFiles) {
+        const filePath = path.join(commandsDir, file);
+        expect(await fs.pathExists(filePath)).toBe(true);
+
+        // Verify files have content
+        const content = await fs.readFile(filePath, 'utf8');
+        expect(content.length).toBeGreaterThan(0);
+        expect(content).toContain('---'); // YAML frontmatter
+      }
+    });
+
+    it('should use Markdown format with $ARGUMENTS placeholders', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants cursor`);
+      expect(result.exitCode).toBe(0);
+
+      const createPlanPath = path.join(testDir, '.cursor/commands/tasks/create-plan.md');
+      const content = await fs.readFile(createPlanPath, 'utf8');
+
+      // Should contain Markdown/YAML frontmatter
+      expect(content).toContain('---');
+      expect(content).toContain('$ARGUMENTS');
+      expect(content).toContain('argument-hint: "[userPrompt]"');
+
+      // Should NOT contain TOML formatting
+      expect(content).not.toContain('[metadata]');
+      expect(content).not.toContain('{{args}}');
+      expect(content).not.toContain('content = """');
+    });
+
+    it('should work with multi-assistant initialization including cursor', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants claude,cursor,gemini`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('AI Task Manager initialized successfully!');
+
+      // Verify Cursor structure
+      const cursorDir = path.join(testDir, '.cursor/commands/tasks');
+      expect(await fs.pathExists(cursorDir)).toBe(true);
+      expect(await fs.pathExists(path.join(cursorDir, 'create-plan.md'))).toBe(true);
+
+      // Verify Claude structure
+      const claudeDir = path.join(testDir, '.claude/commands/tasks');
+      expect(await fs.pathExists(claudeDir)).toBe(true);
+      expect(await fs.pathExists(path.join(claudeDir, 'create-plan.md'))).toBe(true);
+
+      // Verify Gemini structure (TOML)
+      const geminiDir = path.join(testDir, '.gemini/commands/tasks');
+      expect(await fs.pathExists(geminiDir)).toBe(true);
+      expect(await fs.pathExists(path.join(geminiDir, 'create-plan.toml'))).toBe(true);
+
+      // Verify no cross-contamination
+      expect(await fs.pathExists(path.join(testDir, '.cursor/prompts'))).toBe(false);
+      expect(await fs.pathExists(path.join(testDir, '.claude/prompts'))).toBe(false);
+    });
+
+    it('should have identical template content to Claude (both use Markdown)', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants cursor,claude`);
+      expect(result.exitCode).toBe(0);
+
+      // Verify Cursor and Claude templates are identical (both Markdown)
+      const cursorCreatePlan = await fs.readFile(
+        path.join(testDir, '.cursor/commands/tasks/create-plan.md'),
+        'utf8'
+      );
+      const claudeCreatePlan = await fs.readFile(
+        path.join(testDir, '.claude/commands/tasks/create-plan.md'),
+        'utf8'
+      );
+      expect(cursorCreatePlan).toBe(claudeCreatePlan);
+
+      // Verify all template files match
+      const templates = [
+        'create-plan',
+        'refine-plan',
+        'generate-tasks',
+        'execute-task',
+        'execute-blueprint',
+        'fix-broken-tests',
+        'full-workflow',
+      ];
+      for (const template of templates) {
+        const cursorTemplatePath = path.join(testDir, `.cursor/commands/tasks/${template}.md`);
+        const claudeTemplatePath = path.join(testDir, `.claude/commands/tasks/${template}.md`);
+
+        expect(await fs.pathExists(cursorTemplatePath)).toBe(true);
+        expect(await fs.pathExists(claudeTemplatePath)).toBe(true);
+
+        const cursorContent = await fs.readFile(cursorTemplatePath, 'utf8');
+        const claudeContent = await fs.readFile(claudeTemplatePath, 'utf8');
+
+        // Both should be identical (Markdown format)
+        expect(cursorContent).toBe(claudeContent);
+        expect(cursorContent).toContain('---'); // YAML frontmatter
+        expect(cursorContent).not.toContain('[metadata]'); // Not TOML
+      }
+    });
+
+    it('should initialize all supported assistants including cursor', async () => {
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude,codex,cursor,gemini,github,opencode`
+      );
+      expect(result.exitCode).toBe(0);
+
+      // Verify all assistant directories
+      const assistantPaths = [
+        '.claude/commands/tasks',
+        '.codex/prompts',
+        '.cursor/commands/tasks',
+        '.gemini/commands/tasks',
+        '.github/prompts',
+        '.opencode/command/tasks',
+      ];
+
+      for (const assistantPath of assistantPaths) {
+        expect(await fs.pathExists(path.join(testDir, assistantPath))).toBe(true);
+      }
     });
   });
 

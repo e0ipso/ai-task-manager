@@ -14,13 +14,14 @@ Transform complex AI prompts into organized, executable workflows through custom
 ```bash
 # Initialize for your preferred AI assistant
 npx @e0ipso/ai-task-manager init --assistants claude
+npx @e0ipso/ai-task-manager init --assistants cursor
 npx @e0ipso/ai-task-manager init --assistants gemini
 npx @e0ipso/ai-task-manager init --assistants opencode
 npx @e0ipso/ai-task-manager init --assistants codex
 npx @e0ipso/ai-task-manager init --assistants github
 
 # Or configure multiple assistants
-npx @e0ipso/ai-task-manager init --assistants claude,gemini,opencode,codex,github
+npx @e0ipso/ai-task-manager init --assistants claude,cursor,gemini,opencode,codex,github
 ```
 
 ## ✨ Key Benefits
@@ -62,6 +63,7 @@ Comprehensive guides covering:
 | Assistant | Interface | Setup Time |
 |-----------|-----------|------------|
 | 🎭 **Claude** | [claude.ai/code](https://claude.ai/code) | < 30 seconds |
+| 🖱️ **Cursor** | Cursor IDE | < 30 seconds |
 | 💎 **Gemini** | Gemini CLI | < 30 seconds |
 | 📝 **Open Code** | Open source | < 30 seconds |
 | 🔮 **Codex** | Codex CLI | < 30 seconds |

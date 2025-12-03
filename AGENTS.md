@@ -29,6 +29,12 @@ npx . init --assistants claude,gemini,opencode,codex --destination-directory /pa
 # Initialize for Codex
 npx . init --assistants codex --destination-directory /path/to/project
 
+# Initialize for Cursor
+npx . init --assistants cursor --destination-directory /path/to/project
+
+# Initialize for multiple assistants including Cursor
+npx . init --assistants claude,cursor,gemini --destination-directory /path/to/project
+
 # Re-run init to update configuration files
 # Your customizations are automatically detected and protected
 npx . init --assistants claude --destination-directory /path/to/project
@@ -60,7 +66,7 @@ This CLI tool initializes AI-assisted development environments with hierarchical
 - **Cognitive Load Management**: Prevents AI context overload through staged processing
 - **Scope Control**: Enforces YAGNI principles and prevents feature creep
 - **Quality Assurance**: Ensures working code through integrity-focused testing
-- **Multi-Assistant Support**: Unified workflow across Claude, Gemini, Open Code, and Codex platforms
+- **Multi-Assistant Support**: Unified workflow across Claude, Codex, Cursor, Gemini, GitHub, and Open Code platforms
 
 ---
 
@@ -357,7 +363,7 @@ The composition pattern maintains full backward compatibility:
 #### Type System (`src/types.ts`)
 ```typescript
 // Type definitions:
-- Assistant type: 'claude' | 'gemini' | 'opencode' | 'codex'
+- Assistant type: 'claude' | 'codex' | 'cursor' | 'gemini' | 'github' | 'opencode'
 - TemplateFormat: 'md' | 'toml'
 - Custom error classes: FileSystemError, ConfigError
 - Interface definitions for configurations and results
@@ -419,6 +425,22 @@ project/
 │   ├── generate-tasks.md
 │   ├── execute-blueprint.md
 │   └── fix-broken-tests.md        # NEW: Test integrity command
+├── .codex/prompts/                # Codex commands (Markdown, flat structure)
+│   ├── tasks-create-plan.md
+│   ├── tasks-refine-plan.md       # NEW: Plan feedback/refinement loop
+│   ├── tasks-generate-tasks.md
+│   ├── tasks-execute-blueprint.md
+│   ├── tasks-execute-task.md
+│   ├── tasks-fix-broken-tests.md  # NEW: Test integrity command
+│   └── tasks-full-workflow.md
+├── .cursor/commands/tasks/        # Cursor commands (Markdown)
+│   ├── create-plan.md
+│   ├── refine-plan.md
+│   ├── generate-tasks.md
+│   ├── execute-task.md
+│   ├── execute-blueprint.md
+│   ├── fix-broken-tests.md
+│   └── full-workflow.md
 ├── .gemini/commands/tasks/        # Gemini commands (TOML)
 │   ├── create-plan.toml
 │   ├── refine-plan.toml           # NEW: Plan feedback/refinement loop
@@ -431,14 +453,6 @@ project/
 │   ├── generate-tasks.md
 │   ├── execute-blueprint.md
 │   └── fix-broken-tests.md        # NEW: Test integrity command
-├── .codex/prompts/                # Codex commands (Markdown, flat structure)
-│   ├── tasks-create-plan.md
-│   ├── tasks-refine-plan.md       # NEW: Plan feedback/refinement loop
-│   ├── tasks-generate-tasks.md
-│   ├── tasks-execute-blueprint.md
-│   ├── tasks-execute-task.md
-│   ├── tasks-fix-broken-tests.md  # NEW: Test integrity command
-│   └── tasks-full-workflow.md
 └── .github/prompts/               # GitHub Copilot prompts (Markdown, flat structure)
     ├── tasks-create-plan.prompt.md
     ├── tasks-refine-plan.prompt.md
@@ -497,6 +511,59 @@ Codex has unique requirements due to its architecture:
 - **Use lowercase bash variables**: Codex has issues with uppercase bash variable names (e.g., `TASK_COUNT`)
 - **Prefer lowercase convention**: Use `task_count`, `plan_id`, etc. instead of uppercase equivalents
 - This applies to all bash scripts and command templates to ensure cross-assistant compatibility
+
+#### Cursor Workflow
+
+Cursor is an AI-powered code editor built on VS Code that supports custom slash commands:
+
+**Directory Structure**:
+- Uses nested directory structure in `.cursor/commands/tasks/`
+- File naming pattern: standard names (e.g., `create-plan.md`, `generate-tasks.md`)
+- All files stored in the tasks subdirectory
+
+**User Workflow**:
+1. Run initialization: `npx . init --assistants cursor --destination-directory /path/to/project`
+2. Commands are automatically discovered by Cursor when typing `/` in the editor
+3. Invoke commands using `/tasks/` prefix: `/tasks/create-plan`, `/tasks/generate-tasks`, etc.
+
+**Key Differences**:
+- **Automatic Discovery**: Cursor automatically detects project-level commands in `.cursor/commands/`
+- **Nested Structure**: Uses `tasks/` subdirectory for organization (like Claude and Gemini)
+- **Markdown Format**: Uses standard Markdown with `$ARGUMENTS` placeholder (like Claude)
+- **No Manual Setup**: Unlike Codex, no file copying or IDE restart required
+
+**Command Invocation Examples**:
+```bash
+# Create a new plan
+/tasks/create-plan Implement user authentication system
+
+# Refine an existing plan
+/tasks/refine-plan 51
+
+# Generate tasks from a plan
+/tasks/generate-tasks 51
+
+# Execute a single task
+/tasks/execute-task 51 3
+
+# Execute the complete blueprint
+/tasks/execute-blueprint 51
+
+# Full automated workflow
+/tasks/full-workflow Add dark mode toggle to application settings
+
+# Fix broken tests
+/tasks/fix-broken-tests npm test
+```
+
+**Key Features**:
+- **Nested Directory Support**: Commands organized in subdirectories for better structure
+- **Native Placeholder Support**: `$ARGUMENTS` works natively (no conversion needed)
+- **Automatic IDE Integration**: Commands appear automatically in Cursor's command palette
+- **No Manual Setup**: Commands work immediately after init (no copying or restart)
+
+**Beta Status Note**:
+Cursor's slash commands feature is in beta and subject to change. The implementation uses standard Markdown format to ensure easy adaptation to future updates.
 
 #### GitHub Copilot Workflow
 
@@ -726,19 +793,19 @@ npm run prepublishOnly        # Pre-publish validation (auto-runs)
 
 ### Adding New Assistant Support
 
-To add a new AI assistant (like Codex was added to the existing Claude, Gemini, and Open Code support), follow these steps:
+To add a new AI assistant (like Cursor was added to the existing Claude, Codex, Gemini, GitHub, and Open Code support), follow these steps:
 
 1. **Type System**: Update `Assistant` type in `src/types.ts`
    ```typescript
    // Add new assistant to the union type
-   export type Assistant = 'claude' | 'gemini' | 'opencode' | 'codex' | 'newassistant';
+   export type Assistant = 'claude' | 'codex' | 'cursor' | 'gemini' | 'github' | 'opencode' | 'newassistant';
    ```
 
 2. **Format Mapping**: Add template format in `getTemplateFormat()` (`src/utils.ts`)
    ```typescript
    export function getTemplateFormat(assistant: Assistant): TemplateFormat {
      if (assistant === 'gemini') return 'toml';
-     return 'md';  // Default for Claude, Open Code, Codex, and new assistants
+     return 'md';  // Default for Claude, Codex, Cursor, GitHub, Open Code, and new assistants
    }
    ```
 
@@ -747,9 +814,11 @@ To add a new AI assistant (like Codex was added to the existing Claude, Gemini, 
    export function getAssistantConfig(assistant: Assistant) {
      const configs = {
        claude: { dir: '.claude/commands', subdir: 'tasks' },
-       gemini: { dir: '.gemini/commands', subdir: 'tasks' },
-       opencode: { dir: '.opencode/command', subdir: 'tasks' },
        codex: { dir: '.codex/prompts', subdir: null },  // Flat structure example
+       cursor: { dir: '.cursor/commands', subdir: 'tasks' },
+       gemini: { dir: '.gemini/commands', subdir: 'tasks' },
+       github: { dir: '.github/prompts', subdir: null },
+       opencode: { dir: '.opencode/command', subdir: 'tasks' },
        newassistant: { dir: '.newassistant/commands', subdir: 'tasks' }
      };
      return configs[assistant];
@@ -759,9 +828,11 @@ To add a new AI assistant (like Codex was added to the existing Claude, Gemini, 
 4. **File Naming Convention**: Update `getCommandFileName()` if needed (`src/utils.ts`)
    ```typescript
    export function getCommandFileName(assistant: Assistant, command: string): string {
-     // Codex uses hyphenated naming (tasks-create-plan.md)
-     if (assistant === 'codex') {
-       return `tasks-${command}.${getTemplateFormat(assistant)}`;
+     // Codex and GitHub use hyphenated naming (tasks-create-plan.md)
+     if (assistant === 'codex' || assistant === 'github') {
+       const extension = getTemplateFormat(assistant);
+       const suffix = assistant === 'github' ? '.prompt' : '';
+       return `tasks-${command}${suffix}.${extension}`;
      }
      // Others use plain names (create-plan.md, create-plan.toml)
      return `${command}.${getTemplateFormat(assistant)}`;
@@ -784,16 +855,20 @@ To add a new AI assistant (like Codex was added to the existing Claude, Gemini, 
    - Any assistant-specific workflow requirements
    - Command invocation examples
 
-**Example: Codex Implementation**
+**Example: Cursor Implementation**
 
-The Codex assistant was added with these characteristics:
-- **Flat directory structure**: `.codex/prompts/` with no subdirectories
-- **Hyphenated file naming**: `tasks-create-plan.md` instead of nested `tasks/create-plan.md`
-- **Markdown format**: Uses `.md` files like Claude and Open Code
-- **Special workflow**: Requires copying files to `~/.codex/prompts/` and restarting Codex
-- **Command prefix**: `/prompts:tasks-*` instead of `/tasks:*`
+The Cursor assistant was added with these characteristics:
+- **Nested directory structure**: `.cursor/commands/tasks/` with subdirectories (like Claude/Gemini)
+- **Standard file naming**: `create-plan.md`, `generate-tasks.md`, etc.
+- **Markdown format**: Uses `.md` files like Claude, Codex, GitHub, and Open Code
+- **Automatic discovery**: Cursor detects project-level commands automatically
+- **Command prefix**: `/tasks/*` for organized command structure
 
-These unique requirements were handled through conditional logic in `getAssistantConfig()` and `getCommandFileName()` without needing changes to the core template system.
+These characteristics were handled through:
+- Type system update in `src/types.ts`
+- Validation updates in `src/utils.ts`
+- Using existing template processing pipeline (no special logic needed)
+- Following established patterns from Claude and Gemini
 
 ### Template Development Workflow
 

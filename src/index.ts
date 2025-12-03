@@ -531,6 +531,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
   hasGeminiConfig: boolean;
   hasOpencodeConfig: boolean;
   hasCodexConfig: boolean;
+  hasCursorConfig: boolean;
   hasGithubConfig: boolean;
   assistants: Assistant[];
 }> {
@@ -540,6 +541,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
   const hasGeminiConfig = await exists(resolvePath(targetDir, '.gemini/commands/tasks'));
   const hasOpencodeConfig = await exists(resolvePath(targetDir, '.opencode/command/tasks'));
   const hasCodexConfig = await exists(resolvePath(targetDir, '.codex/prompts'));
+  const hasCursorConfig = await exists(resolvePath(targetDir, '.cursor/commands/tasks'));
   const hasGithubConfig = await exists(resolvePath(targetDir, '.github/prompts'));
 
   const assistants: Assistant[] = [];
@@ -547,6 +549,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
   if (hasGeminiConfig) assistants.push('gemini');
   if (hasOpencodeConfig) assistants.push('opencode');
   if (hasCodexConfig) assistants.push('codex');
+  if (hasCursorConfig) assistants.push('cursor');
   if (hasGithubConfig) assistants.push('github');
 
   return {
@@ -555,6 +558,7 @@ export async function getInitInfo(baseDir?: string): Promise<{
     hasGeminiConfig,
     hasOpencodeConfig,
     hasCodexConfig,
+    hasCursorConfig,
     hasGithubConfig,
     assistants,
   };

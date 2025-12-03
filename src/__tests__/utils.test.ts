@@ -41,10 +41,10 @@ describe('Critical Utils Business Logic', () => {
 
     it('should reject invalid assistants', () => {
       expect(() => parseAssistants('invalid')).toThrow(
-        'Invalid assistant(s): invalid. Valid options are: claude, codex, gemini, github, opencode'
+        'Invalid assistant(s): invalid. Valid options are: claude, codex, cursor, gemini, github, opencode'
       );
       expect(() => parseAssistants('claude,invalid,unknown')).toThrow(
-        'Invalid assistant(s): invalid, unknown. Valid options are: claude, codex, gemini, github, opencode'
+        'Invalid assistant(s): invalid, unknown. Valid options are: claude, codex, cursor, gemini, github, opencode'
       );
     });
   });
@@ -63,7 +63,7 @@ describe('Critical Utils Business Logic', () => {
 
     it('should reject invalid assistants', () => {
       expect(() => validateAssistants(['invalid' as Assistant])).toThrow(
-        'Invalid assistant: invalid. Supported assistants: claude, codex, gemini, github, opencode'
+        'Invalid assistant: invalid. Supported assistants: claude, codex, cursor, gemini, github, opencode'
       );
     });
   });
