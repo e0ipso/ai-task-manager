@@ -1,3 +1,7 @@
+## 1.26.0 (2025-12-03)
+
+* feat: add support for Cursor ([a62cc68](https://github.com/e0ipso/ai-task-manager/commit/a62cc68))
+
 ## 1.25.0 (2025-12-01)
 
 * feat: engage Claude Skills ([3ae7f20](https://github.com/e0ipso/ai-task-manager/commit/3ae7f20))
