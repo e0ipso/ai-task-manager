@@ -170,6 +170,19 @@ export function escapeTomlString(str: string): string {
 }
 
 /**
+ * Escape a string for TOML triple-quoted format
+ * Triple-quoted strings in TOML do NOT interpret escape sequences,
+ * so we preserve newlines and only escape triple-quote boundaries.
+ * @param str - The string to escape
+ * @returns The escaped string suitable for TOML triple-quoted strings
+ */
+export function escapeTomlTripleQuotedString(str: string): string {
+  // Triple-quoted strings don't interpret escape sequences, so preserve newlines
+  // Only escape triple-quote sequences that would break the string delimiters
+  return str.replace(/"""/g, '"\\"'); // Replace """ with "\" to break the boundary
+}
+
+/**
  * Convert markdown template content to TOML format for Gemini
  * @param mdContent - The markdown template content
  * @returns The converted TOML content
@@ -206,7 +219,7 @@ export function convertMdToToml(mdContent: string): string {
 
   // Add the prompt section with escaped content
   tomlContent += '\n[prompt]\n';
-  tomlContent += `content = """${escapeTomlString(processedBody)}"""\n`;
+  tomlContent += `content = """${escapeTomlTripleQuotedString(processedBody)}"""\n`;
 
   return tomlContent;
 }

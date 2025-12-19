@@ -216,8 +216,9 @@ Newlines\nand\ttabs.`;
 
       const result = convertMdToToml(md);
       expect(result).toContain('title = "Title with \\"quotes\\" and \\\\backslashes"');
+      // Triple-quoted strings preserve newlines, so content field should NOT escape them
       expect(result).toContain(
-        'Content with \\"quotes\\" and \\\\ backslashes\\nNewlines\\nand\\ttabs.'
+        'Content with "quotes" and \\ backslashes\nNewlines\nand\ttabs.'
       );
     });
 
