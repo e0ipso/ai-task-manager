@@ -173,13 +173,20 @@ export function escapeTomlString(str: string): string {
  * Escape a string for TOML triple-quoted format
  * Triple-quoted strings in TOML do NOT interpret escape sequences,
  * so we preserve newlines and only escape triple-quote boundaries.
+ * However, some TOML parsers (notably Gemini's) treat backslashes as escape
+ * characters even in triple-quoted strings, so we must escape them.
  * @param str - The string to escape
  * @returns The escaped string suitable for TOML triple-quoted strings
  */
 export function escapeTomlTripleQuotedString(str: string): string {
-  // Triple-quoted strings don't interpret escape sequences, so preserve newlines
-  // Only escape triple-quote sequences that would break the string delimiters
-  return str.replace(/"""/g, '"\\"'); // Replace """ with "\" to break the boundary
+  return (
+    str
+      // Escape backslashes first to prevent them being treated as escape characters
+      // by non-compliant TOML parsers (notably Gemini's parser)
+      .replace(/\\/g, '\\\\')
+      // Escape triple-quote sequences that would break the string delimiters
+      .replace(/"""/g, '"\\"')
+  );
 }
 
 /**

@@ -212,13 +212,15 @@ Content`;
 title: Title with "quotes" and \\backslashes
 ---
 Content with "quotes" and \\ backslashes
-Newlines\nand\ttabs.`;
+Newlines
+and	tabs.`;
 
       const result = convertMdToToml(md);
       expect(result).toContain('title = "Title with \\"quotes\\" and \\\\backslashes"');
-      // Triple-quoted strings preserve newlines, so content field should NOT escape them
+      // Triple-quoted strings preserve newlines, but backslashes must be escaped
+      // for non-compliant TOML parsers (like Gemini's), so \\ becomes \\\\
       expect(result).toContain(
-        'Content with "quotes" and \\ backslashes\nNewlines\nand\ttabs.'
+        'Content with "quotes" and \\\\ backslashes\nNewlines\nand\ttabs.'
       );
     });
 
