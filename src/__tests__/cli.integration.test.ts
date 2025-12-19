@@ -171,7 +171,7 @@ describe('CLI Integration Tests - Consolidated', () => {
         );
         expect(createPlan).toContain('{{args}}');
         expect(createPlan).toContain('[metadata]');
-        expect(createPlan).toContain('[prompt]');
+        expect(createPlan).toContain('prompt = """');
       } else if (assistant === 'opencode') {
         const createPlan = await fs.readFile(
           path.join(baseDir, '.opencode/command/tasks/create-plan.md'),
@@ -269,7 +269,7 @@ describe('CLI Integration Tests - Consolidated', () => {
         path.join(testDir, '.gemini/commands/tasks/create-plan.toml'),
         'utf8'
       );
-      expect(createPlan).toContain('content = """');
+      expect(createPlan).toContain('prompt = """');
       expect(createPlan).toContain('argument-hint = "{{args}}"');
       expect(createPlan).not.toContain('$ARGUMENTS'); // Should be converted
     });
@@ -282,15 +282,14 @@ describe('CLI Integration Tests - Consolidated', () => {
       const content = await fs.readFile(createPlanPath, 'utf8');
 
       // The content field should have actual newlines, not \n escape sequences
-      expect(content).toContain('[prompt]\ncontent = """');
+      expect(content).toContain('prompt = """');
 
       // Verify actual newline exists in prompt (not escaped)
-      const promptStart = content.indexOf('[prompt]');
-      const contentStart = content.indexOf('content = """', promptStart);
+      const contentStart = content.indexOf('prompt = """');
       const contentSection = content.substring(contentStart, contentStart + 500);
 
       // Should have actual line breaks in the triple-quoted string (content starts on same line as """)
-      expect(contentSection).toMatch(/content = """#.*\n\n/);
+      expect(contentSection).toMatch(/prompt = """#.*\n\n/);
       // Verify no escaped newlines in the content
       expect(contentSection).not.toContain('\\n');
     });
@@ -316,10 +315,9 @@ describe('CLI Integration Tests - Consolidated', () => {
 
         // Verify basic TOML structure
         expect(content).toContain('[metadata]');
-        expect(content).toContain('[prompt]');
+        expect(content).toContain('prompt = """');
         expect(content).toContain('argument-hint');
         expect(content).toContain('description');
-        expect(content).toContain('content = """');
       }
     });
 
@@ -344,7 +342,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       const geminiPath = path.join(testDir, '.gemini/commands/tasks/create-plan.toml');
       const geminiContent = await fs.readFile(geminiPath, 'utf8');
       expect(geminiContent).toContain('[metadata]');
-      expect(geminiContent).toContain('[prompt]');
+      expect(geminiContent).toContain('prompt = """');
       expect(geminiContent).toContain('{{args}}');
     });
 
@@ -643,15 +641,14 @@ describe('CLI Integration Tests - Consolidated', () => {
         'utf8'
       );
       expect(geminiCreatePlan).toContain('[metadata]');
-      expect(geminiCreatePlan).toContain('[prompt]');
+      expect(geminiCreatePlan).toContain('prompt = """');
       expect(geminiCreatePlan).toContain('{{args}}');
       expect(geminiCreatePlan).toContain('argument-hint = "{{args}}"');
       expect(geminiCreatePlan).not.toContain('$ARGUMENTS'); // Should be converted
       // Note: TOML can contain '---' in content, so we just check it has TOML structure
 
       // Verify TOML escaping and format
-      expect(geminiCreatePlan).toContain('content = """');
-      const contentStart = geminiCreatePlan.indexOf('content = """') + 'content = """'.length;
+      const contentStart = geminiCreatePlan.indexOf('prompt = """') + 'prompt = """'.length;
       const contentEnd = geminiCreatePlan.lastIndexOf('"""');
       const content = geminiCreatePlan.substring(contentStart, contentEnd);
       expect(content).not.toContain('"""'); // No nested triple quotes

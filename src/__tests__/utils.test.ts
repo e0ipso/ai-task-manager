@@ -178,8 +178,9 @@ This is the command content.`;
       expect(result).toContain('[metadata]');
       expect(result).toContain('title = "Test Command"');
       expect(result).toContain('description = "A test command"');
-      expect(result).toContain('[prompt]');
-      expect(result).toContain('content = """This is the command content."""');
+      // prompt should be a root key, not a table
+      expect(result).not.toContain('[prompt]');
+      expect(result).toContain('prompt = """This is the command content."""');
     });
 
     it('should transform variable placeholders correctly', () => {
@@ -229,8 +230,8 @@ and	tabs.`;
       const result = convertMdToToml(md);
 
       expect(result).toContain('[metadata]');
-      expect(result).toContain('[prompt]');
-      expect(result).toContain('content = """Just content without frontmatter."""');
+      expect(result).not.toContain('[prompt]');
+      expect(result).toContain('prompt = """Just content without frontmatter."""');
     });
 
     it('should preserve exact variable replacement boundaries', () => {

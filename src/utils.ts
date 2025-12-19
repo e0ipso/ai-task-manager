@@ -207,7 +207,9 @@ export function convertMdToToml(mdContent: string): string {
     .replace(/\$3(?![0-9])/g, '{{param3}}');
 
   // Build TOML content
-  let tomlContent = '[metadata]\n';
+  // prompt must be at the root, so it comes before [metadata] table
+  let tomlContent = `prompt = """${escapeTomlTripleQuotedString(processedBody)}"""\n\n`;
+  tomlContent += '[metadata]\n';
 
   // Add frontmatter fields to metadata section
   for (const [key, value] of Object.entries(frontmatter)) {
@@ -223,10 +225,6 @@ export function convertMdToToml(mdContent: string): string {
       tomlContent += `${key} = "${escapeTomlString(String(value))}"\n`;
     }
   }
-
-  // Add the prompt section with escaped content
-  tomlContent += '\n[prompt]\n';
-  tomlContent += `content = """${escapeTomlTripleQuotedString(processedBody)}"""\n`;
 
   return tomlContent;
 }
