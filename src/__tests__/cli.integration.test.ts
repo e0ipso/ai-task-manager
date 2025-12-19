@@ -274,6 +274,80 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(createPlan).not.toContain('$ARGUMENTS'); // Should be converted
     });
 
+    it('should generate valid TOML with actual newlines, not escaped \\n sequences', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants gemini`);
+      expect(result.exitCode).toBe(0);
+
+      const createPlanPath = path.join(testDir, '.gemini/commands/tasks/create-plan.toml');
+      const content = await fs.readFile(createPlanPath, 'utf8');
+
+      // The content field should have actual newlines, not \n escape sequences
+      expect(content).toContain('[prompt]\ncontent = """');
+
+      // Verify actual newline exists in prompt (not escaped)
+      const promptStart = content.indexOf('[prompt]');
+      const contentStart = content.indexOf('content = """', promptStart);
+      const contentSection = content.substring(contentStart, contentStart + 500);
+
+      // Should have actual line breaks in the triple-quoted string (content starts on same line as """)
+      expect(contentSection).toMatch(/content = """#.*\n\n/);
+      // Verify no escaped newlines in the content
+      expect(contentSection).not.toContain('\\n');
+    });
+
+    it('should generate syntactically valid TOML for all Gemini commands', async () => {
+      const result = executeCommand(`node "${cliPath}" init --assistants gemini`);
+      expect(result.exitCode).toBe(0);
+
+      const commandsDir = path.join(testDir, '.gemini/commands/tasks');
+      const files = await fs.readdir(commandsDir);
+      const tomlFiles = files.filter(f => f.endsWith('.toml'));
+
+      // Verify all expected commands generated
+      expect(tomlFiles.length).toBe(7);
+      expect(tomlFiles).toContain('create-plan.toml');
+      expect(tomlFiles).toContain('generate-tasks.toml');
+      expect(tomlFiles).toContain('execute-blueprint.toml');
+
+      // Validate each file structure
+      for (const file of tomlFiles) {
+        const filePath = path.join(commandsDir, file);
+        const content = await fs.readFile(filePath, 'utf8');
+
+        // Verify basic TOML structure
+        expect(content).toContain('[metadata]');
+        expect(content).toContain('[prompt]');
+        expect(content).toContain('argument-hint');
+        expect(content).toContain('description');
+        expect(content).toContain('content = """');
+      }
+    });
+
+    it('should not affect other assistant formats when fixing Gemini', async () => {
+      const result = executeCommand(
+        `node "${cliPath}" init --assistants claude,cursor,gemini`
+      );
+      expect(result.exitCode).toBe(0);
+
+      // Verify Claude uses Markdown format
+      const claudePath = path.join(testDir, '.claude/commands/tasks/create-plan.md');
+      const claudeContent = await fs.readFile(claudePath, 'utf8');
+      expect(claudeContent).toContain('$ARGUMENTS');
+      expect(claudeContent).not.toContain('{{args}}');
+
+      // Verify Cursor uses Markdown format
+      const cursorPath = path.join(testDir, '.cursor/commands/tasks/create-plan.md');
+      const cursorContent = await fs.readFile(cursorPath, 'utf8');
+      expect(cursorContent).toContain('$ARGUMENTS');
+
+      // Verify Gemini uses TOML format
+      const geminiPath = path.join(testDir, '.gemini/commands/tasks/create-plan.toml');
+      const geminiContent = await fs.readFile(geminiPath, 'utf8');
+      expect(geminiContent).toContain('[metadata]');
+      expect(geminiContent).toContain('[prompt]');
+      expect(geminiContent).toContain('{{args}}');
+    });
+
     it('should successfully initialize with opencode and verify Markdown format preservation', async () => {
       const result = executeCommand(`node "${cliPath}" init --assistants opencode`);
       expect(result.exitCode).toBe(0);
