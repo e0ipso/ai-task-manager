@@ -9,13 +9,12 @@ description: Generate tasks to implement the plan with the provided ID.
 
 Before proceeding with this command, you MUST load and respect the assistant's configuration:
 
-**Run the following scripts:**
-```bash
-assistant=$(node .ai/task-manager/config/scripts/detect-assistant.cjs)
-node .ai/task-manager/config/scripts/read-assistant-config.cjs "$assistant"
-```
+Load the following configuration files in order of precedence (later files override earlier ones):
+1. `/workspace/AGENTS.md` - Project-level task management guidance
+2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
+3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
 
-The output above contains your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
+These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
 
 ---
 

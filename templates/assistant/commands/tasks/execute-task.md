@@ -6,6 +6,19 @@ description: Execute a single task with dependency validation and status managem
 
 You are responsible for executing a single task within a plan while maintaining strict dependency validation and proper status management. Your role is to ensure the task is ready for execution, deploy the appropriate agent, and track execution progress.
 
+## Assistant Configuration
+
+Before proceeding with this command, you MUST load and respect the assistant's configuration:
+
+Load the following configuration files in order of precedence (later files override earlier ones):
+1. `/workspace/AGENTS.md` - Project-level task management guidance
+2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
+3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
+
+These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
+
+---
+
 Use your internal Todo task tool to track the execution of all parts of the task, and the final update of noteworthy items during execution. Example:
 
 - [ ] Validate task: file, status, and dependencies.

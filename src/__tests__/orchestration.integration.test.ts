@@ -382,13 +382,18 @@ describe('Orchestration Workflows', () => {
 
         const content = await fs.readFile(templatePath, 'utf8');
 
-        // Verify assistant configuration loading
-        expect(content).toContain('detect-assistant.cjs');
-        expect(content).toContain('read-assistant-config.cjs');
+        // Verify assistant configuration loading (direct approach, not detection scripts)
         expect(content).toMatch(/Assistant Configuration/i);
+
+        // Verify configuration files are referenced directly (not via detection scripts)
+        expect(content).toMatch(/AGENTS\.md|configuration.*files|config/i);
 
         // Verify configuration is required before proceeding
         expect(content).toMatch(/MUST.*configuration|configuration.*MUST/i);
+
+        // Verify detection scripts are NOT used anymore
+        expect(content).not.toContain('detect-assistant.cjs');
+        expect(content).not.toContain('read-assistant-config.cjs');
       }
     });
   });
