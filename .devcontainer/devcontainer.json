@@ -3,7 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
-      "BASE_IMAGE": "node:20",
+      "BASE_IMAGE": "node:22",
       "TZ": "${localEnv:TZ:Europe/Madrid}",
       "CLAUDE_CODE_VERSION": "latest",
       "GEMINI_VERSION": "latest",
@@ -46,7 +46,8 @@
         "com.anthropic.code.plugin",
         "IdeaVIM",
         "org.jetbrains.IdeaVim-EasyMotion",
-        "org.jetbrains.plugins.github"
+        "org.jetbrains.plugins.github",
+        "com.github.continuedev.continueintellijextension"
       ]
     }
   },
