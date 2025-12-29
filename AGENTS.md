@@ -331,7 +331,7 @@ DEBUG=true node .ai/task-manager/config/scripts/get-next-plan-id.cjs
 #### Why It Exists
 
 The `/tasks:refine-plan [planId]` command enables a feedback loop between multiple LLMs (or between an LLM and a human). One assistant creates the initial plan, then the refine-plan command lets another assistant:
-- Load the plan context safely via `detect-assistant.cjs` and `read-assistant-config.cjs`
+- Load the plan context directly from the plan file in `.ai/task-manager/plans/`
 - Inspect the document section-by-section, highlighting gaps, contradictions, or gold-plated scope
 - Ask targeted clarifying questions and log the answers back into the "Plan Clarifications" table
 - Apply edits directly in the plan file while preserving the original plan ID and template structure
