@@ -1,3 +1,15 @@
+## <small>1.26.1 (2026-01-03)</small>
+
+* refactor: delete obsolete assistant detection scripts ([3029f51](https://github.com/e0ipso/ai-task-manager/commit/3029f51))
+* refactor: remove assistant detection scripts from command templates ([d4e8162](https://github.com/e0ipso/ai-task-manager/commit/d4e8162))
+* refactor: remove detection script references from hooks and documentation ([87676d4](https://github.com/e0ipso/ai-task-manager/commit/87676d4))
+* chore: update node base image ([839b672](https://github.com/e0ipso/ai-task-manager/commit/839b672))
+* fix: implement context-aware TOML escaping for triple-quoted strings ([d3350c9](https://github.com/e0ipso/ai-task-manager/commit/d3350c9))
+* fix: improve TOML escaping for backslashes in triple-quoted strings ([e2d84ae](https://github.com/e0ipso/ai-task-manager/commit/e2d84ae))
+* fix: restructure TOML prompt field at root level ([08d257d](https://github.com/e0ipso/ai-task-manager/commit/08d257d))
+* test: add TOML validation tests and verify multi-assistant compatibility ([ed6bd10](https://github.com/e0ipso/ai-task-manager/commit/ed6bd10))
+* docs: update AGENTS.md with simplified content and multi-platform focus ([ad82f50](https://github.com/e0ipso/ai-task-manager/commit/ad82f50))
+
 ## 1.26.0 (2025-12-03)
 
 * feat: add support for Cursor ([a62cc68](https://github.com/e0ipso/ai-task-manager/commit/a62cc68))
