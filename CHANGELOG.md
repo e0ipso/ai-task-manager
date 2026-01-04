@@ -1,3 +1,8 @@
+## <small>1.26.2 (2026-01-04)</small>
+
+* chore: update semantic-release packages to latest major versions ([54c7996](https://github.com/e0ipso/ai-task-manager/commit/54c7996))
+* fix: update PRE_PLAN.md and PLAN_TEMPLATE.md for improved documentation ([17c956a](https://github.com/e0ipso/ai-task-manager/commit/17c956a))
+
 ## <small>1.26.1 (2026-01-03)</small>
 
 * refactor: delete obsolete assistant detection scripts ([3029f51](https://github.com/e0ipso/ai-task-manager/commit/3029f51))
