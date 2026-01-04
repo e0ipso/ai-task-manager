@@ -74,6 +74,10 @@ Example:
 2. [Measurable outcome 2]
 3. [Measurable outcome 3]
 
+## Documentation
+
+[Required documentation updates to existing documentation, either human-focused documentation, the project's README.md or assistant-focused documentation like AGENTS.md, .claude/skills/* for the site, etc.]
+
 ## Resource Requirements
 
 ### Development Skills
