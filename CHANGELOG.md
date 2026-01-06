@@ -1,3 +1,9 @@
+## <small>1.26.3 (2026-01-06)</small>
+
+* fix: streamline task and plan ID retrieval scripts ([0368e94](https://github.com/e0ipso/ai-task-manager/commit/0368e94))
+* Merge remote-tracking branch 'origin/main' ([4f6e77f](https://github.com/e0ipso/ai-task-manager/commit/4f6e77f))
+* chore: update semantic-release packages to latest major versions ([b2a9cc8](https://github.com/e0ipso/ai-task-manager/commit/b2a9cc8))
+
 ## <small>1.26.2 (2026-01-04)</small>
 
 * chore: update semantic-release packages to latest major versions ([54c7996](https://github.com/e0ipso/ai-task-manager/commit/54c7996))
