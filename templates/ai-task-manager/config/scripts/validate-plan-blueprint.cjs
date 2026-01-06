@@ -2,20 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-
-// Enable debug logging via environment variable
-const DEBUG = process.env.DEBUG === 'true';
-
-/**
- * Debug logging utility
- * @param {string} message - Debug message
- * @param {...any} args - Additional arguments to log
- */
-function debugLog(message, ...args) {
-  if (DEBUG) {
-    console.error(`[DEBUG] ${message}`, ...args);
-  }
-}
+const { findTaskManagerRoot } = require('./shared-utils.cjs');
 
 /**
  * Error logging utility
@@ -24,59 +11,6 @@ function debugLog(message, ...args) {
  */
 function errorLog(message, ...args) {
   console.error(`[ERROR] ${message}`, ...args);
-}
-
-/**
- * Find the task manager root directory by traversing up from current working directory
- * @returns {string|null} Path to task manager root or null if not found
- */
-function findTaskManagerRoot() {
-  let currentPath = process.cwd();
-  const filesystemRoot = path.parse(currentPath).root;
-
-  debugLog(`Starting search for task manager root from: ${currentPath}`);
-  debugLog(`Filesystem root: ${filesystemRoot}`);
-
-  while (currentPath !== filesystemRoot) {
-    const taskManagerPlansPath = path.join(currentPath, '.ai', 'task-manager', 'plans');
-    debugLog(`Checking for task manager at: ${taskManagerPlansPath}`);
-
-    try {
-      if (fs.existsSync(taskManagerPlansPath)) {
-        const stats = fs.lstatSync(taskManagerPlansPath);
-        if (stats.isDirectory()) {
-          const taskManagerRoot = path.join(currentPath, '.ai', 'task-manager');
-          debugLog(`Found valid task manager root at: ${taskManagerRoot}`);
-          return taskManagerRoot;
-        } else {
-          debugLog(`Path exists but is not a directory: ${taskManagerPlansPath}`);
-        }
-      } else {
-        debugLog(`Task manager path does not exist: ${taskManagerPlansPath}`);
-      }
-    } catch (err) {
-      if (err.code === 'EPERM' || err.code === 'EACCES') {
-        const warningMsg = `Warning: Permission denied accessing ${taskManagerPlansPath}`;
-        console.warn(warningMsg);
-        debugLog(`Permission error: ${err.message}`);
-      } else {
-        debugLog(`Filesystem error checking ${taskManagerPlansPath}: ${err.message}`);
-      }
-    }
-
-    const parentPath = path.dirname(currentPath);
-
-    if (parentPath === currentPath) {
-      debugLog(`Reached filesystem root, stopping traversal`);
-      break;
-    }
-
-    currentPath = parentPath;
-    debugLog(`Moving up to parent directory: ${currentPath}`);
-  }
-
-  debugLog(`Task manager root not found in any parent directory`);
-  return null;
 }
 
 /**
@@ -92,8 +26,6 @@ function findPlanById(planId) {
     return null;
   }
 
-  debugLog(`Task manager root found: ${taskManagerRoot}`);
-
   // Convert planId to numeric for flexible matching (handles both "2" and "02")
   const numericPlanId = parseInt(planId, 10);
 
@@ -102,23 +34,17 @@ function findPlanById(planId) {
     return null;
   }
 
-  debugLog(`Searching for plan with numeric ID: ${numericPlanId} (input was: ${planId})`);
-
   const plansDir = path.join(taskManagerRoot, 'plans');
   const archiveDir = path.join(taskManagerRoot, 'archive');
-
-  debugLog(`Searching for plan ID ${planId} in: ${plansDir}, ${archiveDir}`);
 
   // Search both plans and archive directories
   for (const dir of [plansDir, archiveDir]) {
     if (!fs.existsSync(dir)) {
-      debugLog(`Directory does not exist: ${dir}`);
       continue;
     }
 
     try {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
-      debugLog(`Found ${entries.length} entries in ${dir}`);
 
       for (const entry of entries) {
         // Match directory pattern: [plan-id]--* (with flexible ID matching)
@@ -127,7 +53,6 @@ function findPlanById(planId) {
           const dirMatch = entry.name.match(/^0*(\d+)--/);
           if (dirMatch && parseInt(dirMatch[1], 10) === numericPlanId) {
             const planDirPath = path.join(dir, entry.name);
-            debugLog(`Found matching plan directory: ${planDirPath} (extracted ID: ${dirMatch[1]} matches input: ${numericPlanId})`);
 
           try {
             const planDirEntries = fs.readdirSync(planDirPath, { withFileTypes: true });
@@ -139,7 +64,6 @@ function findPlanById(planId) {
                 const fileMatch = planEntry.name.match(/^plan-0*(\d+)--.*\.md$/);
                 if (fileMatch && parseInt(fileMatch[1], 10) === numericPlanId) {
                   const planFilePath = path.join(planDirPath, planEntry.name);
-                  debugLog(`Found plan file: ${planFilePath} (extracted ID: ${fileMatch[1]} matches input: ${numericPlanId})`);
 
                   return {
                     planFile: planFilePath,
@@ -148,8 +72,6 @@ function findPlanById(planId) {
                 }
               }
             }
-
-            debugLog(`No plan file found in directory: ${planDirPath}`);
           } catch (err) {
             errorLog(`Failed to read plan directory ${planDirPath}: ${err.message}`);
           }
@@ -161,7 +83,6 @@ function findPlanById(planId) {
     }
   }
 
-  debugLog(`Plan ID ${planId} not found in any directory`);
   return null;
 }
 
@@ -174,19 +95,16 @@ function countTasks(planDir) {
   const tasksDir = path.join(planDir, 'tasks');
 
   if (!fs.existsSync(tasksDir)) {
-    debugLog(`Tasks directory does not exist: ${tasksDir}`);
     return 0;
   }
 
   try {
     const stats = fs.lstatSync(tasksDir);
     if (!stats.isDirectory()) {
-      debugLog(`Tasks path exists but is not a directory: ${tasksDir}`);
       return 0;
     }
 
     const files = fs.readdirSync(tasksDir).filter(f => f.endsWith('.md'));
-    debugLog(`Found ${files.length} task files in ${tasksDir}`);
     return files.length;
   } catch (err) {
     errorLog(`Failed to read tasks directory ${tasksDir}: ${err.message}`);
@@ -203,7 +121,6 @@ function checkBlueprintExists(planFile) {
   try {
     const planContent = fs.readFileSync(planFile, 'utf8');
     const blueprintExists = /^## Execution Blueprint/m.test(planContent);
-    debugLog(`Blueprint section ${blueprintExists ? 'found' : 'not found'} in ${planFile}`);
     return blueprintExists;
   } catch (err) {
     errorLog(`Failed to read plan file ${planFile}: ${err.message}`);
@@ -270,8 +187,6 @@ function validatePlanBlueprint(planId, fieldName) {
     process.exit(1);
   }
 
-  debugLog(`Validating plan blueprint for ID: ${planId}`);
-
   const planInfo = findPlanById(planId);
 
   if (!planInfo) {
@@ -307,8 +222,6 @@ function validatePlanBlueprint(planId, fieldName) {
     taskCount,
     blueprintExists: blueprintExists ? 'yes' : 'no'
   };
-
-  debugLog('Validation complete:', result);
 
   // If field name is provided, output just that field
   if (fieldName) {

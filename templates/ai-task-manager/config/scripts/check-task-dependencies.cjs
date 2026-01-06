@@ -10,6 +10,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
+const { parseFrontmatter } = require('./shared-utils.cjs');
 
 // Chalk instance - loaded dynamically to handle ESM module
 let chalkInstance = null;
@@ -149,33 +150,6 @@ const findTaskFile = (planDir, taskId) => {
     return null;
 };
 
-// Function to parse YAML frontmatter
-const parseFrontmatter = (content) => {
-    const lines = content.split('\n');
-    let inFrontmatter = false;
-    let frontmatterEnd = false;
-    let delimiterCount = 0;
-    const frontmatterLines = [];
-
-    for (const line of lines) {
-        if (line.trim() === '---') {
-            delimiterCount++;
-            if (delimiterCount === 1) {
-                inFrontmatter = true;
-                continue;
-            } else if (delimiterCount === 2) {
-                frontmatterEnd = true;
-                break;
-            }
-        }
-
-        if (inFrontmatter && !frontmatterEnd) {
-            frontmatterLines.push(line);
-        }
-    }
-
-    return frontmatterLines.join('\n');
-};
 
 // Function to extract dependencies from frontmatter
 const extractDependencies = (frontmatter) => {

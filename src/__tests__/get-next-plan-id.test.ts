@@ -359,23 +359,7 @@ describe('get-next-plan-id Integration Tests', () => {
     });
   });
 
-  describe('Legacy and Archive Directory Support', () => {
-    test('handles legacy plan files in plans directory', () => {
-      const plans = [
-        { id: 5, format: 'simple', legacy: false }, // New format
-        { id: 10, format: 'simple', legacy: true }, // Legacy format
-        { id: 15, format: 'simple', legacy: false }, // New format
-      ];
-
-      createTaskManagerStructure(tempDir, plans);
-
-      process.chdir(tempDir);
-      const result = executeScript(tempDir);
-
-      expect(result.exitCode).toBe(0);
-      expect(parseInt(result.stdout)).toBe(16); // Next after highest (15)
-    });
-
+  describe('Archive Directory Support', () => {
     test('includes archived plans in ID calculation', () => {
       const plans = [
         { id: 5, format: 'simple' }, // Active
@@ -392,12 +376,12 @@ describe('get-next-plan-id Integration Tests', () => {
       expect(parseInt(result.stdout)).toBe(21); // Next after archived highest (20)
     });
 
-    test('handles mixed legacy and new formats in both plans and archive', () => {
+    test('handles plans in both active and archive directories', () => {
       const plans = [
-        { id: 1, format: 'simple', legacy: false }, // New active
-        { id: 25, format: 'simple', legacy: true }, // Legacy active
-        { id: 10, format: 'simple', legacy: false, archived: true }, // New archived
-        { id: 30, format: 'simple', legacy: true, archived: true }, // Legacy archived - highest
+        { id: 1, format: 'simple' }, // New active
+        { id: 25, format: 'simple' }, // Active
+        { id: 10, format: 'simple', archived: true }, // Archived
+        { id: 30, format: 'simple', archived: true }, // Archived - highest
       ];
 
       createTaskManagerStructure(tempDir, plans);
@@ -481,7 +465,7 @@ describe('get-next-plan-id Integration Tests', () => {
     });
   });
 
-  describe('Error Handling and Debug Mode', () => {
+  describe('Error Handling', () => {
     test('provides clear errors for common failure scenarios', () => {
       // Test missing directory
       const emptyDir = path.join(tempDir, 'no-task-manager');
@@ -521,34 +505,15 @@ describe('get-next-plan-id Integration Tests', () => {
       expect(nextId).toBeGreaterThanOrEqual(6); // At least next after ID 5
     });
 
-    test('debug mode provides detailed logging information', () => {
-      createTaskManagerStructure(tempDir, [
-        { id: 1, format: 'simple' },
-        { id: 3, format: 'quoted' },
-      ]);
-
-      process.chdir(tempDir);
-      const result = executeScript(tempDir, { DEBUG: 'true' });
-
-      expect(result.exitCode).toBe(0);
-      expect(parseInt(result.stdout)).toBe(4);
-
-      // Check for debug logging in stderr
-      expect(result.stderr).toContain('[DEBUG]');
-      expect(result.stderr).toContain('Starting search for task manager root');
-      expect(result.stderr).toContain('Found valid task manager root');
-      expect(result.stderr).toContain('Scanning directory:');
-      expect(result.stderr).toContain('Successfully extracted ID');
-    });
-
-    test('reports ID consistency validation errors', () => {
+    test('uses frontmatter ID as source of truth regardless of directory/filename', () => {
       // Create plan with mismatched IDs between directory, filename, and frontmatter
+      // Frontmatter is the source of truth, so directory/filename mismatches are ignored
       const taskManagerDir = path.join(tempDir, '.ai', 'task-manager');
       const plansDir = path.join(taskManagerDir, 'plans');
 
       fs.mkdirSync(plansDir, { recursive: true });
 
-      // Directory says ID 5, filename says ID 7, frontmatter says ID 10
+      // Directory says ID 5, filename says ID 7, frontmatter says ID 10 (source of truth)
       const planDir = path.join(plansDir, '5--mismatched-plan');
       fs.mkdirSync(planDir, { recursive: true });
 
@@ -558,15 +523,18 @@ describe('get-next-plan-id Integration Tests', () => {
 
       fs.writeFileSync(path.join(planDir, filename), content, 'utf8');
 
+      // Also create another plan with ID 15 to ensure we're using frontmatter
+      createTaskManagerStructure(tempDir, [{ id: 15 }]);
+
       process.chdir(tempDir);
       const result = executeScript(tempDir);
 
       expect(result.exitCode).toBe(0);
-      // Should use highest ID found (10) and continue
-      expect(parseInt(result.stdout)).toBe(11);
+      // Should use frontmatter ID (10) and highest other ID (15), so next is 16
+      expect(parseInt(result.stdout)).toBe(16);
 
-      // Should report consistency errors
-      expect(result.stderr).toContain('ID mismatch');
+      // Should NOT report consistency errors (we no longer check for mismatches)
+      expect(result.stderr).not.toContain('ID mismatch');
     });
   });
 

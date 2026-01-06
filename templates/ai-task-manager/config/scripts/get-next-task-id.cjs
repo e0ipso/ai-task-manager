@@ -2,67 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-
-/**
- * Find the task manager root directory by traversing up from CWD
- * @returns {string|null} Path to task manager root or null if not found
- */
-function findTaskManagerRoot() {
-  let currentPath = process.cwd();
-  const root = path.parse(currentPath).root;
-
-  while (currentPath !== root) {
-    const taskManagerPath = path.join(currentPath, '.ai', 'task-manager', 'plans');
-    if (fs.existsSync(taskManagerPath)) {
-      return path.join(currentPath, '.ai', 'task-manager');
-    }
-    currentPath = path.dirname(currentPath);
-  }
-
-  // Check root directory as well
-  const rootTaskManager = path.join(root, '.ai', 'task-manager', 'plans');
-  if (fs.existsSync(rootTaskManager)) {
-    return path.join(root, '.ai', 'task-manager');
-  }
-
-  return null;
-}
-
-/**
- * Parse YAML frontmatter for ID with resilience to different formats
- * @param {string} content - File content
- * @returns {number|null} Extracted ID or null
- */
-function extractIdFromFrontmatter(content) {
-  const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!frontmatterMatch) return null;
-
-  const frontmatterText = frontmatterMatch[1];
-
-  // Handle various YAML formats for id field using regex:
-  // id: 5
-  // id: "5"
-  // id: '5'
-  // "id": 5
-  // 'id': 5
-  // id : 5 (with spaces)
-  const patterns = [
-    /^\s*["']?id["']?\s*:\s*["']?(\d+)["']?\s*$/m,  // Most flexible pattern
-    /^\s*id\s*:\s*(\d+)\s*$/m,                       // Simple numeric
-    /^\s*id\s*:\s*"(\d+)"\s*$/m,                     // Double quoted
-    /^\s*id\s*:\s*'(\d+)'\s*$/m,                     // Single quoted
-  ];
-
-  for (const pattern of patterns) {
-    const match = frontmatterText.match(pattern);
-    if (match) {
-      const id = parseInt(match[1], 10);
-      if (!isNaN(id)) return id;
-    }
-  }
-
-  return null;
-}
+const { findTaskManagerRoot, extractIdFromFrontmatter } = require('./shared-utils.cjs');
 
 /**
  * Get the next available task ID for a specific plan

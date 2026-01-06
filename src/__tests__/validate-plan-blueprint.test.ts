@@ -12,12 +12,8 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
     testDir = path.join(tmpdir(), `test-validate-${Date.now()}`);
     fs.mkdirpSync(testDir);
 
-    // Copy the script from templates to the test directory
-    const sourceScriptPath = path.join(__dirname, '../../templates/ai-task-manager/config/scripts/validate-plan-blueprint.cjs');
-    const targetScriptDir = path.join(testDir, '.ai/task-manager/config/scripts');
-    fs.mkdirpSync(targetScriptDir);
-    scriptPath = path.join(targetScriptDir, 'validate-plan-blueprint.cjs');
-    fs.copyFileSync(sourceScriptPath, scriptPath);
+    // Use the script from its original location in templates
+    scriptPath = path.join(__dirname, '../../templates/ai-task-manager/config/scripts/validate-plan-blueprint.cjs');
   });
 
   afterEach(() => {
