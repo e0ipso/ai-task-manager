@@ -220,9 +220,7 @@ and	tabs.`;
       expect(result).toContain('title = "Title with \\"quotes\\" and \\\\backslashes"');
       // Triple-quoted strings preserve newlines, but backslashes must be escaped
       // for non-compliant TOML parsers (like Gemini's), so \\ becomes \\\\
-      expect(result).toContain(
-        'Content with "quotes" and \\\\ backslashes\nNewlines\nand\ttabs.'
-      );
+      expect(result).toContain('Content with "quotes" and \\\\ backslashes\nNewlines\nand\ttabs.');
     });
 
     it('should handle content without frontmatter', () => {

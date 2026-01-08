@@ -270,7 +270,13 @@ describe('Orchestration Workflows', () => {
 
   describe('structured output formats', () => {
     it('should verify all commands maintain consistent structured output formats', async () => {
-      const commands = ['create-plan', 'generate-tasks', 'execute-blueprint', 'refine-plan', 'full-workflow'];
+      const commands = [
+        'create-plan',
+        'generate-tasks',
+        'execute-blueprint',
+        'refine-plan',
+        'full-workflow',
+      ];
 
       for (const command of commands) {
         const templatePath = path.resolve(

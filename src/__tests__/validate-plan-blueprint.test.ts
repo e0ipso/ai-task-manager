@@ -13,7 +13,10 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
     fs.mkdirpSync(testDir);
 
     // Use the script from its original location in templates
-    scriptPath = path.join(__dirname, '../../templates/ai-task-manager/config/scripts/validate-plan-blueprint.cjs');
+    scriptPath = path.join(
+      __dirname,
+      '../../templates/ai-task-manager/config/scripts/validate-plan-blueprint.cjs'
+    );
   });
 
   afterEach(() => {
@@ -24,9 +27,21 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
   /**
    * Helper function to create a plan fixture
    */
-  function createPlanFixture(planId: string, planName: string, hasTasks = false, hasBlueprint = false) {
-    const planDir = path.join(testDir, '.ai/task-manager/plans', `${planId}--${planName}`);
+  function createPlanFixture(
+    planId: string,
+    planName: string,
+    hasTasks = false,
+    hasBlueprint = false
+  ) {
+    const tmRoot = path.join(testDir, '.ai', 'task-manager');
+    const planDir = path.join(tmRoot, 'plans', `${planId}--${planName}`);
     fs.mkdirpSync(planDir);
+
+    // Ensure .init-metadata.json exists
+    const metadataPath = path.join(tmRoot, '.init-metadata.json');
+    if (!fs.existsSync(metadataPath)) {
+      fs.writeFileSync(metadataPath, JSON.stringify({ version: '1.0.0' }));
+    }
 
     const planFile = path.join(planDir, `plan-${planId}--${planName}.md`);
     let content = `---\nid: ${parseInt(planId, 10)}\n---\n\n# Plan ${planName}\n`;
@@ -49,19 +64,26 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
   /**
    * Helper function to run the validation script
    */
-  function runScript(planId: string, field?: string): { stdout: string; stderr: string; exitCode: number } {
+  function runScript(
+    planId: string,
+    field?: string
+  ): { stdout: string; stderr: string; exitCode: number } {
     try {
       const cmd = field
         ? `node "${scriptPath}" ${planId} ${field}`
         : `node "${scriptPath}" ${planId}`;
 
-      const stdout = execSync(cmd, { cwd: testDir, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+      const stdout = execSync(cmd, {
+        cwd: testDir,
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
       return { stdout, stderr: '', exitCode: 0 };
     } catch (error: any) {
       return {
         stdout: error.stdout?.toString() || '',
         stderr: error.stderr?.toString() || '',
-        exitCode: error.status || 1
+        exitCode: error.status || 1,
       };
     }
   }

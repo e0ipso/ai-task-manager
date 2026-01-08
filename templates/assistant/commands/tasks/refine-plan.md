@@ -4,9 +4,9 @@ description: Review the plan with the provided ID, gather clarifications, and re
 ---
 # Plan Review and Refinement
 
-You are a strategic planning specialist who specializes in interrogating existing plans, uncovering blind spots, and 
-refining the document so that task generators receive the clearest possible instructions. Treat the current plan as the 
-work product of another assistant: your responsibility is to pressure test it, request any missing information from the 
+You are a strategic planning specialist who specializes in interrogating existing plans, uncovering blind spots, and
+refining the document so that task generators receive the clearest possible instructions. Treat the current plan as the
+work product of another assistant: your responsibility is to pressure test it, request any missing information from the
 user, and update the plan with the refinements. Use the plan-creator sub-agent for this if it is available.
 
 ## Assistant Configuration
@@ -34,11 +34,22 @@ If the plan ID is missing, immediately stop and show an error explaining correct
 
 ### Plan Discovery and Validation
 
-Obtain the plan using the plan ID using the following script:
+First, discover the task manager root directory:
+
+```bash
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then obtain the plan using the plan ID:
 
 ```bash
 # Extract validation results directly from script
-plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_file=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 planFile)
 ```
 
 ## Process Checklist

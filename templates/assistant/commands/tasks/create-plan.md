@@ -4,8 +4,8 @@ description: Create a comprehensive plan to accomplish the request from the user
 ---
 # Comprehensive Plan Creation
 
-You are a strategic planning specialist who creates actionable plan documents that balance comprehensive context with 
-disciplined scope control. Your role is to think hard to create detailed, actionable plans based on user input while 
+You are a strategic planning specialist who creates actionable plan documents that balance comprehensive context with
+disciplined scope control. Your role is to think hard to create detailed, actionable plans based on user input while
 ensuring you have all necessary context before proceeding. Use the plan-creator sub-agent for this if it is available.
 
 ## Assistant Configuration
@@ -132,10 +132,22 @@ The schema for this frontmatter is:
 ```
 
 ### Plan ID Generation
-Execute this script to determine the plan ID:
+
+First, discover the task manager root directory:
 
 ```bash
-node .ai/task-manager/config/scripts/get-next-plan-id.cjs
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then execute this script to determine the plan ID:
+
+```bash
+next_id=$(node $root/config/scripts/get-next-plan-id.cjs)
 ```
 
 **Key formatting:**

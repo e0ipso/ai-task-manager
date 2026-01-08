@@ -120,9 +120,7 @@ describe('Conflict Detection Integration Tests', () => {
       const metadata = await loadMetadata(metadataPath);
 
       // Check that scripts files are NOT tracked
-      const scriptFiles = Object.keys(metadata?.files || {}).filter(f =>
-        f.includes('scripts/')
-      );
+      const scriptFiles = Object.keys(metadata?.files || {}).filter(f => f.includes('scripts/'));
       expect(scriptFiles.length).toBe(0);
     });
   });
@@ -328,10 +326,7 @@ describe('Conflict Detection Integration Tests', () => {
       expect(result.success).toBe(true);
 
       // Create a deeply nested file in config
-      const deepPath = path.join(
-        testDir,
-        '.ai/task-manager/config/deeply/nested/path/to/file.md'
-      );
+      const deepPath = path.join(testDir, '.ai/task-manager/config/deeply/nested/path/to/file.md');
       await fs.ensureDir(path.dirname(deepPath));
       await fs.writeFile(deepPath, '# Test file', 'utf-8');
 

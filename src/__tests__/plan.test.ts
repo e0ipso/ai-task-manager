@@ -17,9 +17,12 @@ jest.mock('chalk', () => ({
       cyan: jest.fn((str: string) => str),
       white: jest.fn((str: string) => str),
     },
-    cyan: Object.assign(jest.fn((str: string) => str), {
-      bold: jest.fn((str: string) => str),
-    }),
+    cyan: Object.assign(
+      jest.fn((str: string) => str),
+      {
+        bold: jest.fn((str: string) => str),
+      }
+    ),
   },
 }));
 

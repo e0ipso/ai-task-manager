@@ -145,9 +145,20 @@ created: 2025-09-01
 
 #### Plan ID Generation
 
-**Auto-generate the next plan ID:**
+First, discover the task manager root directory:
+
 ```bash
-node .ai/task-manager/config/scripts/get-next-plan-id.cjs
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then auto-generate the next plan ID:
+```bash
+node $root/config/scripts/get-next-plan-id.cjs
 ```
 
 **Key formatting:**
@@ -272,7 +283,7 @@ Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
 When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
 
 ```bash
-node .ai/task-manager/config/scripts/get-next-task-id.cjs [PLAN_ID from Step 1]
+node $root/config/scripts/get-next-task-id.cjs [PLAN_ID from Step 1]
 ```
 
 #### Step 4: POST_TASK_GENERATION_ALL hook
@@ -337,12 +348,14 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 
 **Validation Steps:**
 
+Use the task manager root discovered in Step 1 to extract validation results:
+
 ```bash
 # Extract validation results directly from script
-plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] planFile)
-plan_dir=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] planDir)
-task_count=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] taskCount)
-blueprint_exists=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs [planId] blueprintExists)
+plan_file=$(node $root/config/scripts/validate-plan-blueprint.cjs [planId] planFile)
+plan_dir=$(node $root/config/scripts/validate-plan-blueprint.cjs [planId] planDir)
+task_count=$(node $root/config/scripts/validate-plan-blueprint.cjs [planId] taskCount)
+blueprint_exists=$(node $root/config/scripts/validate-plan-blueprint.cjs [planId] blueprintExists)
 ```
 
 If either `$task_count` is 0 or `$blueprint_exists` is "no":

@@ -44,12 +44,25 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 
 **Validation Steps:**
 
+First, discover the task manager root directory:
+
+```bash
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then extract validation results:
+
 ```bash
 # Extract validation results directly from script
-plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
-plan_dir=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planDir)
-task_count=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
-blueprint_exists=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
+plan_file=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_dir=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 planDir)
+task_count=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 taskCount)
+blueprint_exists=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 blueprintExists)
 ```
 
 4. **Automatic task generation**:

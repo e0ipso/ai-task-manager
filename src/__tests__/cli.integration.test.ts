@@ -322,9 +322,7 @@ describe('CLI Integration Tests - Consolidated', () => {
     });
 
     it('should not affect other assistant formats when fixing Gemini', async () => {
-      const result = executeCommand(
-        `node "${cliPath}" init --assistants claude,cursor,gemini`
-      );
+      const result = executeCommand(`node "${cliPath}" init --assistants claude,cursor,gemini`);
       expect(result.exitCode).toBe(0);
 
       // Verify Claude uses Markdown format

@@ -38,9 +38,22 @@ Use your internal Todo task tool to track the following process:
 
 - A plan document. Extract it with the following command.
 
+First, discover the task manager root directory:
+
+```bash
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then extract validation results:
+
 ```bash
 # Extract validation results directly from script
-plan_file=$(node .ai/task-manager/config/scripts/validate-plan-blueprint.cjs $1 planFile)
+plan_file=$(node $root/config/scripts/validate-plan-blueprint.cjs $1 planFile)
 ```
 
 ### Input Error Handling
@@ -243,7 +256,7 @@ Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
 When creating tasks, you need to determine the next available task ID for the specified plan. Use this bash command to automatically generate the correct ID:
 
 ```bash
-node .ai/task-manager/config/scripts/get-next-task-id.cjs $1
+node $root/config/scripts/get-next-task-id.cjs $1
 ```
 
 ### Validation Checklist

@@ -57,21 +57,32 @@ fi
 
 ## Execution Process
 
-### 1. Plan and Task Location
+### 1. Root Discovery and Plan Location
 
-Locate the plan directory using the established find pattern:
+First, discover the task manager root directory:
+
+```bash
+root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
+
+Then locate the plan directory using the discovered root:
 
 ```bash
 plan_id="$1"
 task_id="$2"
 
 # Find plan directory
-plan_dir=$(find .ai/task-manager/{plans,archive} -type d -name "${plan_id}--*" 2>/dev/null | head -1)
+plan_dir=$(find $root/{plans,archive} -type d -name "${plan_id}--*" 2>/dev/null | head -1)
 
 if [ -z "$plan_dir" ]; then
     echo "Error: Plan with ID ${plan_id} not found"
     echo "Available plans:"
-    find .ai/task-manager/plans -name "*--*" -type d | head -5
+    find $root/plans -name "*--*" -type d | head -5
     exit 1
 fi
 
@@ -147,7 +158,7 @@ Use the dependency checking script to validate all dependencies:
 
 ```bash
 # Call the dependency checking script
-if ! node .ai/task-manager/config/scripts/check-task-dependencies.cjs "$plan_id" "$task_id"; then
+if ! node $root/config/scripts/check-task-dependencies.cjs "$plan_id" "$task_id"; then
     echo ""
     echo "Task execution blocked by unresolved dependencies."
     echo "Please complete the required dependencies first."

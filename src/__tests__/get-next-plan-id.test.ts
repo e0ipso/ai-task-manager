@@ -173,6 +173,12 @@ describe('get-next-plan-id Integration Tests', () => {
     fs.mkdirSync(plansDir, { recursive: true });
     fs.mkdirSync(archiveDir, { recursive: true });
 
+    // Create .init-metadata.json to mark this as a valid task manager root
+    fs.writeFileSync(
+      path.join(taskManagerDir, '.init-metadata.json'),
+      JSON.stringify({ version: '1.0.0' })
+    );
+
     // Create plan files
     plans.forEach(plan => {
       const planId = plan.id;
@@ -425,6 +431,12 @@ describe('get-next-plan-id Integration Tests', () => {
       fs.mkdirSync(path.join(taskManagerDir, 'plans'), { recursive: true });
       fs.mkdirSync(path.join(taskManagerDir, 'archive'), { recursive: true });
 
+      // Create .init-metadata.json to mark this as a valid task manager root
+      fs.writeFileSync(
+        path.join(taskManagerDir, '.init-metadata.json'),
+        JSON.stringify({ version: '1.0.0' })
+      );
+
       process.chdir(tempDir);
       const result = executeScript(tempDir);
 
@@ -541,9 +553,16 @@ describe('get-next-plan-id Integration Tests', () => {
   describe('Cross-Platform Compatibility', () => {
     test('handles different path separators and line endings', () => {
       // Create plan files with different line endings
-      const taskManagerDir = path.join(tempDir, '.ai', 'task-manager', 'plans');
+      const taskManagerRoot = path.join(tempDir, '.ai', 'task-manager');
+      const taskManagerDir = path.join(taskManagerRoot, 'plans');
       const planDir = path.join(taskManagerDir, '1--cross-platform');
       fs.mkdirSync(planDir, { recursive: true });
+
+      // Create .init-metadata.json to mark this as a valid task manager root
+      fs.writeFileSync(
+        path.join(taskManagerRoot, '.init-metadata.json'),
+        JSON.stringify({ version: '1.0.0' })
+      );
 
       // Test with Windows-style line endings
       const windowsContent =
