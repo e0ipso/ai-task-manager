@@ -1,3 +1,8 @@
+## <small>1.26.4 (2026-01-08)</small>
+
+* fix: trigger release ([4217652](https://github.com/e0ipso/ai-task-manager/commit/4217652))
+* test: add comprehensive unit tests for scripts and utilities ([e4fde03](https://github.com/e0ipso/ai-task-manager/commit/e4fde03))
+
 ## <small>1.26.3 (2026-01-06)</small>
 
 * fix: streamline task and plan ID retrieval scripts ([0368e94](https://github.com/e0ipso/ai-task-manager/commit/0368e94))
