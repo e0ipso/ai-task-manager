@@ -1,3 +1,8 @@
+## <small>1.26.6 (2026-01-09)</small>
+
+* Merge remote-tracking branch 'origin/main' ([fa9e7d9](https://github.com/e0ipso/ai-task-manager/commit/fa9e7d9))
+* fix(commands): update root script filename ([f0bea2c](https://github.com/e0ipso/ai-task-manager/commit/f0bea2c))
+
 ## <small>1.26.5 (2026-01-09)</small>
 
 * fix(commands): improve configuration handling ([db51b05](https://github.com/e0ipso/ai-task-manager/commit/db51b05))
