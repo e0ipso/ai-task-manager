@@ -1,3 +1,7 @@
+## <small>1.26.5 (2026-01-09)</small>
+
+* fix(commands): improve configuration handling ([db51b05](https://github.com/e0ipso/ai-task-manager/commit/db51b05))
+
 ## <small>1.26.4 (2026-01-08)</small>
 
 * fix: trigger release ([4217652](https://github.com/e0ipso/ai-task-manager/commit/4217652))
