@@ -6,18 +6,48 @@ description: Execute a single task with dependency validation and status managem
 
 You are responsible for executing a single task within a plan while maintaining strict dependency validation and proper status management. Your role is to ensure the task is ready for execution, deploy the appropriate agent, and track execution progress.
 
-## Assistant Configuration
-
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
 ---
+
+## Find the AI Task Manager root
+
+```bash
+if [ ! -f /tmp/find-ai-task-manager-root.js ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.js
+const fs = require('fs');
+const path = require('path');
+
+const findRoot = (currentDir) => {
+  const taskManagerPath = path.join(currentDir, '.ai/task-manager');
+  const metadataPath = path.join(taskManagerPath, '.init-metadata.json');
+
+  try {
+    if (fs.existsSync(metadataPath) && JSON.parse(fs.readFileSync(metadataPath, 'utf8')).version) {
+      console.log(path.resolve(taskManagerPath));
+      process.exit(0);
+    }
+  } catch (e) {
+    // Continue searching
+  }
+
+  const parentDir = path.dirname(currentDir);
+  if (parentDir !== currentDir) {
+    findRoot(parentDir);
+  } else {
+    process.exit(1);
+  }
+};
+
+findRoot(process.cwd());
+EOF
+fi
+
+root=$(node /tmp/find-ai-task-manager-root.js)
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
 
 Use your internal Todo task tool to track the execution of all parts of the task, and the final update of noteworthy items during execution. Example:
 
@@ -40,7 +70,7 @@ Use your internal Todo task tool to track the execution of all parts of the task
 - Plan ID: $1 (required)
 - Task ID: $2 (required)
 - Task management directory structure: `/`
-- Dependency checking script: `.ai/task-manager/config/scripts/check-task-dependencies.cjs`
+- Dependency checking script: `$root/.ai/task-manager/config/scripts/check-task-dependencies.cjs`
 
 ### Input Validation
 
@@ -57,20 +87,9 @@ fi
 
 ## Execution Process
 
-### 1. Root Discovery and Plan Location
+### 1. Plan Location
 
-First, discover the task manager root directory:
-
-```bash
-root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
-
-if [ -z "$root" ]; then
-    echo "Error: Could not find task manager root directory (.ai/task-manager)"
-    exit 1
-fi
-```
-
-Then locate the plan directory using the discovered root:
+Locate the plan directory using the discovered root:
 
 ```bash
 plan_id="$1"
@@ -173,7 +192,7 @@ echo "✓ All dependencies resolved - proceeding with execution"
 
 Read task skills and select appropriate task-specific agent:
 
-Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
+Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 ### 6. Status Update to In-Progress
 
@@ -256,7 +275,7 @@ echo "You can now execute dependent tasks or continue with the full blueprint ex
 
 ## Error Handling
 
-Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
+Read and execute $root/.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ## Usage Examples
 

@@ -5,24 +5,54 @@ description: Generate tasks to implement the plan with the provided ID.
 
 # Comprehensive Task List Creation
 
-## Assistant Configuration
-
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
 ---
 
-Think harder and use tools.
+Ultrathink, think harder, and use tools.
+
+## Find the AI Task Manager root
+
+```bash
+if [ ! -f /tmp/find-ai-task-manager-root.js ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.js
+const fs = require('fs');
+const path = require('path');
+
+const findRoot = (currentDir) => {
+  const taskManagerPath = path.join(currentDir, '.ai/task-manager');
+  const metadataPath = path.join(taskManagerPath, '.init-metadata.json');
+
+  try {
+    if (fs.existsSync(metadataPath) && JSON.parse(fs.readFileSync(metadataPath, 'utf8')).version) {
+      console.log(path.resolve(taskManagerPath));
+      process.exit(0);
+    }
+  } catch (e) {
+    // Continue searching
+  }
+
+  const parentDir = path.dirname(currentDir);
+  if (parentDir !== currentDir) {
+    findRoot(parentDir);
+  } else {
+    process.exit(1);
+  }
+};
+
+findRoot(process.cwd());
+EOF
+fi
+
+root=$(node /tmp/find-ai-task-manager-root.js)
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
 
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
-Include `.ai/task-manager/config/TASK_MANAGER.md` for the directory structure of tasks.
+Include `$root/.ai/task-manager/config/TASK_MANAGER.md` for the directory structure of tasks.
 
 ## Instructions
 
@@ -32,24 +62,11 @@ Use your internal Todo task tool to track the following process:
 
 - [ ] Read and process plan $1
 - [ ] Use the Task Generation Process to create tasks according to the Task Creation Guidelines
-- [ ] Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+- [ ] Read and run the $root/.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 ### Input
 
 - A plan document. Extract it with the following command.
-
-First, discover the task manager root directory:
-
-```bash
-root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
-
-if [ -z "$root" ]; then
-    echo "Error: Could not find task manager root directory (.ai/task-manager)"
-    exit 1
-fi
-```
-
-Then extract validation results:
 
 ```bash
 # Extract validation results directly from script
@@ -249,7 +266,7 @@ The schema for this frontmatter is:
 
 ##### Task Body Structure
 
-Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
+Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.md
 
 ##### Task ID Generation
 
@@ -309,14 +326,14 @@ If the plan lacks sufficient detail:
 
 #### Step 4: POST_TASK_GENERATION_ALL hook
 
-Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+Read and run the $root/.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 ### Output Requirements
 
 **Output Behavior:**
 
 Provide a concise completion message with task count and location:
-- Example: "Task generation complete. Created [count] tasks in `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
+- Example: "Task generation complete. Created [count] tasks in `$root/.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 

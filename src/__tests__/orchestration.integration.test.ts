@@ -376,34 +376,6 @@ describe('Orchestration Workflows', () => {
     });
   });
 
-  describe('assistant configuration integration', () => {
-    it('should verify commands load assistant configuration before execution', async () => {
-      const commands = ['full-workflow', 'execute-blueprint', 'refine-plan'];
-
-      for (const command of commands) {
-        const templatePath = path.resolve(
-          __dirname,
-          `../../templates/assistant/commands/tasks/${command}.md`
-        );
-
-        const content = await fs.readFile(templatePath, 'utf8');
-
-        // Verify assistant configuration loading (direct approach, not detection scripts)
-        expect(content).toMatch(/Assistant Configuration/i);
-
-        // Verify configuration files are referenced directly (not via detection scripts)
-        expect(content).toMatch(/AGENTS\.md|configuration.*files|config/i);
-
-        // Verify configuration is required before proceeding
-        expect(content).toMatch(/MUST.*configuration|configuration.*MUST/i);
-
-        // Verify detection scripts are NOT used anymore
-        expect(content).not.toContain('detect-assistant.cjs');
-        expect(content).not.toContain('read-assistant-config.cjs');
-      }
-    });
-  });
-
   describe('error handling and edge cases', () => {
     it('should verify full-workflow handles missing user input', async () => {
       const templatePath = path.resolve(

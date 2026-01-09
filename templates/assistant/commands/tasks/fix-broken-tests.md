@@ -2,20 +2,8 @@
 argument-hint: "[testCommand]"
 description: Fix the tests your task execution broke.
 ---
-## Assistant Configuration
 
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
----
-
-Fix all failing tests in this repository. Think harder and use tools.
+Fix all failing tests in this repository. Ultrathink, think harder, and use tools.
 
 Execute this command to run the tests:
 

@@ -8,24 +8,54 @@ You are a strategic planning specialist who creates actionable plan documents th
 disciplined scope control. Your role is to think hard to create detailed, actionable plans based on user input while
 ensuring you have all necessary context before proceeding. Use the plan-creator sub-agent for this if it is available.
 
-## Assistant Configuration
-
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
 ---
 
-Think harder and use tools.
+Ultrathink, think harder, and use tools.
 
-Include .ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
+## Find the AI Task Manager root
+
+```bash
+if [ ! -f /tmp/find-ai-task-manager-root.js ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.js
+const fs = require('fs');
+const path = require('path');
+
+const findRoot = (currentDir) => {
+  const taskManagerPath = path.join(currentDir, '.ai/task-manager');
+  const metadataPath = path.join(taskManagerPath, '.init-metadata.json');
+
+  try {
+    if (fs.existsSync(metadataPath) && JSON.parse(fs.readFileSync(metadataPath, 'utf8')).version) {
+      console.log(path.resolve(taskManagerPath));
+      process.exit(0);
+    }
+  } catch (e) {
+    // Continue searching
+  }
+
+  const parentDir = path.dirname(currentDir);
+  if (parentDir !== currentDir) {
+    findRoot(parentDir);
+  } else {
+    process.exit(1);
+  }
+};
+
+findRoot(process.cwd());
+EOF
+fi
+
+root=$(node /tmp/find-ai-task-manager-root.js)
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
 
 ## Instructions
+
+Include $root/ $root/.ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
 
 The user input is:
 
@@ -39,11 +69,11 @@ If no user input is provided stop immediately and show an error message to the u
 
 Use your internal Todo task tool to track the following plan generation:
 
-- [ ] Read and execute .ai/task-manager/config/hooks/PRE_PLAN.md
+- [ ] Read and execute $root/ $root/.ai/task-manager/config/hooks/PRE_PLAN.md
 - [ ] User input and context analysis
 - [ ] Clarification questions
 - [ ] Plan generation
-- [ ] Read and execute .ai/task-manager/config/hooks/POST_PLAN.md
+- [ ] Read and execute $root/ $root/.ai/task-manager/config/hooks/POST_PLAN.md
 
 #### Step 1: Context Analysis
 Before creating any plan, analyze the user's request for:
@@ -66,7 +96,7 @@ Try to answer your own questions first by inspecting the codebase, docs, and ass
 IMPORTANT: Once you have the user's answers go back to Step 2. Do this in a loop until you have no more questions. Ask as many rounds of questions as necessary, it is very important you have all the information you need to achieve your task.
 
 #### Step 3: Plan Generation
-Only after confirming sufficient context, create a plan according the the .ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Only after confirming sufficient context, create a plan according the the $root/ $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ##### CRITICAL: Output Format
 
@@ -88,7 +118,7 @@ This structured output enables automated workflow coordination and must be inclu
 
 ###### Plan Template
 
-Use the template in .ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Use the template in $root/ $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ###### Patterns to Avoid
 Do not include the following in your plan output.
@@ -133,18 +163,7 @@ The schema for this frontmatter is:
 
 ### Plan ID Generation
 
-First, discover the task manager root directory:
-
-```bash
-root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
-
-if [ -z "$root" ]; then
-    echo "Error: Could not find task manager root directory (.ai/task-manager)"
-    exit 1
-fi
-```
-
-Then execute this script to determine the plan ID:
+Execute this script to determine the plan ID:
 
 ```bash
 next_id=$(node $root/config/scripts/get-next-plan-id.cjs)

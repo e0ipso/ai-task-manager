@@ -2,22 +2,53 @@
 argument-hint: "[userPrompt]"
 description: Execute the full workflow from plan creation to blueprint execution.
 ---
+
 # Full Workflow Execution
 
 You are a workflow composition assistant. Your role is to execute the complete task management workflow from plan creation through blueprint execution **without pausing between steps**. This is a fully automated workflow that executes all three steps sequentially.
 
-## Assistant Configuration
-
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
 ---
+
+## Find the AI Task Manager root
+
+```bash
+if [ ! -f /tmp/find-ai-task-manager-root.js ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.js
+const fs = require('fs');
+const path = require('path');
+
+const findRoot = (currentDir) => {
+  const taskManagerPath = path.join(currentDir, '.ai/task-manager');
+  const metadataPath = path.join(taskManagerPath, '.init-metadata.json');
+
+  try {
+    if (fs.existsSync(metadataPath) && JSON.parse(fs.readFileSync(metadataPath, 'utf8')).version) {
+      console.log(path.resolve(taskManagerPath));
+      process.exit(0);
+    }
+  } catch (e) {
+    // Continue searching
+  }
+
+  const parentDir = path.dirname(currentDir);
+  if (parentDir !== currentDir) {
+    findRoot(parentDir);
+  } else {
+    process.exit(1);
+  }
+};
+
+findRoot(process.cwd());
+EOF
+fi
+
+root=$(node /tmp/find-ai-task-manager-root.js)
+
+if [ -z "$root" ]; then
+    echo "Error: Could not find task manager root directory (.ai/task-manager)"
+    exit 1
+fi
+```
 
 ## Workflow Execution Instructions
 
@@ -52,24 +83,24 @@ Use your internal Todo task tool to track the workflow execution:
 
 Execute the following plan creation process:
 
-Think harder and use tools.
+Ultrathink, think harder, and use tools.
 
 You are a comprehensive task planning assistant. Your role is to think hard to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
-Include .ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
+Include $root/.ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
 
 ### Process
 
 Use your internal Todo task tool to track the plan generation:
 
-- [ ] Read and execute .ai/task-manager/config/hooks/PRE_PLAN.md
+- [ ] Read and execute $root/.ai/task-manager/config/hooks/PRE_PLAN.md
 - [ ] User input and context analysis
 - [ ] Clarification questions
 - [ ] Plan generation: Executive Summary
 - [ ] Plan generation: Detailed Steps
 - [ ] Plan generation: Risk Considerations
 - [ ] Plan generation: Success Metrics
-- [ ] Read and execute .ai/task-manager/config/hooks/POST_PLAN.md
+- [ ] Read and execute $root/.ai/task-manager/config/hooks/POST_PLAN.md
 
 #### Context Analysis
 Before creating any plan, analyze the user's request for:
@@ -125,7 +156,7 @@ This structured output enables automated workflow coordination and must be inclu
 
 #### Plan Template
 
-Use the template in .ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Use the template in $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 #### Patterns to Avoid
 Do not include the following in your plan output.
@@ -145,18 +176,8 @@ created: 2025-09-01
 
 #### Plan ID Generation
 
-First, discover the task manager root directory:
+Execute to auto-generate the next plan ID:
 
-```bash
-root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
-
-if [ -z "$root" ]; then
-    echo "Error: Could not find task manager root directory (.ai/task-manager)"
-    exit 1
-fi
-```
-
-Then auto-generate the next plan ID:
 ```bash
 node $root/config/scripts/get-next-plan-id.cjs
 ```
@@ -179,8 +200,6 @@ node $root/config/scripts/get-next-plan-id.cjs
 
 Using the Plan ID extracted from Step 1, execute task generation:
 
-Think harder and use tools.
-
 You are a comprehensive task planning assistant. Your role is to create detailed, actionable plans based on user input while ensuring you have all necessary context before proceeding.
 
 Include /TASK_MANAGER.md for the directory structure of tasks.
@@ -193,10 +212,10 @@ Use your internal Todo task tool to track the following process:
 
 - [ ] Read and process plan [PLAN_ID from Step 1]
 - [ ] Use the Task Generation Process to create tasks according to the Task Creation Guidelines
-- [ ] Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+- [ ] Read and run the $root/.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 #### Input
-- A plan document. See .ai/task-manager/config/TASK_MANAGER.md to find the plan with ID from Step 1
+- A plan document. See $root/.ai/task-manager/config/TASK_MANAGER.md to find the plan with ID from Step 1
 - The plan contains high-level objectives and implementation steps
 
 #### Input Error Handling
@@ -276,7 +295,7 @@ For each task, identify:
 
 #### Step 3: Task Generation
 
-Use the task template in .ai/task-manager/config/templates/TASK_TEMPLATE.md
+Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.md
 
 **Task ID Generation:**
 
@@ -288,14 +307,14 @@ node $root/config/scripts/get-next-task-id.cjs [PLAN_ID from Step 1]
 
 #### Step 4: POST_TASK_GENERATION_ALL hook
 
-Read and run the .ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
+Read and run the $root/.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md
 
 ### Output Requirements
 
 **Output Behavior:**
 
 Provide a concise completion message with task count and location:
-- Example: "Task generation complete. Created [count] tasks in `.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
+- Example: "Task generation complete. Created [count] tasks in `$root/.ai/task-manager/plans/[plan-id]--[name]/tasks/`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 
@@ -367,7 +386,7 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 
 #### Phase Pre-Execution
 
-Read and execute .ai/task-manager/config/hooks/PRE_PHASE.md
+Read and execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md
 
 #### Phase Execution Workflow
 
@@ -376,7 +395,7 @@ Read and execute .ai/task-manager/config/hooks/PRE_PHASE.md
     - List all tasks scheduled for parallel execution in this phase
 
 2. **Agent Selection and Task Assignment**
-Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
+Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 3. **Parallel Execution**
     - Deploy all selected agents simultaneously using your internal Task tool
@@ -391,7 +410,7 @@ Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 #### Phase Post-Execution
 
-Read and execute .ai/task-manager/config/hooks/POST_PHASE.md
+Read and execute $root/.ai/task-manager/config/hooks/POST_PHASE.md
 
 #### Phase Transition
 
@@ -404,7 +423,7 @@ Read and execute .ai/task-manager/config/hooks/POST_PHASE.md
 **Output Behavior:**
 
 Provide a concise execution summary:
-- Example: "Execution completed. Review summary: `.ai/task-manager/archive/[plan]/plan-[id].md`"
+- Example: "Execution completed. Review summary: `$root/.ai/task-manager/archive/[plan]/plan-[id].md`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 
@@ -415,7 +434,7 @@ Always end your output with a standardized summary in this exact format:
 Execution Summary:
 - Plan ID: [numeric-id]
 - Status: Archived
-- Location: .ai/task-manager/archive/[plan-id]--[plan-name]/
+- Location: $root/.ai/task-manager/archive/[plan-id]--[plan-name]/
 ```
 
 This structured output enables automated workflow coordination and must be included even when running standalone.
@@ -429,7 +448,7 @@ Upon successful completion of all phases and validation gates, perform the follo
 
 #### Execution Summary Generation
 
-Append an execution summary section to the plan document with the format described in .ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md
+Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md
 
 #### Plan Archival
 
@@ -437,7 +456,7 @@ After successfully appending the execution summary:
 
 **Move completed plan to archive**:
 ```bash
-mv .ai/task-manager/plans/[plan-folder] .ai/task-manager/archive/
+mv $root/.ai/task-manager/plans/[plan-folder] $root/.ai/task-manager/archive/
 ```
 
 **Progress**: ⬛⬛⬛ 100% - Step 3/3: Blueprint Execution Complete

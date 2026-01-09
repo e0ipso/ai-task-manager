@@ -4,17 +4,6 @@ description: Execute the task in the plan.
 ---
 # Task Execution
 
-## Assistant Configuration
-
-Before proceeding with this command, you MUST load and respect the assistant's configuration:
-
-Load the following configuration files in order of precedence (later files override earlier ones):
-1. `/workspace/AGENTS.md` - Project-level task management guidance
-2. `/workspace/CLAUDE.md` - Claude-specific assistant configuration (if it exists)
-3. `/home/node/.claude/CLAUDE.md` - Global Claude configuration from your home directory (if it exists)
-
-These files contain your global and project-level configuration rules. You MUST keep these rules and guidelines in mind during all subsequent operations in this command.
-
 ---
 
 You are the coordinator responsible for executing all tasks defined in the execution blueprint of a plan document, so choose an appropriate sub-agent for this role. Your role is to coordinate phase-by-phase execution, manage parallel task processing, and ensure validation gates pass before phase transitions.
@@ -47,7 +36,37 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 First, discover the task manager root directory:
 
 ```bash
-root=$(node -e 'const fs=require("fs"),path=require("path");const f=p=>{const t=path.join(p,".ai/task-manager");const m=path.join(t,".init-metadata.json");try{if(JSON.parse(fs.readFileSync(m)).version){console.log(path.resolve(t));process.exit(0)}}catch(e){};const d=path.dirname(p);if(d!==p)f(d)};f(process.cwd());process.exit(1)')
+if [ ! -f /tmp/find-ai-task-manager-root.cjs ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.cjs
+const fs = require('fs');
+const path = require('path');
+
+const findRoot = (currentDir) => {
+  const taskManagerPath = path.join(currentDir, '.ai/task-manager');
+  const metadataPath = path.join(taskManagerPath, '.init-metadata.json');
+
+  try {
+    if (fs.existsSync(metadataPath) && JSON.parse(fs.readFileSync(metadataPath, 'utf8')).version) {
+      console.log(path.resolve(taskManagerPath));
+      process.exit(0);
+    }
+  } catch (e) {
+    // Continue searching
+  }
+
+  const parentDir = path.dirname(currentDir);
+  if (parentDir !== currentDir) {
+    findRoot(parentDir);
+  } else {
+    process.exit(1);
+  }
+};
+
+findRoot(process.cwd());
+EOF
+fi
+
+root=$(node /tmp/find-ai-task-manager-root.js)
 
 if [ -z "$root" ]; then
     echo "Error: Could not find task manager root directory (.ai/task-manager)"
@@ -95,21 +114,21 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 
 - [ ] Create feature branch from the main branch.
 - [ ] Validate or auto-generate tasks and execution blueprint if missing.
-- [ ] Execute .ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 1.
+- [ ] Execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 1.
 - [ ] Phase 1: Execute 1 task(s) in parallel.
-- [ ] Execute .ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 1.
-- [ ] Execute .ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 2.
+- [ ] Execute $root/.ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 1.
+- [ ] Execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 2.
 - [ ] Phase 2: Execute 3 task(s) in parallel.
-- [ ] Execute .ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 2.
-- [ ] Execute .ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 3.
+- [ ] Execute $root/.ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 2.
+- [ ] Execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md hook before Phase 3.
 - [ ] Phase 3: Execute 1 task(s) in parallel.
-- [ ] Execute .ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 3.
-- [ ] Update the Plan 7 with execution summary using .ai/task-manager/config/hooks/EXECUTION_SUMMARY_TEMPLATE.md.
+- [ ] Execute $root/.ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 3.
+- [ ] Update the Plan 7 with execution summary using $root/.ai/task-manager/config/hooks/EXECUTION_SUMMARY_TEMPLATE.md.
 - [ ] Archive Plan 7.
 
 ### Phase Pre-Execution
 
-Read and execute .ai/task-manager/config/hooks/PRE_PHASE.md
+Read and execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md
 
 ### Phase Execution Workflow
 
@@ -118,7 +137,7 @@ Read and execute .ai/task-manager/config/hooks/PRE_PHASE.md
     - List all tasks scheduled for parallel execution in this phase
 
 2. **Agent Selection and Task Assignment**
-Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
+Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 3. **Parallel Execution**
     - Deploy all selected agents simultaneously using your internal Task tool
@@ -133,7 +152,7 @@ Read and execute .ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 ### Phase Post-Execution
 
-Read and execute .ai/task-manager/config/hooks/POST_PHASE.md
+Read and execute $root/.ai/task-manager/config/hooks/POST_PHASE.md
 
 
 ### Phase Transition
@@ -145,14 +164,14 @@ Read and execute .ai/task-manager/config/hooks/POST_PHASE.md
 ### Error Handling
 
 #### Validation Gate Failures
-Read and execute .ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
+Read and execute $root/.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ### Output Requirements
 
 **Output Behavior:**
 
 Provide a concise execution summary:
-- Example: "Execution completed. Review summary: `.ai/task-manager/archive/[plan]/plan-[id].md`"
+- Example: "Execution completed. Review summary: `$root/.ai/task-manager/archive/[plan]/plan-[id].md`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 
@@ -163,7 +182,7 @@ Always end your output with a standardized summary in this exact format:
 Execution Summary:
 - Plan ID: [numeric-id]
 - Status: Archived
-- Location: .ai/task-manager/archive/[plan-id]--[plan-name]/
+- Location: $root/.ai/task-manager/archive/[plan-id]--[plan-name]/
 ```
 
 This structured output enables automated workflow coordination and must be included even when running standalone.
@@ -184,7 +203,7 @@ Upon successful completion of all phases and validation gates, perform the follo
 
 ### 1. Execution Summary Generation
 
-Append an execution summary section to the plan document with the format described in .ai/task-manager/config/templates/[EXECUTION_SUMMARY_TEMPLATE.md
+Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/[EXECUTION_SUMMARY_TEMPLATE.md
 
 ### 2. Plan Archival
 
@@ -192,7 +211,7 @@ After successfully appending the execution summary:
 
 **Move completed plan to archive**:
 ```bash
-mv .ai/task-manager/plans/[plan-folder] .ai/task-manager/archive/
+mv $root/.ai/task-manager/plans/[plan-folder] $root/.ai/task-manager/archive/
 ```
 
 ### Important Notes
