@@ -36,8 +36,8 @@ Before proceeding with execution, validate that tasks exist and the execution bl
 First, discover the task manager root directory:
 
 ```bash
-if [ ! -f /tmp/find-ai-task-manager-root.cjs ]; then
-  cat << 'EOF' > /tmp/find-ai-task-manager-root.cjs
+if [ ! -f /tmp/find-ai-task-manager-root.js ]; then
+  cat << 'EOF' > /tmp/find-ai-task-manager-root.js
 const fs = require('fs');
 const path = require('path');
 
