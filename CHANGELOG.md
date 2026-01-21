@@ -1,3 +1,7 @@
+## <small>1.26.7 (2026-01-21)</small>
+
+* fix: prevent auto-responses in refine-plan ([9f7da42](https://github.com/e0ipso/ai-task-manager/commit/9f7da42))
+
 ## <small>1.26.6 (2026-01-09)</small>
 
 * Merge remote-tracking branch 'origin/main' ([fa9e7d9](https://github.com/e0ipso/ai-task-manager/commit/fa9e7d9))
