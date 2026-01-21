@@ -113,14 +113,16 @@ Think harder before interrupting the user—only trigger this loop when you can 
     - Build a clarification packet grouped by theme.
     - Prefill each question with the most plausible answer so the user can confirm/deny quickly.
     - Always include an **“Other / open-ended”** option to capture nuances you did not anticipate.
-5. Send the packet, capture the responses (including open-ended notes), update the Plan Clarifications table, then jump back to Step 1 to ensure no new gaps remain.
+5. **STOP AND ASK**: Present the clarification packet to the user. **You must halt execution here and await user input.** Do not simulate the user's response. Do not proceed to Stage 3 until you have received explicit answers.
 
 ```mermaid
 flowchart TD
     A[Inspect current plan] --> B{Need more clarification?}
     B -- No --> C[End · proceed with refinement]
-    B -- Yes --> D[Collect question set\n• targeted prompts\n• prefilled answers\n• open-ended field]
-    D --> B
+    B -- Yes --> D[Construct Question Packet]
+    D --> E[STOP · Ask User]
+    E --> F[Receive Input]
+    F --> B
 ```
 
 ## Stage 3: Refinement Implementation
