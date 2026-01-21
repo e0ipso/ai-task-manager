@@ -92,7 +92,7 @@ If either `$task_count` is 0 or `$blueprint_exists` is "no":
 
    ## Embedded Task Generation
 
-   Follow ALL instructions from `generate-tasks.md` exactly for plan ID $1.
+   Follow ALL instructions from `.*/**/generate-tasks.md` exactly for plan ID $1. It is important that you find and read the `generate-tasks.md` command first.
 
    This includes:
    - Reading and processing the plan document
