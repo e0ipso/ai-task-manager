@@ -1,3 +1,7 @@
+## <small>1.26.8 (2026-01-21)</small>
+
+* fix: find the generate-tasks.md file first ([08e4d5f](https://github.com/e0ipso/ai-task-manager/commit/08e4d5f))
+
 ## <small>1.26.7 (2026-01-21)</small>
 
 * fix: prevent auto-responses in refine-plan ([9f7da42](https://github.com/e0ipso/ai-task-manager/commit/9f7da42))
