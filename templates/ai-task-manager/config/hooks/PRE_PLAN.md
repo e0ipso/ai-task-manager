@@ -10,6 +10,7 @@ This hook provides pre-planning guidance to ensure scope control, simplicity pri
 - **Question Everything Extra**: If not directly mentioned by the user, don't add it
 - **Avoid Feature Creep**: Resist the urge to add "helpful" features or "nice-to-have" additions
 - **YAGNI Principle**: _You Aren't Gonna Need It_ - don't build for hypothetical future needs
+- **Do NOT add backwards compatibility, unless requested**: If there is a potential BC break, ask the user if they want to BC support. Do not assume the want it.
 
 **Common Scope Creep Anti-Patterns to Avoid:**
 1. Adding extra commands or features "for completeness"
