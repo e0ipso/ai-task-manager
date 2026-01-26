@@ -1,3 +1,8 @@
+## <small>1.26.9 (2026-01-26)</small>
+
+* Merge remote-tracking branch 'origin/main' ([610daff](https://github.com/e0ipso/ai-task-manager/commit/610daff))
+* fix: avoid BC spam ([1ffb97c](https://github.com/e0ipso/ai-task-manager/commit/1ffb97c))
+
 ## <small>1.26.8 (2026-01-21)</small>
 
 * fix: find the generate-tasks.md file first ([08e4d5f](https://github.com/e0ipso/ai-task-manager/commit/08e4d5f))
