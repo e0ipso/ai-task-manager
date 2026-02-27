@@ -57,7 +57,7 @@ fi
 
 ## Instructions
 
-Include $root/ $root/.ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
+Include $root/.ai/task-manager/config/TASK_MANAGER.md for the directory structure of tasks.
 
 The user input is:
 
@@ -71,11 +71,11 @@ If no user input is provided stop immediately and show an error message to the u
 
 Use your internal Todo task tool to track the following plan generation:
 
-- [ ] Read and execute $root/ $root/.ai/task-manager/config/hooks/PRE_PLAN.md
+- [ ] Read and execute $root/.ai/task-manager/config/hooks/PRE_PLAN.md
 - [ ] User input and context analysis
 - [ ] Clarification questions
 - [ ] Plan generation
-- [ ] Read and execute $root/ $root/.ai/task-manager/config/hooks/POST_PLAN.md
+- [ ] Read and execute $root/.ai/task-manager/config/hooks/POST_PLAN.md
 
 #### Step 1: Context Analysis
 Before creating any plan, analyze the user's request for:
@@ -98,7 +98,7 @@ Try to answer your own questions first by inspecting the codebase, docs, and ass
 IMPORTANT: Once you have the user's answers go back to Step 2. Do this in a loop until you have no more questions. Ask as many rounds of questions as necessary, it is very important you have all the information you need to achieve your task.
 
 #### Step 3: Plan Generation
-Only after confirming sufficient context, create a plan according the the $root/ $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ##### CRITICAL: Output Format
 
@@ -120,7 +120,7 @@ This structured output enables automated workflow coordination and must be inclu
 
 ###### Plan Template
 
-Use the template in $root/ $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Use the template in $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ###### Patterns to Avoid
 Do not include the following in your plan output.
