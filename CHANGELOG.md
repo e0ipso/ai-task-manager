@@ -1,3 +1,7 @@
+## <small>1.27.2 (2026-02-27)</small>
+
+* fix: template typos and broken refs (#9) ([cbf1d85](https://github.com/e0ipso/ai-task-manager/commit/cbf1d85)), closes [#9](https://github.com/e0ipso/ai-task-manager/issues/9) [#8](https://github.com/e0ipso/ai-task-manager/issues/8)
+
 ## <small>1.27.1 (2026-02-27)</small>
 
 * fix: improve tool guidance in templates (#7) ([c495a1b](https://github.com/e0ipso/ai-task-manager/commit/c495a1b)), closes [#7](https://github.com/e0ipso/ai-task-manager/issues/7)
