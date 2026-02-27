@@ -1,3 +1,7 @@
+## <small>1.27.1 (2026-02-27)</small>
+
+* fix: improve tool guidance in templates (#7) ([c495a1b](https://github.com/e0ipso/ai-task-manager/commit/c495a1b)), closes [#7](https://github.com/e0ipso/ai-task-manager/issues/7)
+
 ## 1.27.0 (2026-02-02)
 
 * Merge remote-tracking branch 'origin/main' ([0ac8f6b](https://github.com/e0ipso/ai-task-manager/commit/0ac8f6b))
