@@ -11,7 +11,9 @@ user, and update the plan with the refinements. Use the plan-creator sub-agent f
 
 ---
 
-Ultrathink, think harder, and use tools.
+Use tools for the plan refinement. You are encouraged to write your own specialized tools to research, analyze, and
+debug any plan refinement. You are not restricted to the stack of the current project to create your own specialized
+tools.
 
 ## Find the AI Task Manager root
 

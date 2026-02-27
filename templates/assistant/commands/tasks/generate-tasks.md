@@ -7,8 +7,6 @@ description: Generate tasks to implement the plan with the provided ID.
 
 ---
 
-Ultrathink, think harder, and use tools.
-
 ## Find the AI Task Manager root
 
 ```bash
