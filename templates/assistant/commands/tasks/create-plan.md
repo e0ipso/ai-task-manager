@@ -10,7 +10,9 @@ ensuring you have all necessary context before proceeding. Use the plan-creator 
 
 ---
 
-Ultrathink, think harder, and use tools.
+Use tools for the planning. You are encouraged to write your own specialized tools to research, analyze, and debug
+any work order from the user. You are not restricted to the stack of the current project to create your own
+specialized tools.
 
 ## Find the AI Task Manager root
 

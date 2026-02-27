@@ -3,7 +3,11 @@ argument-hint: "[testCommand]"
 description: Fix the tests your task execution broke.
 ---
 
-Fix all failing tests in this repository. Ultrathink, think harder, and use tools.
+Fix all failing tests in this repository.
+
+Use tools for debugging. You are encouraged to write your own specialized tools to research, analyze, and debug
+failing tests. You are not restricted to the stack of the current project to create your own
+specialized tools.
 
 Execute this command to run the tests:
 
