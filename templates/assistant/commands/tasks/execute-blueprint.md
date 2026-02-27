@@ -17,7 +17,7 @@ You are the coordinator responsible for executing all tasks defined in the execu
 5. **Fail safely** - Better to halt and request help than corrupt the execution state
 
 ## Input Requirements
-- A plan document with an execution blueprint section. See /TASK_MANAGER.md fo find the plan with ID $1
+- A plan document with an execution blueprint section. See /TASK_MANAGER.md to find the plan with ID $1
 - Task files with frontmatter metadata (id, group, dependencies, status)
 - Validation gates document: `/config/hooks/POST_PHASE.md`
 
@@ -211,7 +211,7 @@ If validation fails, halt execution. The plan remains in `plans/` for debugging.
 
 ### 1. Execution Summary Generation
 
-Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/[EXECUTION_SUMMARY_TEMPLATE.md
+Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md
 
 ### 2. Plan Archival
 
