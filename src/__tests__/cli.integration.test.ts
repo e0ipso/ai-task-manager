@@ -800,11 +800,11 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(await fs.pathExists(path.join(promptsDir, 'generate-tasks.md'))).toBe(false);
     });
 
-    it('should copy all 7 command templates', async () => {
+    it('should copy all 9 command templates', async () => {
       const result = executeCommand(`node "${cliPath}" init --assistants codex`);
       expect(result.exitCode).toBe(0);
 
-      // Verify exactly 7 files exist
+      // Verify exactly 9 files exist
       const promptsDir = path.join(testDir, '.codex/prompts');
       const files = await fs.readdir(promptsDir);
       const mdFiles = files.filter(f => f.endsWith('.md'));
@@ -881,7 +881,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(await fs.pathExists(commandsDir)).toBe(true);
     });
 
-    it('should create all 7 command files with correct names', async () => {
+    it('should create all 9 command files with correct names', async () => {
       const result = executeCommand(`node "${cliPath}" init --assistants cursor`);
       expect(result.exitCode).toBe(0);
 
