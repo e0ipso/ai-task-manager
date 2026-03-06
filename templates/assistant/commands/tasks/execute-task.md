@@ -49,22 +49,22 @@ if [ -z "$root" ]; then
 fi
 ```
 
-Use your internal Todo task tool to track the execution of all parts of the task, and the final update of noteworthy items during execution. Example:
+Use your internal Todo task tool to track the execution of all parts of the task. Example:
 
-- [ ] Validate task: file, status, and dependencies.
-- [ ] Select the most appropriate sub-agent.
+- [ ] Validate task: file, status (including needs-clarification), and dependencies.
 - [ ] Set task status to in-progress.
-- [ ] Delegate task implementation to the sub-agent.
+- [ ] Execute the task.
 - [ ] Update task status to completed or failed.
-- [ ] Update the task file with noteworthy events during execution.
+- [ ] Document noteworthy events (if any).
+- [ ] Emit structured output for orchestrator.
 
 ## Critical Rules
 
 1. **Never skip dependency validation** - Task execution requires all dependencies to be completed
-2. **Validate task status** - Never execute tasks that are already completed or in-progress
+2. **Validate task status** - Never execute tasks that are already completed, in-progress, or needs-clarification
 3. **Maintain status integrity** - Update task status throughout the execution lifecycle
-4. **Use appropriate agents** - Match task skills to available sub-agents
-5. **Document execution** - Record all outcomes and issues encountered
+4. **Document execution** - Record all outcomes and issues encountered
+5. **Provide structured output** - Always emit the structured result block for orchestrator parsing
 
 ## Input Requirements
 - Plan ID: $1 (required)
@@ -162,6 +162,11 @@ case "$current_status" in
         echo "Wait for current execution to complete or check for stale processes"
         exit 1
         ;;
+    "needs-clarification")
+        echo "Error: Task ${task_id} is marked as 'needs-clarification'"
+        echo "Resolve clarification questions in the task file before execution"
+        exit 1
+        ;;
     "pending"|"failed"|"")
         echo "Task status allows execution - proceeding..."
         ;;
@@ -170,6 +175,17 @@ case "$current_status" in
         ;;
 esac
 ```
+
+#### Valid Status Transitions
+
+Reference for orchestrators and execution flow:
+
+- `pending` → `in-progress` (execution starts)
+- `in-progress` → `completed` (successful execution)
+- `in-progress` → `failed` (execution error)
+- `failed` → `in-progress` (retry attempt)
+- `pending` → `needs-clarification` (set externally by orchestrator or reviewer)
+- `needs-clarification` → `pending` (clarification resolved, set externally)
 
 ### 4. Dependency Validation
 
@@ -268,14 +284,43 @@ awk '
 
 mv "$temp_file" "$task_file"
 
-echo "✓ Task ${task_id} completed successfully"
-echo ""
-echo "You can now execute dependent tasks or continue with the full blueprint execution."
+echo "✓ Task ${task_id} status updated to completed"
 ```
+
+### 9. Noteworthy Events Documentation
+
+After task execution (whether successful or failed), append a "Noteworthy Events" section to the task file body if anything noteworthy occurred during execution.
+
+Append to the end of the task file:
+
+```markdown
+## Noteworthy Events
+- [YYYY-MM-DD] [Event description with sufficient context for the orchestrator]
+```
+
+If no noteworthy events occurred, do not add the section.
 
 ## Error Handling
 
 Read and execute $root/.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
+
+On any error, ensure you still emit the structured output block (see Output Requirements) with `Exit Code: 1`.
+
+## Output Requirements
+
+**CRITICAL - Structured Output for Orchestrator Coordination:**
+
+Always end your output with a standardized summary in this exact format:
+
+```
+---
+Task Execution Result:
+- Plan ID: [plan-id]
+- Task ID: [task-id]
+- Exit Code: [0 for success, 1 for failure]
+```
+
+This structured output enables automated orchestration pipelines to parse results and determine next steps. It MUST be included regardless of success or failure.
 
 ## Usage Examples
 
@@ -292,11 +337,12 @@ Read and execute $root/.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 
 ## Integration Notes
 
-This command integrates with the existing task management system by:
+This command is designed for scripting contexts where an external orchestrator manages task sequencing, commits, feature branches, linting, test execution, and plan archival. It integrates with the task management system by:
 - Using established plan and task location patterns
 - Leveraging the dependency checking script for validation
-- Following status management conventions
+- Following status management conventions (see Valid Status Transitions)
+- Providing structured machine-parseable output for orchestrator pipelines
 - Maintaining compatibility with execute-blueprint workflows
 - Preserving task isolation and dependency order
 
-The command complements execute-blueprint by providing granular task control while maintaining the same validation and execution standards.
+The command complements execute-blueprint by providing granular single-task control while maintaining the same validation standards.
