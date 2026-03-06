@@ -1,3 +1,7 @@
+## 1.29.0 (2026-03-06)
+
+* feat: add non-interactive commands (#11) ([1148cc9](https://github.com/e0ipso/ai-task-manager/commit/1148cc9)), closes [#11](https://github.com/e0ipso/ai-task-manager/issues/11)
+
 ## 1.28.0 (2026-03-06)
 
 * feat: introduce `claude-exec` command (#10) ([688d860](https://github.com/e0ipso/ai-task-manager/commit/688d860)), closes [#10](https://github.com/e0ipso/ai-task-manager/issues/10)
