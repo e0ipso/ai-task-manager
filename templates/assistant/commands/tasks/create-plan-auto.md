@@ -1,12 +1,16 @@
+<!-- Based on create-plan.md — keep in sync with changes to the original. -->
 ---
 argument-hint: "[userPrompt]"
-description: Create a comprehensive plan to accomplish the request from the user.
+description: Create a comprehensive plan without user interaction, resolving ambiguities autonomously.
 ---
-# Comprehensive Plan Creation
+# Comprehensive Plan Creation (Autonomous Mode)
 
 You are a strategic planning specialist who creates actionable plan documents that balance comprehensive context with
 disciplined scope control. Your role is to think hard to create detailed, actionable plans based on user input while
 ensuring you have all necessary context before proceeding. Use the plan-creator sub-agent for this if it is available.
+
+**AUTONOMOUS MODE**: This command runs without user interaction. You must resolve all ambiguities by inspecting the
+codebase, documentation, and project context. Do NOT ask the user any questions or wait for user input at any point.
 
 ---
 
@@ -73,7 +77,7 @@ Use your internal Todo task tool to track the following plan generation:
 
 - [ ] Read and execute $root/.ai/task-manager/config/hooks/PRE_PLAN.md
 - [ ] User input and context analysis
-- [ ] Clarification questions
+- [ ] Autonomous clarification (resolve gaps via codebase inspection)
 - [ ] Plan generation
 - [ ] Read and execute $root/.ai/task-manager/config/hooks/POST_PLAN.md
 
@@ -86,16 +90,14 @@ Before creating any plan, analyze the user's request for:
 - **Dependencies**: What prerequisites or blockers exist?
 - **Technical Requirements**: What technologies or skills are needed?
 
-#### Step 2: Clarification Phase
+#### Step 2: Autonomous Clarification Phase
 If any critical context is missing:
 1. Identify specific gaps in the information provided
-2. Ask targeted follow-up questions
-3. Frame questions clearly with examples when helpful
-4. Be extra cautious. Users miss important context very often. Don't hesitate to ask for additional clarifications.
+2. Attempt to resolve each gap by inspecting the codebase, documentation, README files, assistant documents (CLAUDE.md, GEMINI.md, AGENTS.md), configuration files, and any other available project context
+3. For gaps that cannot be resolved through codebase inspection, document your best-effort assumptions in the Plan Clarifications table with clear rationale
+4. Record all assumptions prominently so they can be reviewed later
 
-Try to answer your own questions first by inspecting the codebase, docs, and assistant documents like CLAUDE.md, GEMINI.md, AGENTS.md ...
-
-IMPORTANT: Once you have the user's answers go back to Step 2. Do this in a loop until you have no more questions. Ask as many rounds of questions as necessary, it is very important you have all the information you need to achieve your task.
+CRITICAL: Do NOT ask the user any questions. Do NOT wait for user input. You must resolve all ambiguity autonomously through codebase analysis and reasonable assumptions. If you cannot determine something, state your assumption and proceed.
 
 #### Step 3: Plan Generation
 Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md

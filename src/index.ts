@@ -133,7 +133,13 @@ export async function init(options: InitOptions): Promise<CommandResult> {
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-create-plan.prompt.md')}`
         );
         console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-create-plan-auto.prompt.md')}`
+        );
+        console.log(
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-refine-plan.prompt.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-refine-plan-auto.prompt.md')}`
         );
         console.log(
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-generate-tasks.prompt.md')}`
@@ -162,6 +168,9 @@ export async function init(options: InitOptions): Promise<CommandResult> {
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-create-plan.md')}`
         );
         console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-create-plan-auto.md')}`
+        );
+        console.log(
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-execute-blueprint.md')}`
         );
         console.log(
@@ -169,6 +178,9 @@ export async function init(options: InitOptions): Promise<CommandResult> {
         );
         console.log(
           `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-full-workflow.md')}`
+        );
+        console.log(
+          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-refine-plan-auto.md')}`
         );
         continue;
       }
@@ -407,7 +419,9 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     // Copy and process all template files
     const templateFiles = [
       'create-plan.md',
+      'create-plan-auto.md',
       'refine-plan.md',
+      'refine-plan-auto.md',
       'generate-tasks.md',
       'execute-task.md',
       'execute-blueprint.md',
@@ -442,12 +456,14 @@ async function createAssistantStructure(assistant: Assistant, baseDir: string): 
     // Copy and rename templates
     const templateFiles = [
       'create-plan.md',
+      'create-plan-auto.md',
       'generate-tasks.md',
       'execute-blueprint.md',
       'execute-task.md',
       'fix-broken-tests.md',
       'full-workflow.md',
       'refine-plan.md',
+      'refine-plan-auto.md',
     ];
 
     const templateFormat = getTemplateFormat(assistant);
