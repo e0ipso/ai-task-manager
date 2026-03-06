@@ -1,3 +1,7 @@
+## 1.30.0 (2026-03-06)
+
+* feat: enhance single task execution (#12) ([0dcbb88](https://github.com/e0ipso/ai-task-manager/commit/0dcbb88)), closes [#12](https://github.com/e0ipso/ai-task-manager/issues/12)
+
 ## 1.29.0 (2026-03-06)
 
 * feat: add non-interactive commands (#11) ([1148cc9](https://github.com/e0ipso/ai-task-manager/commit/1148cc9)), closes [#11](https://github.com/e0ipso/ai-task-manager/issues/11)
