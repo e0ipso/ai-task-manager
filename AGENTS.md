@@ -203,8 +203,14 @@ Information flows through the workflow via structured output parsing:
 # Create plan for manual review before proceeding
 /tasks:create-plan "Implement user authentication system"
 
+# Create plan without user interaction (scripted/automated workflows)
+/tasks:create-plan-auto "Implement user authentication system"
+
 # Run a plan refinement session before generating tasks
 /tasks:refine-plan 51
+
+# Refine plan without user interaction (scripted/automated workflows)
+/tasks:refine-plan-auto 51
 
 # Generate tasks after reviewing and adjusting the plan
 /tasks:generate-tasks 51
@@ -212,6 +218,15 @@ Information flows through the workflow via structured output parsing:
 # Execute a pre-approved and reviewed blueprint
 /tasks:execute-blueprint 51
 ```
+
+#### Use Auto (Non-Interactive) Commands When:
+
+- **Scripted or automated workflows**: No user is available to respond to clarification questions
+- **CI/CD pipelines**: Plan creation/refinement runs as part of an automated pipeline
+- **Batch processing**: Creating or refining multiple plans without manual intervention
+- **The assistant should resolve ambiguity autonomously**: By inspecting the codebase, docs, and project context instead of asking the user
+
+The `-auto` variants (`/tasks:create-plan-auto`, `/tasks:refine-plan-auto`) behave identically to their interactive counterparts except they skip the user feedback loop. Instead of asking clarifying questions and waiting for answers, they resolve gaps by inspecting the codebase and documenting assumptions in the Plan Clarifications table.
 
 #### Use Orchestration Commands When:
 
@@ -298,7 +313,9 @@ project/
 **Common Command Examples** (adjust prefix per assistant):
 ```bash
 /tasks:create-plan "Add user authentication"
+/tasks:create-plan-auto "Add user authentication"  # Non-interactive variant
 /tasks:refine-plan 51
+/tasks:refine-plan-auto 51                          # Non-interactive variant
 /tasks:generate-tasks 51
 /tasks:execute-blueprint 51
 /tasks:full-workflow "Implement dark mode"

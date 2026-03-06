@@ -74,7 +74,9 @@ describe('CLI Integration Tests - Consolidated', () => {
 
         const promptFiles = [
           'tasks-create-plan.prompt.md',
+          'tasks-create-plan-auto.prompt.md',
           'tasks-refine-plan.prompt.md',
+          'tasks-refine-plan-auto.prompt.md',
           'tasks-generate-tasks.prompt.md',
           'tasks-execute-task.prompt.md',
           'tasks-execute-blueprint.prompt.md',
@@ -111,7 +113,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       if (assistant === 'cursor') {
         const templateFiles = [
           'create-plan',
+          'create-plan-auto',
           'refine-plan',
+          'refine-plan-auto',
           'generate-tasks',
           'execute-task',
           'execute-blueprint',
@@ -126,7 +130,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       }
 
       const extension = assistant === 'gemini' ? 'toml' : 'md';
-      const templateFiles = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
+      const templateFiles = ['create-plan', 'create-plan-auto', 'execute-blueprint', 'generate-tasks', 'refine-plan', 'refine-plan-auto'];
 
       for (const template of templateFiles) {
         const templatePath = path.join(assistantDir, `${template}.${extension}`);
@@ -231,10 +235,12 @@ describe('CLI Integration Tests - Consolidated', () => {
       // Verify directory structure
       expect(await fs.pathExists(path.join(testDir, '.cursor/commands/tasks'))).toBe(true);
 
-      // Verify all 7 command files exist
+      // Verify all command files exist
       const templateFiles = [
         'create-plan.md',
+        'create-plan-auto.md',
         'refine-plan.md',
+        'refine-plan-auto.md',
         'generate-tasks.md',
         'execute-task.md',
         'execute-blueprint.md',
@@ -303,7 +309,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       const tomlFiles = files.filter(f => f.endsWith('.toml'));
 
       // Verify all expected commands generated
-      expect(tomlFiles.length).toBe(7);
+      expect(tomlFiles.length).toBe(9);
       expect(tomlFiles).toContain('create-plan.toml');
       expect(tomlFiles).toContain('generate-tasks.toml');
       expect(tomlFiles).toContain('execute-blueprint.toml');
@@ -672,7 +678,7 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(opencodeCreatePlan).toBe(claudeCreatePlan);
 
       // Verify all template files for Open Code
-      const templates = ['create-plan', 'execute-blueprint', 'generate-tasks', 'refine-plan'];
+      const templates = ['create-plan', 'create-plan-auto', 'execute-blueprint', 'generate-tasks', 'refine-plan', 'refine-plan-auto'];
       for (const template of templates) {
         const opencodeTemplatePath = path.join(testDir, `.opencode/command/tasks/${template}.md`);
         const claudeTemplatePath = path.join(testDir, `.claude/commands/tasks/${template}.md`);
@@ -769,12 +775,14 @@ describe('CLI Integration Tests - Consolidated', () => {
       const promptsDir = path.join(testDir, '.codex/prompts');
       const expectedFiles = [
         'tasks-create-plan.md',
+        'tasks-create-plan-auto.md',
         'tasks-generate-tasks.md',
         'tasks-execute-blueprint.md',
         'tasks-execute-task.md',
         'tasks-fix-broken-tests.md',
         'tasks-full-workflow.md',
         'tasks-refine-plan.md',
+        'tasks-refine-plan-auto.md',
       ];
 
       for (const file of expectedFiles) {
@@ -801,14 +809,16 @@ describe('CLI Integration Tests - Consolidated', () => {
       const files = await fs.readdir(promptsDir);
       const mdFiles = files.filter(f => f.endsWith('.md'));
 
-      expect(mdFiles.length).toBe(7);
+      expect(mdFiles.length).toBe(9);
       expect(mdFiles.sort()).toEqual([
+        'tasks-create-plan-auto.md',
         'tasks-create-plan.md',
         'tasks-execute-blueprint.md',
         'tasks-execute-task.md',
         'tasks-fix-broken-tests.md',
         'tasks-full-workflow.md',
         'tasks-generate-tasks.md',
+        'tasks-refine-plan-auto.md',
         'tasks-refine-plan.md',
       ]);
     });
@@ -878,7 +888,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       const commandsDir = path.join(testDir, '.cursor/commands/tasks');
       const expectedFiles = [
         'create-plan.md',
+        'create-plan-auto.md',
         'refine-plan.md',
+        'refine-plan-auto.md',
         'generate-tasks.md',
         'execute-task.md',
         'execute-blueprint.md',
@@ -958,7 +970,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       // Verify all template files match
       const templates = [
         'create-plan',
+        'create-plan-auto',
         'refine-plan',
+        'refine-plan-auto',
         'generate-tasks',
         'execute-task',
         'execute-blueprint',
@@ -1026,7 +1040,9 @@ describe('CLI Integration Tests - Consolidated', () => {
       const promptsDir = path.join(testDir, '.github/prompts');
       const expectedFiles = [
         'tasks-create-plan.prompt.md',
+        'tasks-create-plan-auto.prompt.md',
         'tasks-refine-plan.prompt.md',
+        'tasks-refine-plan-auto.prompt.md',
         'tasks-generate-tasks.prompt.md',
         'tasks-execute-task.prompt.md',
         'tasks-execute-blueprint.prompt.md',
