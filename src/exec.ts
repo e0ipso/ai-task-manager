@@ -47,6 +47,7 @@ async function runClaudeCommand(prompt: string, cwd: string): Promise<string> {
       cwd,
       permissionMode: 'bypassPermissions',
       allowDangerouslySkipPermissions: true,
+      settingSources: ['project', 'user'],
       env: {
         ...process.env,
         CLAUDE_CODE_OAUTH_TOKEN: oauthToken,
