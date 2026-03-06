@@ -1,3 +1,7 @@
+## 1.28.0 (2026-03-06)
+
+* feat: introduce `claude-exec` command (#10) ([688d860](https://github.com/e0ipso/ai-task-manager/commit/688d860)), closes [#10](https://github.com/e0ipso/ai-task-manager/issues/10)
+
 ## <small>1.27.2 (2026-02-27)</small>
 
 * fix: template typos and broken refs (#9) ([cbf1d85](https://github.com/e0ipso/ai-task-manager/commit/cbf1d85)), closes [#9](https://github.com/e0ipso/ai-task-manager/issues/9) [#8](https://github.com/e0ipso/ai-task-manager/issues/8)
