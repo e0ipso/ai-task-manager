@@ -1,3 +1,7 @@
+## <small>1.30.1 (2026-03-06)</small>
+
+* fix: allow running commands ([a8a9ede](https://github.com/e0ipso/ai-task-manager/commit/a8a9ede))
+
 ## 1.30.0 (2026-03-06)
 
 * feat: enhance single task execution (#12) ([0dcbb88](https://github.com/e0ipso/ai-task-manager/commit/0dcbb88)), closes [#12](https://github.com/e0ipso/ai-task-manager/issues/12)
