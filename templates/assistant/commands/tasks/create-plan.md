@@ -81,7 +81,7 @@ Use your internal Todo task tool to track the following plan generation:
 Before creating any plan, analyze the user's request for:
 - **Objective**: What is the end goal?
 - **Scope**: What are the boundaries and constraints?
-- **Resources**: What tools, budget, or team are available?
+- **Resources**: What tools, libraries, or infrastructure are available?
 - **Success Criteria**: How will success be measured?
 - **Dependencies**: What prerequisites or blockers exist?
 - **Technical Requirements**: What technologies or skills are needed?
@@ -117,10 +117,6 @@ Plan Summary:
 ```
 
 This structured output enables automated workflow coordination and must be included even when running standalone.
-
-###### Plan Template
-
-Use the template in $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ###### Patterns to Avoid
 Do not include the following in your plan output.
