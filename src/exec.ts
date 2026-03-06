@@ -1,13 +1,11 @@
 /**
  * Claude Exec Command Module
  *
- * Validates and executes multiple plans sequentially using Claude Code CLI.
+ * Validates and executes multiple plans sequentially using the Claude Agent SDK.
  * Performs pre-flight validation and auto-remediation before execution.
  */
 
 import * as fs from 'fs-extra';
-import * as path from 'path';
-import { spawn } from 'child_process';
 import chalk from 'chalk';
 import { findPlanById, PlanLocation } from './plan-utils';
 import { parseTaskFiles } from './status';
@@ -30,7 +28,7 @@ async function hasBlueprintSection(filePath: string): Promise<boolean> {
 }
 
 /**
- * Run a Claude Code CLI command using the -p (print) flag
+ * Run a Claude Code command using the Agent SDK query function
  */
 async function runClaudeCommand(prompt: string, cwd: string): Promise<string> {
   const oauthToken = process.env.CLAUDE_CODE_OAUTH_TOKEN;
@@ -38,44 +36,45 @@ async function runClaudeCommand(prompt: string, cwd: string): Promise<string> {
     throw new Error('CLAUDE_CODE_OAUTH_TOKEN environment variable is required');
   }
 
-  return new Promise<string>((resolve, reject) => {
-    const claudePath = path.join(__dirname, '..', 'node_modules', '.bin', 'claude');
-    const args = ['-p', '--dangerously-skip-permissions', prompt];
+  // Dynamic import for ESM module from CommonJS context
+  const { query } = await import('@anthropic-ai/claude-agent-sdk');
 
-    const child = spawn(claudePath, args, {
+  const output: string[] = [];
+
+  for await (const message of query({
+    prompt,
+    options: {
       cwd,
+      permissionMode: 'bypassPermissions',
+      allowDangerouslySkipPermissions: true,
       env: {
         ...process.env,
         CLAUDE_CODE_OAUTH_TOKEN: oauthToken,
       },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.on('data', (data: Buffer) => {
-      const text = data.toString();
-      stdout += text;
-      process.stdout.write(chalk.gray(text));
-    });
-
-    child.stderr.on('data', (data: Buffer) => {
-      stderr += data.toString();
-    });
-
-    child.on('close', code => {
-      if (code === 0) {
-        resolve(stdout);
-      } else {
-        reject(new Error(`Claude command failed with exit code ${code}: ${stderr || stdout}`));
+    },
+  })) {
+    if (message.type === 'assistant') {
+      const assistantMsg = message as {
+        type: 'assistant';
+        message?: { content?: Array<{ type: string; text?: string }> };
+      };
+      if (assistantMsg.message?.content) {
+        for (const block of assistantMsg.message.content) {
+          if (block.type === 'text' && block.text) {
+            output.push(block.text);
+            process.stdout.write(chalk.gray(block.text));
+          }
+        }
       }
-    });
+    } else if (message.type === 'result') {
+      const resultMsg = message as { type: 'result'; result?: string };
+      if (resultMsg.result) {
+        output.push(resultMsg.result);
+      }
+    }
+  }
 
-    child.on('error', err => {
-      reject(new Error(`Failed to spawn Claude CLI: ${err.message}`));
-    });
-  });
+  return output.join('\n');
 }
 
 /**
