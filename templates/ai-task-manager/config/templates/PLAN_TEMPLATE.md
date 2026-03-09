@@ -74,6 +74,19 @@ Example:
 2. [Measurable outcome 2]
 3. [Measurable outcome 3]
 
+## Self Validation
+
+[Describe the concrete steps an LLM should execute after all tasks are completed to verify the implementation works correctly. These must be actionable verification procedures that inspect the real system — not just running pre-existing tests.
+
+Examples of good validation steps:
+- Use Playwright CLI to open a browser, navigate to the affected pages, and take screenshots to confirm the UI renders correctly
+- Run a CLI command to query the database and verify the expected configuration or content exists
+- Use `curl` or a browser automation tool to exercise the new API endpoints and confirm correct responses
+- Take a screenshot of the form/page/component and visually verify the expected elements are present
+- Run the application and interact with the new feature end-to-end, capturing evidence of success
+
+Avoid vague statements like "verify it works" or "ensure quality". Each step must be a specific, executable action.]
+
 ## Documentation
 
 [Required documentation updates to existing documentation, either human-focused documentation, the project's README.md or assistant-focused documentation like AGENTS.md, .claude/skills/* for the site, etc.]
