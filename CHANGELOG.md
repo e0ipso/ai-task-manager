@@ -1,3 +1,7 @@
+## 1.31.0 (2026-03-09)
+
+* feat: add Self Validation section to plan template (#13) ([b3c65c3](https://github.com/e0ipso/ai-task-manager/commit/b3c65c3)), closes [#13](https://github.com/e0ipso/ai-task-manager/issues/13)
+
 ## <small>1.30.1 (2026-03-06)</small>
 
 * fix: allow running commands ([a8a9ede](https://github.com/e0ipso/ai-task-manager/commit/a8a9ede))
