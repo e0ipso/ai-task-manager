@@ -130,7 +130,14 @@ describe('CLI Integration Tests - Consolidated', () => {
       }
 
       const extension = assistant === 'gemini' ? 'toml' : 'md';
-      const templateFiles = ['create-plan', 'create-plan-auto', 'execute-blueprint', 'generate-tasks', 'refine-plan', 'refine-plan-auto'];
+      const templateFiles = [
+        'create-plan',
+        'create-plan-auto',
+        'execute-blueprint',
+        'generate-tasks',
+        'refine-plan',
+        'refine-plan-auto',
+      ];
 
       for (const template of templateFiles) {
         const templatePath = path.join(assistantDir, `${template}.${extension}`);
@@ -678,7 +685,14 @@ describe('CLI Integration Tests - Consolidated', () => {
       expect(opencodeCreatePlan).toBe(claudeCreatePlan);
 
       // Verify all template files for Open Code
-      const templates = ['create-plan', 'create-plan-auto', 'execute-blueprint', 'generate-tasks', 'refine-plan', 'refine-plan-auto'];
+      const templates = [
+        'create-plan',
+        'create-plan-auto',
+        'execute-blueprint',
+        'generate-tasks',
+        'refine-plan',
+        'refine-plan-auto',
+      ];
       for (const template of templates) {
         const opencodeTemplatePath = path.join(testDir, `.opencode/command/tasks/${template}.md`);
         const claudeTemplatePath = path.join(testDir, `.claude/commands/tasks/${template}.md`);
