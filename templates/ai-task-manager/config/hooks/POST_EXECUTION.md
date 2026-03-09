@@ -8,6 +8,7 @@ Before marking the blueprint as complete, verify:
 - [ ] All tests must pass successfully. If no test suite is configured, skip this step
 - [ ] Verify all tasks in the plan have `status: "completed"` in their frontmatter
 - [ ] Verify that the AGENTS.md documentation or related documentes are still correct after this plan execution
+- [ ] Execute the **Self Validation** steps defined in the plan document. These are concrete verification procedures (e.g., Playwright browser checks, database CLI queries, screenshots) that confirm the implementation works in the real system. If any step fails, treat it as a validation gate failure
 
 ## Failure Behavior
 
