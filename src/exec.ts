@@ -153,46 +153,50 @@ export async function claudeExec(planIds: number[]): Promise<CommandResult> {
   const needsRemediation = validations.filter(v => v.needsRemediation);
 
   if (needsRemediation.length > 0) {
-    console.log(chalk.bold(`\nRemediating ${needsRemediation.length} plan(s)...\n`));
+    const batchSize = 3;
+    const totalBatches = Math.ceil(needsRemediation.length / batchSize);
+    console.log(
+      chalk.bold(`\nRemediating ${needsRemediation.length} plan(s) in batches of ${batchSize}...\n`)
+    );
 
-    for (const validation of needsRemediation) {
-      console.log(chalk.cyan(`  Generating tasks for plan ${validation.planId}...`));
+    for (let b = 0; b < totalBatches; b++) {
+      const batch = needsRemediation.slice(b * batchSize, (b + 1) * batchSize);
+      console.log(
+        chalk.bold(`  Batch ${b + 1}/${totalBatches}: plans ${batch.map(v => v.planId).join(', ')}`)
+      );
 
-      try {
-        await runClaudeCommand(`/tasks:generate-tasks ${validation.planId}`, cwd);
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        return {
-          success: false,
-          message: `Failed to generate tasks for plan ${validation.planId}: ${msg}`,
-        };
-      }
+      const results = await Promise.allSettled(
+        batch.map(async validation => {
+          console.log(chalk.cyan(`  Generating tasks for plan ${validation.planId}...`));
+          await runClaudeCommand(`/tasks:generate-tasks ${validation.planId}`, cwd);
 
-      // Re-validate after remediation
-      try {
-        const revalidation = await validatePlan(validation.planId);
+          // Re-validate after remediation
+          const revalidation = await validatePlan(validation.planId);
 
-        if (revalidation.taskCount === 0) {
+          if (revalidation.taskCount === 0) {
+            throw new Error(`Plan ${validation.planId}: still has no tasks after remediation`);
+          }
+
+          if (!revalidation.hasBlueprintSection) {
+            throw new Error(
+              `Plan ${validation.planId}: still missing Execution Blueprint section after remediation`
+            );
+          }
+
+          console.log(chalk.green(`  Plan ${validation.planId}: remediation successful`));
+        })
+      );
+
+      // Check for failures in this batch
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          const msg =
+            result.reason instanceof Error ? result.reason.message : String(result.reason);
           return {
             success: false,
-            message: `Plan ${validation.planId}: still has no tasks after remediation`,
+            message: `Remediation failed: ${msg}`,
           };
         }
-
-        if (!revalidation.hasBlueprintSection) {
-          return {
-            success: false,
-            message: `Plan ${validation.planId}: still missing Execution Blueprint section after remediation`,
-          };
-        }
-
-        console.log(chalk.green(`  Plan ${validation.planId}: remediation successful`));
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        return {
-          success: false,
-          message: `Re-validation failed for plan ${validation.planId}: ${msg}`,
-        };
       }
     }
   }
