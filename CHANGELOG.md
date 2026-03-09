@@ -1,3 +1,7 @@
+## 1.32.0 (2026-03-09)
+
+* feat: parallelize exec remediation (#14) ([e7a19d2](https://github.com/e0ipso/ai-task-manager/commit/e7a19d2)), closes [#14](https://github.com/e0ipso/ai-task-manager/issues/14)
+
 ## 1.31.0 (2026-03-09)
 
 * feat: add Self Validation section to plan template (#13) ([b3c65c3](https://github.com/e0ipso/ai-task-manager/commit/b3c65c3)), closes [#13](https://github.com/e0ipso/ai-task-manager/issues/13)
