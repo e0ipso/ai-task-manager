@@ -50,6 +50,29 @@ function resolvePath(baseDir: string | undefined, ...segments: string[]): string
 }
 
 /**
+ * Collect all file paths under a directory, sorted alphabetically
+ */
+async function collectFiles(dir: string): Promise<string[]> {
+  const files: string[] = [];
+  if (!(await exists(dir))) return files;
+
+  async function walk(current: string): Promise<void> {
+    const entries = await fs.readdir(current, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else if (entry.isFile() && entry.name !== '.init-metadata.json') {
+        files.push(fullPath);
+      }
+    }
+  }
+
+  await walk(dir);
+  return files.sort();
+}
+
+/**
  * Check if a file or directory exists
  */
 async function exists(filepath: string): Promise<boolean> {
@@ -110,105 +133,46 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // ========== CREATED FILES SECTION ==========
     console.log(formatSectionHeader('Created Files'));
 
-    // Common configuration files
+    // Common configuration files (dynamically listed)
     console.log(chalk.cyan('  Common Configuration:'));
-    console.log(
-      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/TASK_MANAGER.md')}`
-    );
-    console.log(
-      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_PHASE.md')}`
-    );
-    console.log(
-      `    ${chalk.blue('●')} ${resolvePath(baseDir, '.ai/task-manager/config/hooks/POST_TASK_GENERATION_ALL.md')}`
-    );
+    const commonFiles = await collectFiles(resolvePath(baseDir, '.ai/task-manager'));
+    for (const file of commonFiles) {
+      console.log(`    ${chalk.blue('●')} ${file}`);
+    }
 
-    // Assistant-specific files
+    // Assistant-specific files (dynamically listed)
     for (const assistant of assistants) {
-      const templateFormat = getTemplateFormat(assistant);
+      const assistantLabel = assistant.charAt(0).toUpperCase() + assistant.slice(1);
 
-      // GitHub uses .github/prompts/ with .prompt.md extension
       if (assistant === 'github') {
-        console.log(chalk.cyan('  GitHub Copilot Prompts:'));
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-create-plan.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-create-plan-auto.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-refine-plan.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-refine-plan-auto.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-generate-tasks.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-execute-task.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-execute-blueprint.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-fix-broken-tests.prompt.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.github/prompts/tasks-full-workflow.prompt.md')}`
-        );
-        continue;
-      }
+        console.log(chalk.cyan(`  ${assistantLabel} Copilot Prompts:`));
+        const files = await collectFiles(resolvePath(baseDir, '.github/prompts'));
+        for (const file of files) {
+          console.log(`    ${chalk.blue('●')} ${file}`);
+        }
+      } else if (assistant === 'codex') {
+        console.log(chalk.cyan(`  ${assistantLabel} Prompts:`));
+        const files = await collectFiles(resolvePath(baseDir, '.codex/prompts'));
+        for (const file of files) {
+          console.log(`    ${chalk.blue('●')} ${file}`);
+        }
+      } else {
+        const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
+        console.log(chalk.cyan(`  ${assistantLabel} Commands:`));
+        const cmdFiles = await collectFiles(resolvePath(baseDir, `.${assistant}/${commandsPath}`));
+        for (const file of cmdFiles) {
+          console.log(`    ${chalk.blue('●')} ${file}`);
+        }
 
-      // Codex uses flat directory structure with renamed files
-      if (assistant === 'codex') {
-        console.log(
-          chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Prompts:`)
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-create-plan.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-create-plan-auto.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-execute-blueprint.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-generate-tasks.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-full-workflow.md')}`
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, '.codex/prompts/tasks-refine-plan-auto.md')}`
-        );
-        continue;
-      }
-
-      // Open Code uses 'command' (singular) instead of 'commands' (plural)
-      const commandsPath = assistant === 'opencode' ? 'command' : 'commands';
-
-      console.log(
-        chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Commands:`)
-      );
-      console.log(
-        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/create-plan.${templateFormat}`)}`
-      );
-      console.log(
-        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/execute-blueprint.${templateFormat}`)}`
-      );
-      console.log(
-        `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/${commandsPath}/tasks/generate-tasks.${templateFormat}`)}`
-      );
-
-      // Only show agents for Claude
-      if (assistant === 'claude') {
-        console.log(
-          chalk.cyan(`  ${assistant.charAt(0).toUpperCase() + assistant.slice(1)} Agents:`)
-        );
-        console.log(
-          `    ${chalk.blue('●')} ${resolvePath(baseDir, `.${assistant}/agents/plan-creator.md`)}`
-        );
+        // Show agents separately (currently Claude-only)
+        const agentsDir = resolvePath(baseDir, `.${assistant}/agents`);
+        const agentFiles = await collectFiles(agentsDir);
+        if (agentFiles.length > 0) {
+          console.log(chalk.cyan(`  ${assistantLabel} Agents:`));
+          for (const file of agentFiles) {
+            console.log(`    ${chalk.blue('●')} ${file}`);
+          }
+        }
       }
     }
 
