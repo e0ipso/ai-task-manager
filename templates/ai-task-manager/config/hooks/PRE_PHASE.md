@@ -1,7 +1,5 @@
 # PRE_PHASE Hook
 
-This hook contains the phase preparation logic that should be executed before starting any phase execution.
-
 ## Phase Pre-Execution
 
 ### Feature Branch Creation

@@ -1,3 +1,5 @@
 # POST_PLAN Hook
 
-This hook provides validation and update procedures to execute after plan creation, ensuring comprehensive context analysis and proper plan document structuring with dependency visualization.
+Ensure the plan includes a _Self Validation_ section describing the steps the LLM will take to validate that the plan was completed successfully.
+
+Also, answer the question _Does this plan need to update the documentation, or the AGENTS.md_.
