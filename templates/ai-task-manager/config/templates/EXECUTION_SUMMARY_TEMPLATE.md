@@ -9,5 +9,5 @@
 ### Noteworthy Events
 [Highlight any unexpected events, challenges overcome, or significant findings during execution. If none occurred, state "No significant issues encountered."]
 
-### Recommendations
+### Necessary follow-ups
 [Any follow-up actions or optimizations identified]

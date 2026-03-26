@@ -22,5 +22,3 @@
 ### Execution Summary
 - Total Phases: X
 - Total Tasks: Y
-- Maximum Parallelism: Z tasks (in Phase N)
-- Critical Path Length: X phases
