@@ -165,12 +165,15 @@ If any critical context is missing:
 2. Ask targeted follow-up questions
 3. Frame questions clearly with examples when helpful
 4. Be extra cautious. Users miss important context very often. Don't hesitate to ask for additional clarifications.
+5. Make sure to get explicit confirmation of weather the user wants to maintain backwards compatibility or not.
 
 Try to answer your own questions first by inspecting the codebase, docs, and assistant documents like CLAUDE.md, GEMINI.md, AGENTS.md ...
 
 IMPORTANT: Once you have the user's answers go back to Step 2. Do this in a loop until you have no more questions. Ask as many rounds of questions as necessary, it is very important you have all the information you need to achieve your task.
 
 #### Step 3: Plan Generation
+Step 3 starts only after all items in Step 2 have been executed.
+
 Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
 
 ##### CRITICAL: Output Format
