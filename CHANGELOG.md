@@ -1,3 +1,10 @@
+## 1.33.0 (2026-03-26)
+
+* feat: enforce scope discipline guardrails ([ce6758b](https://github.com/e0ipso/ai-task-manager/commit/ce6758b))
+* chore: simplify template metadata ([2ff5d76](https://github.com/e0ipso/ai-task-manager/commit/2ff5d76))
+* chore: style updates ([b06ac3c](https://github.com/e0ipso/ai-task-manager/commit/b06ac3c))
+* docs: list correct post-install list ([fd9ff66](https://github.com/e0ipso/ai-task-manager/commit/fd9ff66))
+
 ## 1.32.0 (2026-03-09)
 
 * feat: parallelize exec remediation (#14) ([e7a19d2](https://github.com/e0ipso/ai-task-manager/commit/e7a19d2)), closes [#14](https://github.com/e0ipso/ai-task-manager/issues/14)
