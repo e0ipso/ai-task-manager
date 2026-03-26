@@ -116,7 +116,17 @@ The hook system injects custom logic at seven key points in the workflow lifecyc
 - Map skills to specific agent configurations
 - Add fallback strategies for unmatched skills
 
-#### 7. POST_ERROR_DETECTION Hook
+#### 7. PRE_TASK_EXECUTION Hook
+
+**File**: `PRE_TASK_EXECUTION.md`
+**Purpose**: Pre-flight validation before each individual task is dispatched to an agent. Ships empty — add your own checks.
+
+**Common Customizations**:
+- Add project-specific pre-flight checks (e.g., verify required services are running)
+- Configure which checks are hard failures vs warnings
+- Add environment validation (e.g., required env vars are set)
+
+#### 8. POST_ERROR_DETECTION Hook
 
 **File**: `POST_ERROR_DETECTION.md`
 **Purpose**: Error handling procedures for task execution failures

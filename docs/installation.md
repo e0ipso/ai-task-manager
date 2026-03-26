@@ -91,6 +91,7 @@ project-root/
 │       │   │   ├── POST_PLAN.md
 │       │   │   ├── POST_TASK_GENERATION_ALL.md
 │       │   │   ├── PRE_TASK_ASSIGNMENT.md
+│       │   │   ├── PRE_TASK_EXECUTION.md
 │       │   │   ├── POST_ERROR_DETECTION.md
 │       │   │   └── POST_EXECUTION.md
 │       │   ├── templates/         # Customizable templates

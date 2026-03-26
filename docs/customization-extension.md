@@ -30,7 +30,7 @@ In this section:
 ## Customization Points
 
 ### Hooks System
-Eight lifecycle hooks inject custom logic at key points in the workflow. All hooks are Markdown files in `.ai/task-manager/config/hooks/`:
+Nine lifecycle hooks inject custom logic at key points in the workflow. All hooks are Markdown files in `.ai/task-manager/config/hooks/`:
 
 - **PRE_PLAN**: Pre-planning guidance
 - **PRE_PHASE**: Phase preparation logic
@@ -38,6 +38,7 @@ Eight lifecycle hooks inject custom logic at key points in the workflow. All hoo
 - **POST_PLAN**: Plan validation
 - **POST_TASK_GENERATION_ALL**: Task complexity analysis and blueprint generation
 - **PRE_TASK_ASSIGNMENT**: Agent selection based on skills
+- **PRE_TASK_EXECUTION**: Pre-flight validation before each task dispatch
 - **POST_ERROR_DETECTION**: Error handling procedures
 - **POST_EXECUTION**: Final validation before execution summary and archival
 
