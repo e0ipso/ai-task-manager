@@ -83,6 +83,9 @@ Use your internal Todo task tool to track the workflow execution:
 
 Execute the following plan creation process:
 
+For this step, think hard to create detailed, actionable plans based on the user input while
+ensuring you have all necessary context before proceeding. Use the plan-creator sub-agent for this if it is available.
+
 Use tools for the planning. You are encouraged to write your own specialized tools to research, analyze, and debug
 any work order from the user. You are not restricted to the stack of the current project to create your own
 specialized tools.
