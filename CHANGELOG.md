@@ -1,3 +1,7 @@
+## 1.34.0 (2026-03-27)
+
+* feat: add PRE_TASK_EXECUTION hook (#16) ([e86a386](https://github.com/e0ipso/ai-task-manager/commit/e86a386)), closes [#16](https://github.com/e0ipso/ai-task-manager/issues/16) [#15](https://github.com/e0ipso/ai-task-manager/issues/15)
+
 ## 1.33.0 (2026-03-26)
 
 * feat: enforce scope discipline guardrails ([ce6758b](https://github.com/e0ipso/ai-task-manager/commit/ce6758b))
