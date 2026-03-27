@@ -745,17 +745,16 @@ Read and execute $root/.ai/task-manager/config/hooks/PRE_PHASE.md
 2. **Agent Selection and Task Assignment**
 Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
-3. **Task Pre-Flight Validation**
-    - For each task about to be dispatched:
-Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_EXECUTION.md
-
-4. **Parallel Execution**
+3. **Parallel Execution**
     - Deploy all selected agents simultaneously using your internal Task tool
+    - **Each agent MUST perform these steps in order:**
+      1. Read and execute `$root/.ai/task-manager/config/hooks/PRE_TASK_EXECUTION.md` before starting any implementation work
+      2. Execute the task according to its requirements
     - Monitor execution progress for each task
     - Capture outputs and artifacts from each agent
     - Update task status in real-time
 
-5. **Phase Completion Verification**
+4. **Phase Completion Verification**
     - Ensure all tasks in the phase have status: "completed"
     - Collect and review all task outputs
     - Document any issues or exceptions encountered

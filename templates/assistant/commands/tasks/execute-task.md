@@ -53,7 +53,7 @@ Use your internal Todo task tool to track the execution of all parts of the task
 
 - [ ] Validate task: file, status (including needs-clarification), and dependencies.
 - [ ] Set task status to in-progress.
-- [ ] Execute the task.
+- [ ] Execute the task (agent runs PRE_TASK_EXECUTION hook, then implements).
 - [ ] Update task status to completed or failed.
 - [ ] Document noteworthy events (if any).
 - [ ] Emit structured output for orchestrator.
@@ -253,10 +253,13 @@ Deploy the task using the Task tool with full context:
 - Required skills: `$task_skills`
 - Agent selection: Based on skills analysis or general-purpose agent
 
-Read the complete task file and execute according to its requirements. The task includes:
-- Objective and acceptance criteria
-- Technical requirements and implementation notes
-- Input dependencies and expected output artifacts
+**The agent MUST perform these steps in order:**
+
+1. **Pre-flight validation**: Read and execute `$root/.ai/task-manager/config/hooks/PRE_TASK_EXECUTION.md` before starting any implementation work.
+2. **Execute the task**: Read the complete task file and implement according to its requirements, including:
+   - Objective and acceptance criteria
+   - Technical requirements and implementation notes
+   - Input dependencies and expected output artifacts
 
 ### 8. Post-Execution Status Management
 
