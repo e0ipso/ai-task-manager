@@ -292,7 +292,7 @@ project/
 │   ├── config/
 │   │   ├── TASK_MANAGER.md        # Project context
 │   │   ├── scripts/               # ID generation (get-next-plan-id.cjs, etc)
-│   │   ├── hooks/                 # Validation scripts (PRE_PLAN.md, POST_PLAN.md, etc)
+│   │   ├── hooks/                 # Lifecycle hooks (PRE_PLAN, POST_PLAN, PRE_PHASE, POST_PHASE, PRE_TASK_ASSIGNMENT, PRE_TASK_EXECUTION, POST_TASK_GENERATION_ALL, POST_EXECUTION, POST_ERROR_DETECTION)
 │   │   └── templates/             # Customizable (PLAN_TEMPLATE.md, TASK_TEMPLATE.md)
 └── .<assistant>/...               # See Assistant-Specific Differences table below
 ```

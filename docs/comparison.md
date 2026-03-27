@@ -317,7 +317,7 @@ All formats are automatically generated from a single source during initializati
 ### Can I customize the workflow?
 
 **Yes, extensively.** Customize:
-- **Hooks**: Eight lifecycle hooks for validation gates and custom logic
+- **Hooks**: Nine lifecycle hooks for validation gates and custom logic
 - **Templates**: Five templates for plans, tasks, blueprints, and summaries
 - **Configuration**: TASK_MANAGER.md and POST_PHASE.md for project context
 

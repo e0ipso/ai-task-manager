@@ -233,12 +233,13 @@ AI Task Manager is built for customization through three extension points:
 
 ### 1. Hooks System
 
-Eight lifecycle hooks inject custom logic:
+Nine lifecycle hooks inject custom logic:
 
 ```
 PRE_PLAN → Planning guidance
 PRE_PHASE → Phase preparation
 PRE_TASK_ASSIGNMENT → Agent selection
+PRE_TASK_EXECUTION → Task pre-flight validation
 POST_PLAN → Plan validation
 POST_TASK_GENERATION_ALL → Task refinement
 POST_PHASE → Quality gates

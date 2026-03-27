@@ -1,7 +1,5 @@
 # POST_ERROR_DETECTION Hook
 
-This hook provides error handling procedures for task execution failures and validation gate failures.
-
 ## Task Execution Error Handling
 
 If task execution fails:

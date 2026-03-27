@@ -1,7 +1,5 @@
 # PRE_PLAN Hook
 
-This hook provides pre-planning guidance to ensure scope control, simplicity principles, and proper validation requirements are established before comprehensive plan creation.
-
 ## Scope Control Guidelines
 
 **Critical: Implement ONLY what is explicitly requested**

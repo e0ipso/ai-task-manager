@@ -142,6 +142,9 @@ Read and execute $root/.ai/task-manager/config/hooks/PRE_TASK_ASSIGNMENT.md
 
 3. **Parallel Execution**
     - Deploy all selected agents simultaneously using your internal Task tool
+    - **Each agent MUST perform these steps in order:**
+      1. Read and execute `$root/.ai/task-manager/config/hooks/PRE_TASK_EXECUTION.md` before starting any implementation work
+      2. Execute the task according to its requirements
     - Monitor execution progress for each task
     - Capture outputs and artifacts from each agent
     - Update task status in real-time

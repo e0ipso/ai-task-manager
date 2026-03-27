@@ -1,7 +1,5 @@
 # PRE_TASK_ASSIGNMENT Hook
 
-This hook executes before task assignment to determine the most appropriate agent for each task based on skill requirements and available sub-agents.
-
 ## Agent Selection and Task Assignment
 
 - For each task in the current phase:
