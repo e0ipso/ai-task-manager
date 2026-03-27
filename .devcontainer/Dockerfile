@@ -5,8 +5,6 @@ ARG TZ=Europe/Madrid
 ENV TZ="$TZ"
 
 ARG CLAUDE_CODE_VERSION=latest
-ARG GEMINI_VERSION=latest
-ARG CODEX_VERSION=latest
 
 # Install basic development tools and iptables/ipset
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,8 +47,7 @@ RUN mkdir -p /worktrees \
   && chown -R $USERNAME /worktrees
 
 # Pre-create directories that will be needed for bind mounts
-RUN mkdir -p /home/$USERNAME/.claude/debug /home/$USERNAME/.gemini /home/$USERNAME/.codex \
-  && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude /home/$USERNAME/.gemini /home/$USERNAME/.codex
+RUN mkdir -p /home/$USERNAME/.claude/debug && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude
 
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
@@ -91,7 +88,5 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
 
-# Install Claude & Gemini
+# Install Claude
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION:-latest}
-RUN npm install -g @google/gemini-cli@${GEMINI_VERSION:-latest}
-RUN npm install -g @openai/codex@${CODEX_VERSION:-latest}
