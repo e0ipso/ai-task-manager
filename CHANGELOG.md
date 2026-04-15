@@ -1,3 +1,7 @@
+## 1.35.0 (2026-04-15)
+
+* feat(exec): spawn CLI with stream-json output (#17) ([e818ec6](https://github.com/e0ipso/ai-task-manager/commit/e818ec6)), closes [#17](https://github.com/e0ipso/ai-task-manager/issues/17)
+
 ## 1.34.0 (2026-03-27)
 
 * feat: add PRE_TASK_EXECUTION hook (#16) ([e86a386](https://github.com/e0ipso/ai-task-manager/commit/e86a386)), closes [#16](https://github.com/e0ipso/ai-task-manager/issues/16) [#15](https://github.com/e0ipso/ai-task-manager/issues/15)
