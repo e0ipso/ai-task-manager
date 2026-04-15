@@ -1,10 +1,12 @@
 /**
  * Claude Exec Command Module
  *
- * Validates and executes multiple plans sequentially using the Claude Agent SDK.
- * Performs pre-flight validation and auto-remediation before execution.
+ * Validates and executes multiple plans sequentially by spawning the `claude`
+ * CLI with streaming output. Performs pre-flight validation and auto-remediation
+ * before execution.
  */
 
+import { spawn } from 'child_process';
 import * as fs from 'fs-extra';
 import chalk from 'chalk';
 import { findPlanById, PlanLocation } from './plan-utils';
@@ -28,54 +30,112 @@ async function hasBlueprintSection(filePath: string): Promise<boolean> {
 }
 
 /**
- * Run a Claude Code command using the Agent SDK query function
+ * Handle a single stream-json line from the claude CLI
  */
-async function runClaudeCommand(prompt: string, cwd: string): Promise<string> {
-  const oauthToken = process.env.CLAUDE_CODE_OAUTH_TOKEN;
-  if (!oauthToken) {
-    throw new Error('CLAUDE_CODE_OAUTH_TOKEN environment variable is required');
+function handleStreamJsonLine(line: string, output: string[]): void {
+  let msg: unknown;
+  try {
+    msg = JSON.parse(line);
+  } catch {
+    return;
   }
 
-  // Dynamic import for ESM module from CommonJS context
-  const { query } = await import('@anthropic-ai/claude-agent-sdk');
+  if (!msg || typeof msg !== 'object') {
+    return;
+  }
 
-  const output: string[] = [];
+  const m = msg as {
+    type?: string;
+    message?: { content?: Array<{ type?: string; text?: string }> };
+    result?: string;
+  };
 
-  for await (const message of query({
-    prompt,
-    options: {
-      cwd,
-      permissionMode: 'bypassPermissions',
-      allowDangerouslySkipPermissions: true,
-      settingSources: ['project', 'user'],
-      env: {
-        ...process.env,
-        CLAUDE_CODE_OAUTH_TOKEN: oauthToken,
-      },
-    },
-  })) {
-    if (message.type === 'assistant') {
-      const assistantMsg = message as {
-        type: 'assistant';
-        message?: { content?: Array<{ type: string; text?: string }> };
-      };
-      if (assistantMsg.message?.content) {
-        for (const block of assistantMsg.message.content) {
-          if (block.type === 'text' && block.text) {
-            output.push(block.text);
-            process.stdout.write(chalk.gray(block.text));
-          }
-        }
-      }
-    } else if (message.type === 'result') {
-      const resultMsg = message as { type: 'result'; result?: string };
-      if (resultMsg.result) {
-        output.push(resultMsg.result);
+  if (m.type === 'assistant' && m.message?.content) {
+    for (const block of m.message.content) {
+      if (block.type === 'text' && block.text) {
+        output.push(block.text);
+        process.stdout.write(chalk.gray(block.text));
       }
     }
+  } else if (m.type === 'result' && m.result) {
+    output.push(m.result);
   }
+}
 
-  return output.join('\n');
+/**
+ * Run a Claude Code command by spawning the `claude` CLI and streaming its output.
+ * Authentication is delegated to the CLI itself (stored session, keychain, or any
+ * env var the user has configured) — we do not require any auth variable here.
+ */
+async function runClaudeCommand(prompt: string, cwd: string): Promise<string> {
+  const args = [
+    '-p',
+    prompt,
+    '--output-format',
+    'stream-json',
+    '--verbose',
+    '--dangerously-skip-permissions',
+  ];
+
+  return new Promise<string>((resolve, reject) => {
+    const child = spawn('claude', args, {
+      cwd,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    const output: string[] = [];
+    let stdoutBuf = '';
+    let stderrBuf = '';
+
+    child.stdout?.setEncoding('utf-8');
+    child.stdout?.on('data', (chunk: string) => {
+      stdoutBuf += chunk;
+      let idx = stdoutBuf.indexOf('\n');
+      while (idx >= 0) {
+        const line = stdoutBuf.slice(0, idx).trim();
+        stdoutBuf = stdoutBuf.slice(idx + 1);
+        if (line) {
+          handleStreamJsonLine(line, output);
+        }
+        idx = stdoutBuf.indexOf('\n');
+      }
+    });
+
+    child.stderr?.setEncoding('utf-8');
+    child.stderr?.on('data', (chunk: string) => {
+      stderrBuf += chunk;
+      process.stderr.write(chalk.gray(chunk));
+    });
+
+    child.on('error', err => {
+      const msg = err instanceof Error ? err.message : String(err);
+      if ((err as { code?: string }).code === 'ENOENT') {
+        reject(
+          new Error(
+            `Failed to spawn 'claude' CLI: command not found. Install Claude Code and ensure 'claude' is on PATH.`
+          )
+        );
+        return;
+      }
+      reject(new Error(`Failed to spawn 'claude' CLI: ${msg}`));
+    });
+
+    child.on('close', (code, signal) => {
+      if (stdoutBuf.trim()) {
+        handleStreamJsonLine(stdoutBuf.trim(), output);
+        stdoutBuf = '';
+      }
+
+      if (code === 0) {
+        resolve(output.join('\n'));
+        return;
+      }
+
+      const reason = signal ? `signal ${signal}` : `exit code ${code}`;
+      const detail = stderrBuf.trim() ? `: ${stderrBuf.trim()}` : '';
+      reject(new Error(`claude CLI terminated with ${reason}${detail}`));
+    });
+  });
 }
 
 /**
@@ -109,15 +169,6 @@ async function validatePlan(planId: number): Promise<PlanValidation> {
  */
 export async function claudeExec(planIds: number[]): Promise<CommandResult> {
   const cwd = process.cwd();
-
-  // Check for OAuth token early
-  if (!process.env.CLAUDE_CODE_OAUTH_TOKEN) {
-    return {
-      success: false,
-      message:
-        'CLAUDE_CODE_OAUTH_TOKEN environment variable is required. Set it before running claude-exec.',
-    };
-  }
 
   if (planIds.length === 0) {
     return {
