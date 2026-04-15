@@ -24,17 +24,72 @@ jest.mock('chalk', () => ({
   },
 }));
 
-// Mock the Claude Agent SDK
-jest.mock('@anthropic-ai/claude-agent-sdk', () => ({
-  query: jest.fn(),
+// Mock child_process.spawn so tests don't invoke the real claude CLI
+jest.mock('child_process', () => ({
+  spawn: jest.fn(),
 }));
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { EventEmitter } from 'events';
+import { spawn } from 'child_process';
 import { claudeExec } from '../exec';
 
-// Access the mocked module
-const mockQuery = jest.requireMock('@anthropic-ai/claude-agent-sdk').query;
+const mockSpawn = spawn as jest.MockedFunction<typeof spawn>;
+
+type SpawnSideEffect = (args: {
+  command: string;
+  args: readonly string[];
+  prompt: string;
+}) => void | Promise<void>;
+
+interface FakeChildOptions {
+  exitCode?: number;
+  sideEffect?: SpawnSideEffect;
+  emitError?: NodeJS.ErrnoException;
+}
+
+/**
+ * Create a minimal ChildProcess-like EventEmitter with stdout/stderr streams.
+ * Emits close (or error) asynchronously, optionally running a side effect first.
+ */
+function createFakeChild(
+  command: string,
+  args: readonly string[],
+  options: FakeChildOptions
+): EventEmitter {
+  const child = new EventEmitter() as EventEmitter & {
+    stdout: EventEmitter & { setEncoding: jest.Mock };
+    stderr: EventEmitter & { setEncoding: jest.Mock };
+  };
+  const stdout = Object.assign(new EventEmitter(), { setEncoding: jest.fn() });
+  const stderr = Object.assign(new EventEmitter(), { setEncoding: jest.fn() });
+  child.stdout = stdout;
+  child.stderr = stderr;
+
+  const promptIdx = args.indexOf('-p');
+  const prompt = promptIdx >= 0 ? args[promptIdx + 1] ?? '' : '';
+
+  // Run side effects and emit close/error asynchronously so the caller can
+  // attach listeners first.
+  setImmediate(async () => {
+    if (options.emitError) {
+      child.emit('error', options.emitError);
+      return;
+    }
+    try {
+      if (options.sideEffect) {
+        await options.sideEffect({ command, args, prompt });
+      }
+    } catch (err) {
+      child.emit('error', err);
+      return;
+    }
+    child.emit('close', options.exitCode ?? 0, null);
+  });
+
+  return child;
+}
 
 describe('Claude Exec Command', () => {
   const testDir = path.join(__dirname, 'test-exec');
@@ -47,14 +102,10 @@ describe('Claude Exec Command', () => {
     await fs.ensureDir(plansDir);
     await fs.ensureDir(archiveDir);
     process.chdir(testDir);
-    process.env.CLAUDE_CODE_OAUTH_TOKEN = 'test-token';
 
-    // Default mock: query returns an async iterable with a result message
-    mockQuery.mockImplementation(() => ({
-      async *[Symbol.asyncIterator]() {
-        yield { type: 'result', result: 'done' };
-      },
-    }));
+    // Default mock: successful exit with no side effects
+    mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+      createFakeChild(command, args, { exitCode: 0 })) as unknown as typeof spawn);
   });
 
   afterEach(async () => {
@@ -96,13 +147,6 @@ describe('Claude Exec Command', () => {
   }
 
   describe('Input validation', () => {
-    it('should fail when no OAuth token is set', async () => {
-      delete process.env.CLAUDE_CODE_OAUTH_TOKEN;
-      const result = await claudeExec([1]);
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('CLAUDE_CODE_OAUTH_TOKEN');
-    });
-
     it('should fail when no plan IDs are provided', async () => {
       const result = await claudeExec([]);
       expect(result.success).toBe(false);
@@ -128,97 +172,92 @@ describe('Claude Exec Command', () => {
       await createTestPlan(1, 'ready-plan', { taskCount: 2, hasBlueprint: true });
       const result = await claudeExec([1]);
       expect(result.success).toBe(true);
-      expect(mockQuery).toHaveBeenCalledTimes(1); // Only execute-blueprint, no remediation
+      // Only execute-blueprint, no remediation
+      expect(mockSpawn).toHaveBeenCalledTimes(1);
+      const call = mockSpawn.mock.calls[0];
+      expect(call).toBeDefined();
+      const cmd = call![0];
+      const spawnArgs = call![1] as readonly string[];
+      expect(cmd).toBe('claude');
+      expect(spawnArgs).toContain('-p');
+      expect(spawnArgs).toContain('/tasks:execute-blueprint 1');
+      expect(spawnArgs).toContain('--dangerously-skip-permissions');
+      expect(spawnArgs).toContain('--output-format');
+      expect(spawnArgs).toContain('stream-json');
     });
   });
 
   describe('Phase 2: Remediation batching', () => {
     it('should remediate plans needing tasks', async () => {
-      // Plan with no tasks triggers remediation
       await createTestPlan(1, 'needs-tasks', { taskCount: 0, hasBlueprint: true });
 
-      // After remediation mock, create tasks so re-validation passes
-      mockQuery.mockImplementation(() => ({
-        async *[Symbol.asyncIterator]() {
-          // Simulate generate-tasks creating tasks and blueprint
-          const planDir = path.join(plansDir, '01--needs-tasks');
-          const tasksDir = path.join(planDir, 'tasks');
-          await fs.ensureDir(tasksDir);
-          await fs.writeFile(
-            path.join(tasksDir, '01--task-1.md'),
-            '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
-            'utf-8'
-          );
-          // Add blueprint section
-          const planFile = path.join(planDir, 'plan-01--needs-tasks.md');
-          const content = await fs.readFile(planFile, 'utf-8');
-          await fs.writeFile(planFile, content + '\n## Execution Blueprint\n\nPhases.\n', 'utf-8');
-          yield { type: 'result', result: 'done' };
-        },
-      }));
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, {
+          exitCode: 0,
+          sideEffect: async ({ prompt }) => {
+            if (prompt.startsWith('/tasks:generate-tasks')) {
+              const planDir = path.join(plansDir, '01--needs-tasks');
+              const tasksDir = path.join(planDir, 'tasks');
+              await fs.ensureDir(tasksDir);
+              await fs.writeFile(
+                path.join(tasksDir, '01--task-1.md'),
+                '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
+                'utf-8'
+              );
+            }
+          },
+        })) as unknown as typeof spawn);
 
       const result = await claudeExec([1]);
       expect(result.success).toBe(true);
     });
 
     it('should process remediation in parallel batches of 3', async () => {
-      // Create 5 plans needing remediation to test batching (2 batches: 3 + 2)
       for (let i = 1; i <= 5; i++) {
         await createTestPlan(i, `plan-${i}`, { taskCount: 0, hasBlueprint: false });
       }
 
-      const callOrder: number[] = [];
-      let callIndex = 0;
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, {
+          exitCode: 0,
+          sideEffect: async ({ prompt }) => {
+            const match = prompt.match(/\s(\d+)$/);
+            if (!match || !match[1]) return;
+            const planId = parseInt(match[1], 10);
+            const planDirName = `${planId.toString().padStart(2, '0')}--plan-${planId}`;
+            const planDir = path.join(plansDir, planDirName);
 
-      mockQuery.mockImplementation(() => ({
-        async *[Symbol.asyncIterator]() {
-          const currentCall = ++callIndex;
-          callOrder.push(currentCall);
-
-          // Determine which plan this is for based on the call sequence
-          // Calls 1-5 are generate-tasks, calls 6-10 are execute-blueprint
-          const planId = currentCall <= 5 ? currentCall : currentCall - 5;
-          const planDirName = `${planId.toString().padStart(2, '0')}--plan-${planId}`;
-          const planDir = path.join(plansDir, planDirName);
-
-          // Simulate task generation
-          const tasksDir = path.join(planDir, 'tasks');
-          await fs.ensureDir(tasksDir);
-          await fs.writeFile(
-            path.join(tasksDir, '01--task-1.md'),
-            `---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n`,
-            'utf-8'
-          );
-          const planFile = path.join(planDir, `plan-${planDirName}.md`);
-          const content = await fs.readFile(planFile, 'utf-8');
-          if (!content.includes('## Execution Blueprint')) {
-            await fs.writeFile(
-              planFile,
-              content + '\n## Execution Blueprint\n\nPhases.\n',
-              'utf-8'
-            );
-          }
-
-          yield { type: 'result', result: 'done' };
-        },
-      }));
+            if (prompt.startsWith('/tasks:generate-tasks')) {
+              const tasksDir = path.join(planDir, 'tasks');
+              await fs.ensureDir(tasksDir);
+              await fs.writeFile(
+                path.join(tasksDir, '01--task-1.md'),
+                `---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n`,
+                'utf-8'
+              );
+              const planFile = path.join(planDir, `plan-${planDirName}.md`);
+              const content = await fs.readFile(planFile, 'utf-8');
+              if (!content.includes('## Execution Blueprint')) {
+                await fs.writeFile(
+                  planFile,
+                  content + '\n## Execution Blueprint\n\nPhases.\n',
+                  'utf-8'
+                );
+              }
+            }
+          },
+        })) as unknown as typeof spawn);
 
       const result = await claudeExec([1, 2, 3, 4, 5]);
       expect(result.success).toBe(true);
       // 5 remediation calls + 5 execution calls = 10 total
-      expect(mockQuery).toHaveBeenCalledTimes(10);
+      expect(mockSpawn).toHaveBeenCalledTimes(10);
     });
 
     it('should fail if remediation leaves plan without tasks', async () => {
       await createTestPlan(1, 'broken-plan', { taskCount: 0, hasBlueprint: false });
 
-      // Mock that does nothing (doesn't create tasks)
-      mockQuery.mockImplementation(() => ({
-        async *[Symbol.asyncIterator]() {
-          yield { type: 'result', result: 'done' };
-        },
-      }));
-
+      // Default mock does nothing (no tasks created)
       const result = await claudeExec([1]);
       expect(result.success).toBe(false);
       expect(result.message).toContain('still has no tasks after remediation');
@@ -227,20 +266,22 @@ describe('Claude Exec Command', () => {
     it('should fail if remediation leaves plan without blueprint', async () => {
       await createTestPlan(1, 'no-blueprint', { taskCount: 0, hasBlueprint: false });
 
-      // Mock that creates tasks but no blueprint
-      mockQuery.mockImplementation(() => ({
-        async *[Symbol.asyncIterator]() {
-          const planDir = path.join(plansDir, '01--no-blueprint');
-          const tasksDir = path.join(planDir, 'tasks');
-          await fs.ensureDir(tasksDir);
-          await fs.writeFile(
-            path.join(tasksDir, '01--task-1.md'),
-            '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
-            'utf-8'
-          );
-          yield { type: 'result', result: 'done' };
-        },
-      }));
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, {
+          exitCode: 0,
+          sideEffect: async ({ prompt }) => {
+            if (prompt.startsWith('/tasks:generate-tasks')) {
+              const planDir = path.join(plansDir, '01--no-blueprint');
+              const tasksDir = path.join(planDir, 'tasks');
+              await fs.ensureDir(tasksDir);
+              await fs.writeFile(
+                path.join(tasksDir, '01--task-1.md'),
+                '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
+                'utf-8'
+              );
+            }
+          },
+        })) as unknown as typeof spawn);
 
       const result = await claudeExec([1]);
       expect(result.success).toBe(false);
@@ -254,12 +295,13 @@ describe('Claude Exec Command', () => {
       await createTestPlan(2, 'plan-b', { taskCount: 1, hasBlueprint: true });
 
       const executionOrder: string[] = [];
-      mockQuery.mockImplementation(({ prompt }: { prompt: string }) => ({
-        async *[Symbol.asyncIterator]() {
-          executionOrder.push(prompt);
-          yield { type: 'result', result: 'done' };
-        },
-      }));
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, {
+          exitCode: 0,
+          sideEffect: ({ prompt }) => {
+            executionOrder.push(prompt);
+          },
+        })) as unknown as typeof spawn);
 
       const result = await claudeExec([1, 2]);
       expect(result.success).toBe(true);
@@ -271,17 +313,28 @@ describe('Claude Exec Command', () => {
       await createTestPlan(1, 'fail-plan', { taskCount: 1, hasBlueprint: true });
       await createTestPlan(2, 'never-run', { taskCount: 1, hasBlueprint: true });
 
-      mockQuery.mockImplementation(() => ({
-        async *[Symbol.asyncIterator]() {
-          throw new Error('Execution error');
-        },
-      }));
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, { exitCode: 1 })) as unknown as typeof spawn);
 
       const result = await claudeExec([1, 2]);
       expect(result.success).toBe(false);
       expect(result.message).toContain('Execution failed for plan 1');
-      // Only one call - stopped after first failure
-      expect(mockQuery).toHaveBeenCalledTimes(1);
+      expect(mockSpawn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should surface a helpful error when the claude CLI is not installed', async () => {
+      await createTestPlan(1, 'ready-plan', { taskCount: 1, hasBlueprint: true });
+
+      const enoent: NodeJS.ErrnoException = Object.assign(new Error('spawn claude ENOENT'), {
+        code: 'ENOENT',
+      });
+      mockSpawn.mockImplementation(((command: string, args: readonly string[]) =>
+        createFakeChild(command, args, { emitError: enoent })) as unknown as typeof spawn);
+
+      const result = await claudeExec([1]);
+      expect(result.success).toBe(false);
+      expect(result.message).toContain("'claude' CLI");
+      expect(result.message).toContain('not found');
     });
   });
 });
