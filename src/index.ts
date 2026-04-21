@@ -118,6 +118,7 @@ export async function init(options: InitOptions): Promise<CommandResult> {
     // Create .ai/task-manager structure
     console.log(`  ${chalk.green('✓')} Creating .ai/task-manager directory structure`);
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/plans'));
+    await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/archive'));
     await fs.ensureDir(resolvePath(baseDir, '.ai/task-manager/config/hooks'));
 
     // Copy common templates to .ai/task-manager with conflict detection

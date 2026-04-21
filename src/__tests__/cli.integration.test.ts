@@ -64,6 +64,7 @@ describe('CLI Integration Tests - Consolidated', () => {
     // Common directories
     expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager'))).toBe(true);
     expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/plans'))).toBe(true);
+    expect(await fs.pathExists(path.join(baseDir, '.ai/task-manager/archive'))).toBe(true);
 
     // Assistant-specific directories and files
     for (const assistant of assistants) {
