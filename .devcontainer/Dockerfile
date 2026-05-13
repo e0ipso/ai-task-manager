@@ -1,10 +1,8 @@
-ARG BASE_IMAGE=node:22
+ARG BASE_IMAGE=node:24
 FROM ${BASE_IMAGE}
 
 ARG TZ=Europe/Madrid
 ENV TZ="$TZ"
-
-ARG CLAUDE_CODE_VERSION=latest
 
 # Install basic development tools and iptables/ipset
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -13,7 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   procps \
   sudo \
   fzf \
-  zsh \
   man-db \
   unzip \
   gnupg2 \
@@ -42,23 +39,10 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
   && touch /commandhistory/.bash_history \
   && chown -R $USERNAME /commandhistory
 
-# Create worktrees directory for git worktrees
-RUN mkdir -p /worktrees \
-  && chown -R $USERNAME /worktrees
-
-# Pre-create directories that will be needed for bind mounts
-RUN mkdir -p /home/$USERNAME/.claude/debug && chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude
-
 # Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
 
 WORKDIR /workspace
-
-ARG GIT_DELTA_VERSION=0.18.2
-RUN ARCH=$(dpkg --print-architecture) && \
-  wget "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
-  sudo dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
-  rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
 
 # Configure passwordless sudo for node user
 RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/node && \
@@ -71,22 +55,9 @@ USER node
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH=$PATH:/usr/local/share/npm-global/bin
 
-# Set the default shell to zsh rather than sh
-ENV SHELL=/bin/zsh
-
 # Set the default editor and visual
 ENV EDITOR=vim
 ENV VISUAL=vim
 
-# Default powerline10k theme
-ARG ZSH_IN_DOCKER_VERSION=1.2.0
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
-  -p git \
-  -p fzf \
-  -a "source /usr/share/doc/fzf/examples/key-bindings.zsh" \
-  -a "source /usr/share/doc/fzf/examples/completion.zsh" \
-  -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
-  -x
-
 # Install Claude
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION:-latest}
+RUN curl -fsSL https://claude.ai/install.sh | bash
