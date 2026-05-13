@@ -63,9 +63,8 @@
     "SSH_AUTH_SOCK": "/ssh-agent",
     "LC_ALL": "C.UTF-8"
   },
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,readonly,type=bind,consistency=delegated",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "sudo chown -R node:node /home/node/.claude || true",
   "postStartCommand": "curl -fsSL https://claude.ai/install.sh | bash",
   "waitFor": "postStartCommand"
 }
