@@ -189,24 +189,27 @@ Dependency Rule: Task B depends on Task A if:
 
 #### Step 3: Task Generation
 
-##### Frontmatter Structure
+##### Head Metadata Structure
 
-Example:
-```yaml
----
-id: 1
-group: "user-authentication"
-dependencies: []  # List of task IDs, e.g., [2, 3]
-status: "pending"  # pending | in-progress | completed | needs-clarification
-created: "2024-01-15"
-skills: ["react-components", "authentication"]  # Technical skills required for this task
-# Optional: Include complexity scores for high-complexity tasks or decomposition tracking
-# complexity_score: 4.2  # Composite complexity score (only if >4 or decomposed)
-# complexity_notes: "Decomposed from original task due to high technical depth"
----
+Tasks are semantic HTML5 documents. Encode the task metadata in the document's `<head>` using `<meta>` tags. Use comma-separated values for the list-typed entries (`dependencies` and `skills`).
+
+```html
+<head>
+  <meta charset="utf-8">
+  <title>Add login form component</title>
+  <meta name="id" content="1">
+  <meta name="group" content="user-authentication">
+  <meta name="dependencies" content=""> <!-- comma-separated task IDs, e.g. "2,3" -->
+  <meta name="status" content="pending"> <!-- pending | in-progress | completed | needs-clarification -->
+  <meta name="created" content="2024-01-15">
+  <meta name="skills" content="react-components,authentication">
+  <!-- Optional: include complexity tracking for high-complexity or decomposed tasks -->
+  <!-- <meta name="complexity_score" content="4.2"> -->
+  <!-- <meta name="complexity_notes" content="Decomposed from original task due to high technical depth"> -->
+</head>
 ```
 
-The schema for this frontmatter is:
+The schema for the `<meta>` values is:
 ```json
 {
   "type": "object",
@@ -264,7 +267,7 @@ The schema for this frontmatter is:
 
 ##### Task Body Structure
 
-Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.md
+Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.html. Each task file must be a complete semantic HTML5 document (matching the template's structure, including the `<head>` metadata) and saved with a `.html` extension.
 
 ##### Task ID Generation
 

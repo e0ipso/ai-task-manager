@@ -98,11 +98,11 @@ describe('get-next-plan-id Integration Tests', () => {
   };
 
   /**
-   * Create a plan file with YAML frontmatter
+   * Create a plan file as a semantic HTML5 document with `<head>` metadata.
    * @param dir - Directory to create file in
    * @param filename - Name of the file
-   * @param id - ID to put in frontmatter
-   * @param format - YAML format variation
+   * @param id - ID to put in `<meta name="id">`
+   * @param format - HTML metadata variation
    */
   const createPlanFile = (
     dir: string,
@@ -112,43 +112,47 @@ describe('get-next-plan-id Integration Tests', () => {
   ): void => {
     fs.mkdirSync(dir, { recursive: true });
 
-    let frontmatter;
-    switch (format) {
-      case 'quoted':
-        frontmatter = `---\nid: "${id}"\ntitle: Test Plan\n---\n`;
-        break;
-      case 'single-quoted':
-        frontmatter = `---\nid: '${id}'\ntitle: Test Plan\n---\n`;
-        break;
-      case 'quoted-key':
-        frontmatter = `---\n"id": ${id}\ntitle: Test Plan\n---\n`;
-        break;
-      case 'extra-spaces':
-        frontmatter = `---\nid  :  ${id}\ntitle: Test Plan\n---\n`;
-        break;
-      case 'with-comments':
-        frontmatter = `---\n# This is a comment\nid: ${id}  # ID comment\ntitle: Test Plan\n---\n`;
-        break;
-      case 'mixed-quotes':
-        frontmatter = `---\n'id': "${id}"\ntitle: Test Plan\n---\n`;
-        break;
-      case 'malformed':
-        frontmatter = `---\nid ${id}\ntitle: Test Plan\nmalformed line\n---\n`;
-        break;
-      case 'no-frontmatter':
-        frontmatter = '';
-        break;
-      case 'empty-id':
-        frontmatter = `---\nid:\ntitle: Test Plan\n---\n`;
-        break;
-      case 'null-id':
-        frontmatter = `---\nid: null\ntitle: Test Plan\n---\n`;
-        break;
-      default: // 'simple'
-        frontmatter = `---\nid: ${id}\ntitle: Test Plan\n---\n`;
-    }
+    const head = ((): string => {
+      switch (format) {
+        case 'quoted':
+        case 'single-quoted':
+          return `<meta name='id' content='${id}'>`;
+        case 'quoted-key':
+        case 'mixed-quotes':
+          return `<meta content="${id}" name="id">`;
+        case 'extra-spaces':
+          return `<meta   name = "id"   content = "${id}" >`;
+        case 'with-comments':
+          return `<!-- A comment --><meta name="id" content="${id}"> <!-- another comment -->`;
+        case 'malformed':
+          return `<meta name="id">`; // No content
+        case 'no-frontmatter':
+          return '';
+        case 'empty-id':
+          return `<meta name="id" content="">`;
+        case 'null-id':
+          return `<meta name="id" content="null">`;
+        default:
+          return `<meta name="id" content="${id}">`;
+      }
+    })();
 
-    const content = frontmatter + `\n# Test Plan ${id}\n\nThis is a test plan.`;
+    const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Plan ${id}</title>
+  ${head}
+  <meta name="created" content="2025-10-16">
+</head>
+<body>
+  <article>
+    <header><h1>Test Plan ${id}</h1></header>
+    <p>This is a test plan.</p>
+  </article>
+</body>
+</html>
+`;
     fs.writeFileSync(path.join(dir, filename), content, 'utf8');
   };
 
@@ -190,13 +194,13 @@ describe('get-next-plan-id Integration Tests', () => {
 
       if (isLegacy) {
         // Legacy format: direct file in plans/archive directory
-        const filename = `plan-${planId}--test-plan.md`;
+        const filename = `plan-${planId}--test-plan.html`;
         createPlanFile(targetDir, filename, planId, format);
       } else {
         // New format: subdirectory with plan file
         const planDirName = `${planId}--test-plan`;
         const planDir = path.join(targetDir, planDirName);
-        const filename = `plan-${planId}--test-plan.md`;
+        const filename = `plan-${planId}--test-plan.html`;
         createPlanFile(planDir, filename, planId, format);
       }
     });
@@ -506,7 +510,7 @@ describe('get-next-plan-id Integration Tests', () => {
       const corruptedPlanDir = path.join(plansDir, '10--corrupted-plan');
       fs.mkdirSync(corruptedPlanDir, { recursive: true });
       const binaryData = Buffer.from([0x00, 0x01, 0x02, 0xff, 0xfe]);
-      fs.writeFileSync(path.join(corruptedPlanDir, 'plan-10--corrupted.md'), binaryData);
+      fs.writeFileSync(path.join(corruptedPlanDir, 'plan-10--corrupted.html'), binaryData);
 
       process.chdir(tempDir);
       const result = executeScript(tempDir);
@@ -517,32 +521,41 @@ describe('get-next-plan-id Integration Tests', () => {
       expect(nextId).toBeGreaterThanOrEqual(6); // At least next after ID 5
     });
 
-    test('uses frontmatter ID as source of truth regardless of directory/filename', () => {
-      // Create plan with mismatched IDs between directory, filename, and frontmatter
-      // Frontmatter is the source of truth, so directory/filename mismatches are ignored
+    test('uses head metadata ID as source of truth regardless of directory/filename', () => {
+      // Create plan with mismatched IDs between directory, filename, and head metadata
+      // The `<meta name="id">` value is the source of truth; directory/filename mismatches are ignored
       const taskManagerDir = path.join(tempDir, '.ai', 'task-manager');
       const plansDir = path.join(taskManagerDir, 'plans');
 
       fs.mkdirSync(plansDir, { recursive: true });
 
-      // Directory says ID 5, filename says ID 7, frontmatter says ID 10 (source of truth)
+      // Directory says ID 5, filename says ID 7, meta says ID 10 (source of truth)
       const planDir = path.join(plansDir, '5--mismatched-plan');
       fs.mkdirSync(planDir, { recursive: true });
 
-      const filename = 'plan-7--mismatched.md';
-      const frontmatter = '---\nid: 10\ntitle: Test Plan\n---\n';
-      const content = frontmatter + '\n# Mismatched Plan\n';
+      const filename = 'plan-7--mismatched.html';
+      const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mismatched Plan</title>
+  <meta name="id" content="10">
+  <meta name="created" content="2025-10-16">
+</head>
+<body><article><h1>Mismatched Plan</h1></article></body>
+</html>
+`;
 
       fs.writeFileSync(path.join(planDir, filename), content, 'utf8');
 
-      // Also create another plan with ID 15 to ensure we're using frontmatter
+      // Also create another plan with ID 15 to ensure we're using head metadata
       createTaskManagerStructure(tempDir, [{ id: 15 }]);
 
       process.chdir(tempDir);
       const result = executeScript(tempDir);
 
       expect(result.exitCode).toBe(0);
-      // Should use frontmatter ID (10) and highest other ID (15), so next is 16
+      // Should use meta ID (10) and highest other ID (15), so next is 16
       expect(parseInt(result.stdout)).toBe(16);
 
       // Should NOT report consistency errors (we no longer check for mismatches)
@@ -566,8 +579,8 @@ describe('get-next-plan-id Integration Tests', () => {
 
       // Test with Windows-style line endings
       const windowsContent =
-        '---\r\nid: 5\r\ntitle: Cross Platform\r\n---\r\n\r\n# Plan Content\r\n';
-      fs.writeFileSync(path.join(planDir, 'plan-1--cross-platform.md'), windowsContent, 'utf8');
+        '<!DOCTYPE html>\r\n<html><head>\r\n<meta name="id" content="5">\r\n<meta name="created" content="2025-10-16">\r\n</head>\r\n<body><article><h1>Cross Platform</h1></article></body></html>\r\n';
+      fs.writeFileSync(path.join(planDir, 'plan-1--cross-platform.html'), windowsContent, 'utf8');
 
       process.chdir(tempDir);
       const result = executeScript(tempDir);
@@ -583,8 +596,8 @@ describe('get-next-plan-id Integration Tests', () => {
       const extraDir = path.join(tempDir, '.ai', 'task-manager', 'plans', '2--case-test');
       fs.mkdirSync(extraDir, { recursive: true });
       fs.writeFileSync(
-        path.join(extraDir, 'PLAN-2--case-test.md'),
-        '---\nid: 2\n---\n# Plan',
+        path.join(extraDir, 'PLAN-2--case-test.html'),
+        '<!DOCTYPE html><html><head><meta name="id" content="2"><meta name="created" content="2025-10-16"></head><body><article><h1>Plan</h1></article></body></html>',
         'utf8'
       );
 

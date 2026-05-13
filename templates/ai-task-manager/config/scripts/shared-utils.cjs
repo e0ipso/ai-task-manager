@@ -3,6 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 
+const PLAN_FILE_EXTENSION = '.html';
+const TASK_FILE_EXTENSION = '.html';
+
 /**
  * Validate that a task manager root is correctly initialized
  * @internal
@@ -91,103 +94,108 @@ function checkStandardRootShortcut(filePath) {
 }
 
 /**
- * Parse YAML frontmatter for ID
- * @param {string} content - File content
+ * Decode common HTML entities in an attribute value
+ * @private
+ * @param {string} value - The raw attribute value
+ * @returns {string} Decoded value
+ */
+function _decodeHtmlEntities(value) {
+  if (typeof value !== 'string') return value;
+  return value
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+/**
+ * Inspect HTML content and return all `<meta>` tags inside `<head>` as an
+ * object keyed by the `name` attribute. The lookup deliberately mimics a
+ * DOM access pattern (`document.head.querySelector('meta[name=...]')`)
+ * without requiring an HTML parser dependency in standalone scripts.
+ *
+ * @param {string} htmlContent - The HTML document content
+ * @returns {Object<string, string>} Map of meta name to content value
+ */
+function getHeadMeta(htmlContent) {
+  if (typeof htmlContent !== 'string') return {};
+
+  // Restrict to <head>...</head> if present; otherwise fall back to whole doc.
+  const headMatch = htmlContent.match(/<head\b[^>]*>([\s\S]*?)<\/head>/i);
+  const headContent = headMatch ? headMatch[1] : htmlContent;
+
+  const result = {};
+
+  // Two regexes cover both <meta name="x" content="y"> and the reversed order.
+  const metaForwardRegex = /<meta\b[^>]*?\bname\s*=\s*["']([^"']+)["'][^>]*?\bcontent\s*=\s*["']([^"']*)["'][^>]*?\/?>/gi;
+  const metaReverseRegex = /<meta\b[^>]*?\bcontent\s*=\s*["']([^"']*)["'][^>]*?\bname\s*=\s*["']([^"']+)["'][^>]*?\/?>/gi;
+
+  let match;
+  while ((match = metaForwardRegex.exec(headContent)) !== null) {
+    result[match[1]] = _decodeHtmlEntities(match[2]);
+  }
+  while ((match = metaReverseRegex.exec(headContent)) !== null) {
+    if (!(match[2] in result)) {
+      result[match[2]] = _decodeHtmlEntities(match[1]);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Get a single `<meta name="...">` content value from an HTML document.
+ * @param {string} htmlContent - The HTML document content
+ * @param {string} name - The meta name to retrieve
+ * @returns {string|undefined} The content value, or undefined if not present
+ */
+function getMetaValue(htmlContent, name) {
+  return getHeadMeta(htmlContent)[name];
+}
+
+/**
+ * Get a comma-separated `<meta>` content value as a trimmed array.
+ * @param {string} htmlContent - The HTML document content
+ * @param {string} name - The meta name to retrieve
+ * @returns {string[]} Array of trimmed, non-empty values
+ */
+function getMetaList(htmlContent, name) {
+  const raw = getMetaValue(htmlContent, name);
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Extract a non-negative integer ID from a plan/task HTML document's
+ * `<meta name="id">` tag.
+ * @param {string} content - File content (HTML)
  * @param {string} [filePath] - Optional file path for error context
  * @returns {number|null} Extracted ID or null
  */
-function extractIdFromFrontmatter(content, filePath = 'unknown') {
-  // Check for frontmatter block existence
-  const frontmatterMatch = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
-  if (!frontmatterMatch) {
-    return null;
-  }
+function extractIdFromHead(content, filePath = 'unknown') {
+  const raw = getMetaValue(content, 'id');
+  if (raw === undefined || raw === null || raw === '') return null;
 
-  const frontmatterText = frontmatterMatch[1];
-
-  // Enhanced patterns to handle various YAML formats:
-  // - id: 5                    (simple numeric)
-  // - id: "5"                  (double quoted)
-  // - id: '5'                  (single quoted)
-  // - "id": 5                  (quoted key)
-  // - 'id': 5                  (single quoted key)
-  // - id : 5                   (extra spaces)
-  // - id: 05                   (zero-padded)
-  // - id: +5                   (explicit positive)
-  // - Mixed quotes: 'id': "5"  (different quote types)
-  const patterns = [
-    // Most flexible pattern - handles quoted/unquoted keys and values with optional spaces
-    /^\s*["']?id["']?\s*:\s*["']?([+-]?\d+)["']?\s*(?:#.*)?$/mi,
-    // Simple numeric with optional whitespace and comments
-    /^\s*id\s*:\s*([+-]?\d+)\s*(?:#.*)?$/mi,
-    // Double quoted values
-    /^\s*["']?id["']?\s*:\s*"([+-]?\d+)"\s*(?:#.*)?$/mi,
-    // Single quoted values
-    /^\s*["']?id["']?\s*:\s*'([+-]?\d+)'\s*(?:#.*)?$/mi,
-    // Mixed quotes - quoted key, unquoted value
-    /^\s*["']id["']\s*:\s*([+-]?\d+)\s*(?:#.*)?$/mi,
-    // YAML-style with pipe or greater-than indicators (edge case)
-    /^\s*id\s*:\s*[|>]\s*([+-]?\d+)\s*$/mi
-  ];
-
-  // Try each pattern in order using functional find
-  const foundPattern = patterns
-    .map(regex => ({ regex, match: frontmatterText.match(regex) }))
-    .find(({ match }) => match);
-
-  if (!foundPattern) return null;
-
-  const { match, regex } = foundPattern;
-  const rawId = match[1];
-  const id = parseInt(rawId, 10);
-
-  // Validate the parsed ID
+  const id = parseInt(raw, 10);
   if (isNaN(id)) {
-    console.error(`[ERROR] Invalid ID value "${rawId}" in ${filePath} - not a valid number`);
+    console.error(`[ERROR] Invalid ID value "${raw}" in ${filePath} - not a valid number`);
     return null;
   }
-
   if (id < 0) {
     console.error(`[ERROR] Invalid ID value ${id} in ${filePath} - ID must be non-negative`);
     return null;
   }
-
   if (id > Number.MAX_SAFE_INTEGER) {
     console.error(`[ERROR] Invalid ID value ${id} in ${filePath} - ID exceeds maximum safe integer`);
     return null;
   }
 
   return id;
-}
-
-/**
- * Parse YAML frontmatter from markdown content
- * Returns the frontmatter text as a string (not parsed as YAML)
- * @param {string} content - The markdown content with frontmatter
- * @returns {string} Frontmatter text or empty string if not found
- */
-function parseFrontmatter(content) {
-  const lines = content.split('\n');
-
-  const result = lines.reduce((acc, line) => {
-    if (acc.done) return acc;
-
-    if (line.trim() === '---') {
-      const nextDelimiterCount = acc.delimiterCount + 1;
-      if (nextDelimiterCount === 2) {
-        return { ...acc, delimiterCount: nextDelimiterCount, done: true };
-      }
-      return { ...acc, delimiterCount: nextDelimiterCount };
-    }
-
-    if (acc.delimiterCount === 1) {
-      return { ...acc, frontmatterLines: [...acc.frontmatterLines, line] };
-    }
-
-    return acc;
-  }, { delimiterCount: 0, frontmatterLines: [], done: false });
-
-  return result.frontmatterLines.join('\n');
 }
 
 /**
@@ -230,7 +238,7 @@ function countTasks(planDir) {
       return 0;
     }
 
-    const files = fs.readdirSync(tasksDir).filter(f => f.endsWith('.md'));
+    const files = fs.readdirSync(tasksDir).filter(f => f.endsWith(TASK_FILE_EXTENSION));
     return files.length;
   } catch (err) {
     return 0;
@@ -238,24 +246,25 @@ function countTasks(planDir) {
 }
 
 /**
- * Check if execution blueprint section exists in plan file
+ * Check if an execution blueprint section exists in a plan HTML document.
+ * Matches the semantic marker `id="execution-blueprint"` placed on the
+ * `<section>` wrapping the blueprint, as defined in BLUEPRINT_TEMPLATE.html.
  * @param {string} planFile - Path to plan file
  * @returns {boolean} True if blueprint section exists, false otherwise
  */
 function checkBlueprintExists(planFile) {
   try {
     const planContent = fs.readFileSync(planFile, 'utf8');
-    const blueprintExists = /^## Execution Blueprint/m.test(planContent);
-    return blueprintExists;
+    return /\bid\s*=\s*["']execution-blueprint["']/i.test(planContent);
   } catch (err) {
     return false;
   }
 }
 
 /**
- * Validate plan file frontmatter
+ * Validate a plan file by inspecting its `<head>` metadata.
  * @param {string} filePath - Path to plan file
- * @returns {number|null} Plan ID from frontmatter or null if invalid
+ * @returns {number|null} Plan ID from head metadata or null if invalid
  */
 function validatePlanFile(filePath) {
   try {
@@ -264,21 +273,14 @@ function validatePlanFile(filePath) {
     }
 
     const content = fs.readFileSync(filePath, 'utf8');
-    const frontmatter = parseFrontmatter(content);
+    const meta = getHeadMeta(content);
 
-    // Check for required fields
-    if (!frontmatter) {
+    // Required: a `created` meta entry must exist.
+    if (!meta.created) {
       return null;
     }
 
-    // Check for 'created' field
-    if (!/\bcreated\b/i.test(frontmatter)) {
-      return null;
-    }
-
-    // Extract and return ID
-    const id = extractIdFromFrontmatter(content, filePath);
-    return id;
+    return extractIdFromHead(content, filePath);
   } catch (err) {
     return null;
   }
@@ -311,12 +313,12 @@ function getAllPlans(taskManagerRoot) {
         try {
           const planDirEntries = fs.readdirSync(planDirPath, { withFileTypes: true });
           return planDirEntries
-            .filter(planEntry => planEntry.isFile() && planEntry.name.endsWith('.md'))
+            .filter(planEntry => planEntry.isFile() && planEntry.name.endsWith(PLAN_FILE_EXTENSION))
             .flatMap(planEntry => {
               const filePath = path.join(planDirPath, planEntry.name);
               try {
                 const content = fs.readFileSync(filePath, 'utf8');
-                const id = extractIdFromFrontmatter(content, filePath);
+                const id = extractIdFromHead(content, filePath);
 
                 if (id !== null) {
                   return {
@@ -402,13 +404,17 @@ function resolvePlan(input, startPath = process.cwd()) {
 }
 
 module.exports = {
+  PLAN_FILE_EXTENSION,
+  TASK_FILE_EXTENSION,
   findTaskManagerRoot,
   isValidTaskManagerRoot,
   getTaskManagerAt,
   checkStandardRootShortcut,
   validatePlanFile,
-  extractIdFromFrontmatter,
-  parseFrontmatter,
+  getHeadMeta,
+  getMetaValue,
+  getMetaList,
+  extractIdFromHead,
   findPlanById,
   countTasks,
   checkBlueprintExists,

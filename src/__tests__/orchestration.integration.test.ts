@@ -41,20 +41,20 @@ describe('Orchestration Workflows', () => {
       '# Post-Phase Validation\n\nEnsure that all tasks are completed.'
     );
 
-    // Create minimal template files
+    // Create minimal template files (semantic HTML5)
     await fs.writeFile(
-      path.join(testDir, '.ai/task-manager/config/templates/PLAN_TEMPLATE.md'),
-      '---\nid: [plan-id]\nsummary: "[summary]"\ncreated: "YYYY-MM-DD"\n---\n\n# Plan'
+      path.join(testDir, '.ai/task-manager/config/templates/PLAN_TEMPLATE.html'),
+      '<!DOCTYPE html><html><head><meta name="id" content="[plan-id]"><meta name="summary" content="[summary]"><meta name="created" content="YYYY-MM-DD"></head><body><article><h1>Plan</h1></article></body></html>'
     );
 
     await fs.writeFile(
-      path.join(testDir, '.ai/task-manager/config/templates/TASK_TEMPLATE.md'),
-      '---\nid: [task-id]\ngroup: "[group]"\ndependencies: []\nstatus: "pending"\n---\n\n# Task'
+      path.join(testDir, '.ai/task-manager/config/templates/TASK_TEMPLATE.html'),
+      '<!DOCTYPE html><html><head><meta name="id" content="[task-id]"><meta name="group" content="[group]"><meta name="dependencies" content=""><meta name="status" content="pending"></head><body><article><h1>Task</h1></article></body></html>'
     );
 
     await fs.writeFile(
-      path.join(testDir, '.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md'),
-      '# Execution Summary\n\nCompleted successfully.'
+      path.join(testDir, '.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.html'),
+      '<section><h2>Execution Summary</h2><p>Completed successfully.</p></section>'
     );
   });
 
@@ -341,8 +341,8 @@ describe('Orchestration Workflows', () => {
       expect(content).toContain('POST_PHASE.md');
 
       // Verify template usage
-      expect(content).toContain('PLAN_TEMPLATE.md');
-      expect(content).toContain('TASK_TEMPLATE.md');
+      expect(content).toContain('PLAN_TEMPLATE.html');
+      expect(content).toContain('TASK_TEMPLATE.html');
     });
 
     it('should verify execute-blueprint maintains all execution workflow components', async () => {
@@ -368,7 +368,7 @@ describe('Orchestration Workflows', () => {
 
       // Verify execution summary
       expect(content).toContain('Execution Summary Generation');
-      expect(content).toContain('EXECUTION_SUMMARY_TEMPLATE.md');
+      expect(content).toContain('EXECUTION_SUMMARY_TEMPLATE.html');
 
       // Verify plan archival
       expect(content).toMatch(/archive/i);

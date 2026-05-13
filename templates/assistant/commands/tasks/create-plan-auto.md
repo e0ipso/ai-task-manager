@@ -100,7 +100,7 @@ If any critical context is missing:
 CRITICAL: Do NOT ask the user any questions. Do NOT wait for user input. You must resolve all ambiguity autonomously through codebase analysis and reasonable assumptions. If you cannot determine something, state your assumption and proceed.
 
 #### Step 3: Plan Generation
-Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.html. The plan must be written as a complete semantic HTML5 document (matching the template's structure, including the `<head>` metadata).
 
 ##### CRITICAL: Output Format
 
@@ -126,18 +126,21 @@ Do not include the following in your plan output.
 - Avoid task lists and mentions of phases (those are things we'll introduce later)
 - Avoid code examples
 
-###### Frontmatter Structure
+###### Head Metadata Structure
 
-Example:
-```yaml
----
-id: 1
-summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing"
-created: 2025-09-01
----
+Plans are semantic HTML5 documents. Encode the plan metadata in the document's `<head>` using `<meta>` tags:
+
+```html
+<head>
+  <meta charset="utf-8">
+  <title>Plan: Implement CI/CD pipeline</title>
+  <meta name="id" content="1">
+  <meta name="summary" content="Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing">
+  <meta name="created" content="2025-09-01">
+</head>
 ```
 
-The schema for this frontmatter is:
+The schema for the required `<meta>` values is:
 ```json
 {
   "type": "object",
@@ -145,7 +148,7 @@ The schema for this frontmatter is:
   "properties": {
     "id": {
       "type": ["number"],
-      "description": "Unique identifier for the task. An integer."
+      "description": "Unique identifier for the plan. An integer."
     },
     "summary": {
       "type": "string",
@@ -170,5 +173,6 @@ next_id=$(node $root/config/scripts/get-next-plan-id.cjs)
 ```
 
 **Key formatting:**
-- **Front-matter**: Use numeric values (`id: 7`)
+- **Metadata**: Use unquoted numeric values inside `content` (`<meta name="id" content="7">`)
 - **Directory names**: Use zero-padded strings (`07--plan-name`)
+- **Plan file name**: `plan-[id]--[slug].html` (HTML extension)

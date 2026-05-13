@@ -6,8 +6,11 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import matter from 'gray-matter';
 import chalk from 'chalk';
+import { getHeadMeta } from './html-meta';
+
+const PLAN_FILE_EXTENSION = '.html';
+const TASK_FILE_EXTENSION = '.html';
 
 /**
  * Metadata extracted from task files
@@ -60,17 +63,17 @@ async function scanArchiveDirectory(baseDir: string): Promise<string[]> {
 async function parsePlanFile(planDir: string): Promise<PlanMetadata | null> {
   try {
     const files = await fs.readdir(planDir);
-    const planFile = files.find(f => f.startsWith('plan-') && f.endsWith('.md'));
+    const planFile = files.find(f => f.startsWith('plan-') && f.endsWith(PLAN_FILE_EXTENSION));
     if (!planFile) return null;
 
     const content = await fs.readFile(path.join(planDir, planFile), 'utf-8');
-    const { data } = matter(content);
+    const meta = getHeadMeta(content);
 
     return {
-      id: data.id,
-      summary: data.summary,
-      created: data.created,
-      approval_method: data.approval_method,
+      id: Number(meta.id),
+      summary: meta.summary ?? '',
+      created: meta.created ?? '',
+      approval_method: meta.approval_method,
       isArchived: planDir.includes('/archive/'),
       directoryPath: planDir,
       tasks: [],
@@ -79,7 +82,7 @@ async function parsePlanFile(planDir: string): Promise<PlanMetadata | null> {
     const planName = path.basename(planDir);
     console.warn(
       chalk.yellow(
-        `Warning: Skipping corrupted plan in ${planName}. Check the plan file's YAML frontmatter.`
+        `Warning: Skipping corrupted plan in ${planName}. Check the plan file's <head> metadata.`
       )
     );
     return null;
@@ -98,20 +101,20 @@ export async function parseTaskFiles(planDir: string): Promise<TaskMetadata[]> {
     const tasks: TaskMetadata[] = [];
 
     for (const file of taskFiles) {
-      if (!file.endsWith('.md')) continue;
+      if (!file.endsWith(TASK_FILE_EXTENSION)) continue;
 
       try {
         const content = await fs.readFile(path.join(tasksDir, file), 'utf-8');
-        const { data } = matter(content);
+        const meta = getHeadMeta(content);
         tasks.push({
-          id: data.id,
-          status: data.status,
+          id: Number(meta.id),
+          status: meta.status as TaskMetadata['status'],
         });
       } catch (_err) {
         const planName = path.basename(planDir);
         console.warn(
           chalk.yellow(
-            `Warning: Skipping corrupted task file ${file} in ${planName}. Fix by checking for duplicate or invalid YAML frontmatter fields.`
+            `Warning: Skipping corrupted task file ${file} in ${planName}. Fix by checking the task's <head> meta tags for missing or invalid values.`
           )
         );
       }

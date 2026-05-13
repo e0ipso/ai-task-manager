@@ -6,10 +6,12 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import matter from 'gray-matter';
 import * as readline from 'readline';
 import chalk from 'chalk';
 import { loadPlanData, findPlanById } from './plan-utils';
+import { setMetaValue } from './html-meta';
+
+const TASK_FILE_EXTENSION = '.html';
 
 const TERM_WIDTH = 80;
 const DIVIDER = '─'.repeat(TERM_WIDTH);
@@ -245,17 +247,11 @@ export async function archivePlan(
       const taskFiles = await fs.readdir(tasksDir);
 
       for (const file of taskFiles) {
-        if (!file.endsWith('.md')) continue;
+        if (!file.endsWith(TASK_FILE_EXTENSION)) continue;
 
         const taskPath = path.join(tasksDir, file);
         const content = await fs.readFile(taskPath, 'utf-8');
-        const parsed = matter(content);
-
-        // Update status to completed
-        parsed.data.status = 'completed';
-
-        // Write back with updated frontmatter
-        const updated = matter.stringify(parsed.content, parsed.data);
+        const updated = setMetaValue(content, 'status', 'completed');
         await fs.writeFile(taskPath, updated, 'utf-8');
       }
     }
@@ -263,8 +259,11 @@ export async function archivePlan(
     // 5. Append "Manually archived" note to plan document
     const planContent = await fs.readFile(location.filePath, 'utf-8');
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const archiveNote = `\n---\n\n**Note**: Manually archived on ${today}\n`;
-    const updatedContent = planContent + archiveNote;
+    const archiveNote = `\n<aside class="archive-note">\n  <p><strong>Note</strong>: Manually archived on <time datetime="${today}">${today}</time></p>\n</aside>\n`;
+    const closingArticle = /<\/article>/i;
+    const updatedContent = closingArticle.test(planContent)
+      ? planContent.replace(closingArticle, `${archiveNote}</article>`)
+      : planContent + archiveNote;
     await fs.writeFile(location.filePath, updatedContent, 'utf-8');
 
     // 6. Move plan directory to archive

@@ -22,11 +22,13 @@ interface PlanValidation {
 }
 
 /**
- * Check if a plan file contains an Execution Blueprint section
+ * Check if a plan file contains an Execution Blueprint section.
+ * Plans are semantic HTML5 documents — the blueprint is a `<section>` with
+ * `id="execution-blueprint"`.
  */
 async function hasBlueprintSection(filePath: string): Promise<boolean> {
   const content = await fs.readFile(filePath, 'utf-8');
-  return /^## Execution Blueprint/m.test(content);
+  return /\bid\s*=\s*["']execution-blueprint["']/i.test(content);
 }
 
 /**

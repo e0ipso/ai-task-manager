@@ -68,47 +68,63 @@ describe('Plan Command Integration Tests', () => {
 
     await fs.ensureDir(planDir);
 
-    // Create plan file
-    const planContent = `---
-id: ${id}
-summary: "${title}"
-created: "2025-10-16"
----
-
-# Plan: ${title}
-
-## Executive Summary
-
-This is a test plan for integration testing.
-
-## Context
-
-Test content.
+    // Create plan file (semantic HTML5 with <head> metadata)
+    const planContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plan: ${title}</title>
+  <meta name="id" content="${id}">
+  <meta name="summary" content="${title}">
+  <meta name="created" content="2025-10-16">
+</head>
+<body>
+  <article>
+    <header><h1>Plan: ${title}</h1></header>
+    <section aria-labelledby="executive-summary">
+      <h2 id="executive-summary">Executive Summary</h2>
+      <p>This is a test plan for integration testing.</p>
+    </section>
+    <section aria-labelledby="context">
+      <h2 id="context">Context</h2>
+      <p>Test content.</p>
+    </section>
+  </article>
+</body>
+</html>
 `;
 
-    await fs.writeFile(path.join(planDir, `plan-${planDirName}.md`), planContent, 'utf-8');
+    await fs.writeFile(path.join(planDir, `plan-${planDirName}.html`), planContent, 'utf-8');
 
-    // Create tasks
+    // Create tasks (semantic HTML5)
     if (tasks.length > 0) {
       const tasksDir = path.join(planDir, 'tasks');
       await fs.ensureDir(tasksDir);
 
       for (const task of tasks) {
-        const taskContent = `---
-id: ${task.id}
-group: "test"
-dependencies: []
-status: "${task.status}"
-created: "2025-10-16"
-skills: ["test"]
----
-# Test Task ${task.id}
-
-Test content.
+        const taskContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Task ${task.id}</title>
+  <meta name="id" content="${task.id}">
+  <meta name="group" content="test">
+  <meta name="dependencies" content="">
+  <meta name="status" content="${task.status}">
+  <meta name="created" content="2025-10-16">
+  <meta name="skills" content="test">
+</head>
+<body>
+  <article>
+    <header><h1>Test Task ${task.id}</h1></header>
+    <p>Test content.</p>
+  </article>
+</body>
+</html>
 `;
 
         await fs.writeFile(
-          path.join(tasksDir, `${task.id.toString().padStart(2, '00')}--test-task.md`),
+          path.join(tasksDir, `${task.id.toString().padStart(2, '00')}--test-task.html`),
           taskContent,
           'utf-8'
         );

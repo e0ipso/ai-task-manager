@@ -115,16 +115,16 @@ Locate and validate the specific task file:
 ```bash
 # Handle both padded (01, 02) and unpadded (1, 2) task IDs
 task_file=""
-if [ -f "${plan_dir}/tasks/${task_id}--"*.md ]; then
-    task_file=$(ls "${plan_dir}/tasks/${task_id}--"*.md 2>/dev/null | head -1)
-elif [ -f "${plan_dir}/tasks/0${task_id}--"*.md ]; then
-    task_file=$(ls "${plan_dir}/tasks/0${task_id}--"*.md 2>/dev/null | head -1)
+if compgen -G "${plan_dir}/tasks/${task_id}--*.html" > /dev/null; then
+    task_file=$(ls "${plan_dir}/tasks/${task_id}--"*.html 2>/dev/null | head -1)
+elif compgen -G "${plan_dir}/tasks/0${task_id}--*.html" > /dev/null; then
+    task_file=$(ls "${plan_dir}/tasks/0${task_id}--"*.html 2>/dev/null | head -1)
 fi
 
 if [ -z "$task_file" ] || [ ! -f "$task_file" ]; then
     echo "Error: Task with ID ${task_id} not found in plan ${plan_id}"
     echo "Available tasks in plan:"
-    find "$plan_dir/tasks" -name "*.md" -type f | head -5
+    find "$plan_dir/tasks" -name "*.html" -type f | head -5
     exit 1
 fi
 
@@ -136,17 +136,8 @@ echo "Found task: $(basename "$task_file")"
 Check current task status to ensure it can be executed:
 
 ```bash
-# Extract current status from task frontmatter
-current_status=$(awk '
-    /^---$/ { if (++delim == 2) exit }
-    /^status:/ {
-        gsub(/^status:[ \t]*/, "")
-        gsub(/^["'\'']/, "")
-        gsub(/["'\'']$/, "")
-        print
-        exit
-    }
-' "$task_file")
+# Read the `status` meta tag from the task HTML head
+current_status=$(node $root/config/scripts/update-task-meta.cjs "$task_file" status)
 
 echo "Current task status: ${current_status:-unknown}"
 
@@ -217,28 +208,8 @@ Update task status before execution:
 ```bash
 echo "Updating task status to in-progress..."
 
-# Create temporary file with updated status
-temp_file=$(mktemp)
-awk '
-    /^---$/ {
-        if (++delim == 1) {
-            print
-            next
-        } else if (delim == 2) {
-            print "status: \"in-progress\""
-            print
-            next
-        }
-    }
-    /^status:/ && delim == 1 {
-        print "status: \"in-progress\""
-        next
-    }
-    { print }
-' "$task_file" > "$temp_file"
-
-# Replace original file
-mv "$temp_file" "$task_file"
+# Update the `status` meta tag inside the task HTML head
+node $root/config/scripts/update-task-meta.cjs "$task_file" status in-progress
 
 echo "✓ Task status updated to in-progress"
 ```
@@ -266,26 +237,8 @@ Deploy the task using the Task tool with full context:
 After task completion, update the status based on execution outcome:
 
 ```bash
-temp_file=$(mktemp)
-awk '
-    /^---$/ {
-        if (++delim == 1) {
-            print
-            next
-        } else if (delim == 2) {
-            print "status: \"completed\""
-            print
-            next
-        }
-    }
-    /^status:/ && delim == 1 {
-        print "status: \"completed\""
-        next
-    }
-    { print }
-' "$task_file" > "$temp_file"
-
-mv "$temp_file" "$task_file"
+# Update task status to completed
+node $root/config/scripts/update-task-meta.cjs "$task_file" status completed
 
 echo "✓ Task ${task_id} status updated to completed"
 ```
@@ -294,11 +247,15 @@ echo "✓ Task ${task_id} status updated to completed"
 
 After task execution (whether successful or failed), append a "Noteworthy Events" section to the task file body if anything noteworthy occurred during execution.
 
-Append to the end of the task file:
+Task files are semantic HTML5 documents. Append a new `<section>` inside the task's `<article>` element, before the closing `</article>` tag. For example:
 
-```markdown
-## Noteworthy Events
-- [YYYY-MM-DD] [Event description with sufficient context for the orchestrator]
+```html
+<section aria-labelledby="noteworthy-events">
+  <h2 id="noteworthy-events">Noteworthy Events</h2>
+  <ul>
+    <li><time datetime="YYYY-MM-DD">YYYY-MM-DD</time> &mdash; [Event description with sufficient context for the orchestrator]</li>
+  </ul>
+</section>
 ```
 
 If no noteworthy events occurred, do not add the section.

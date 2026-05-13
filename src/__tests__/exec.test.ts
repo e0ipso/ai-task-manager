@@ -125,25 +125,66 @@ describe('Claude Exec Command', () => {
     const planDir = path.join(archived ? archiveDir : plansDir, planDirName);
     await fs.ensureDir(planDir);
 
-    let content = `---\nid: ${id}\nsummary: "${title}"\ncreated: "2025-10-16"\n---\n\n# Plan: ${title}\n`;
-    if (hasBlueprint) {
-      content += '\n## Execution Blueprint\n\nPhases defined here.\n';
-    }
+    const blueprintMarkup = hasBlueprint
+      ? '\n      <section aria-labelledby="execution-blueprint"><h2 id="execution-blueprint">Execution Blueprint</h2><p>Phases defined here.</p></section>\n'
+      : '';
 
-    await fs.writeFile(path.join(planDir, `plan-${planDirName}.md`), content, 'utf-8');
+    const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plan: ${title}</title>
+  <meta name="id" content="${id}">
+  <meta name="summary" content="${title}">
+  <meta name="created" content="2025-10-16">
+</head>
+<body>
+  <article>
+    <header><h1>Plan: ${title}</h1></header>${blueprintMarkup}
+  </article>
+</body>
+</html>
+`;
+
+    await fs.writeFile(path.join(planDir, `plan-${planDirName}.html`), content, 'utf-8');
 
     if (taskCount > 0) {
       const tasksDir = path.join(planDir, 'tasks');
       await fs.ensureDir(tasksDir);
       for (let i = 1; i <= taskCount; i++) {
-        const taskContent = `---\nid: ${i}\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task ${i}\n`;
+        const taskContent = renderTaskHtml(i, 'test', 'pending', ['test']);
         await fs.writeFile(
-          path.join(tasksDir, `${i.toString().padStart(2, '0')}--task-${i}.md`),
+          path.join(tasksDir, `${i.toString().padStart(2, '0')}--task-${i}.html`),
           taskContent,
           'utf-8'
         );
       }
     }
+  }
+
+  function renderTaskHtml(
+    id: number,
+    group: string,
+    status: string,
+    skills: string[]
+  ): string {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Task ${id}</title>
+  <meta name="id" content="${id}">
+  <meta name="group" content="${group}">
+  <meta name="dependencies" content="">
+  <meta name="status" content="${status}">
+  <meta name="created" content="2025-10-16">
+  <meta name="skills" content="${skills.join(',')}">
+</head>
+<body>
+  <article><header><h1>Task ${id}</h1></header></article>
+</body>
+</html>
+`;
   }
 
   describe('Input validation', () => {
@@ -200,8 +241,8 @@ describe('Claude Exec Command', () => {
               const tasksDir = path.join(planDir, 'tasks');
               await fs.ensureDir(tasksDir);
               await fs.writeFile(
-                path.join(tasksDir, '01--task-1.md'),
-                '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
+                path.join(tasksDir, '01--task-1.html'),
+                renderTaskHtml(1, 'test', 'pending', ['test']),
                 'utf-8'
               );
             }
@@ -231,18 +272,20 @@ describe('Claude Exec Command', () => {
               const tasksDir = path.join(planDir, 'tasks');
               await fs.ensureDir(tasksDir);
               await fs.writeFile(
-                path.join(tasksDir, '01--task-1.md'),
-                `---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n`,
+                path.join(tasksDir, '01--task-1.html'),
+                renderTaskHtml(1, 'test', 'pending', ['test']),
                 'utf-8'
               );
-              const planFile = path.join(planDir, `plan-${planDirName}.md`);
+              const planFile = path.join(planDir, `plan-${planDirName}.html`);
               const content = await fs.readFile(planFile, 'utf-8');
-              if (!content.includes('## Execution Blueprint')) {
-                await fs.writeFile(
-                  planFile,
-                  content + '\n## Execution Blueprint\n\nPhases.\n',
-                  'utf-8'
+              if (!/id\s*=\s*["']execution-blueprint["']/i.test(content)) {
+                const blueprintFragment =
+                  '<section aria-labelledby="execution-blueprint"><h2 id="execution-blueprint">Execution Blueprint</h2><p>Phases.</p></section>';
+                const updated = content.replace(
+                  /<\/article>/i,
+                  `${blueprintFragment}</article>`
                 );
+                await fs.writeFile(planFile, updated, 'utf-8');
               }
             }
           },
@@ -275,8 +318,8 @@ describe('Claude Exec Command', () => {
               const tasksDir = path.join(planDir, 'tasks');
               await fs.ensureDir(tasksDir);
               await fs.writeFile(
-                path.join(tasksDir, '01--task-1.md'),
-                '---\nid: 1\ngroup: "test"\ndependencies: []\nstatus: "pending"\ncreated: "2025-10-16"\nskills: ["test"]\n---\n# Task 1\n',
+                path.join(tasksDir, '01--task-1.html'),
+                renderTaskHtml(1, 'test', 'pending', ['test']),
                 'utf-8'
               );
             }

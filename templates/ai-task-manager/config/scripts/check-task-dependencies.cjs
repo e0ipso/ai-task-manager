@@ -11,10 +11,11 @@ const fs = require('fs');
 const path = require('path');
 const {
   resolvePlan,
-  parseFrontmatter
+  getMetaList,
+  getMetaValue,
+  TASK_FILE_EXTENSION
 } = require('./shared-utils.cjs');
 
-// Color functions for output
 const _printError = (message) => {
   console.error(`ERROR: ${message}`);
 };
@@ -31,7 +32,10 @@ const _printInfo = (message) => {
   console.log(message);
 };
 
-// Function to find task file with padded/unpadded ID handling
+/**
+ * Locate a task file in the plan's tasks directory, accepting both padded
+ * (`01`) and unpadded (`1`) numeric IDs.
+ */
 const _findTaskFile = (planDir, taskId) => {
   const taskDir = path.join(planDir, 'tasks');
 
@@ -51,7 +55,7 @@ const _findTaskFile = (planDir, taskId) => {
     const files = fs.readdirSync(taskDir);
     const found = uniqueVariations.reduce((acc, v) => {
       if (acc) return acc;
-      const match = files.find(f => f.startsWith(`${v}--`) && f.endsWith('.md'));
+      const match = files.find(f => f.startsWith(`${v}--`) && f.endsWith(TASK_FILE_EXTENSION));
       return match ? path.join(taskDir, match) : null;
     }, null);
     return found;
@@ -60,66 +64,7 @@ const _findTaskFile = (planDir, taskId) => {
   }
 };
 
-
-// Function to extract dependencies from frontmatter
-const _extractDependencies = (frontmatter) => {
-  const lines = frontmatter.split('\n');
-  const dependencies = [];
-  let inDependenciesSection = false;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    // Check for dependencies line
-    if (line.match(/^dependencies:/)) {
-      inDependenciesSection = true;
-
-      // Check if dependencies are on the same line (array syntax)
-      const arrayMatch = line.match(/\[(.*)\]/);
-      if (arrayMatch) {
-        const deps = arrayMatch[1]
-          .split(',')
-          .map(dep => dep.trim().replace(/['"]/g, ''))
-          .filter(dep => dep.length > 0);
-        dependencies.push(...deps);
-        inDependenciesSection = false;
-      }
-      continue;
-    }
-
-    // If we're in dependencies section and hit a non-indented line that's not a list item, exit
-    if (inDependenciesSection && line.match(/^[^ ]/) && !line.match(/^[ \t]*-/)) {
-      inDependenciesSection = false;
-    }
-
-    // Parse list format dependencies
-    if (inDependenciesSection && line.match(/^[ \t]*-/)) {
-      const dep = line.replace(/^[ \t]*-[ \t]*/, '').replace(/[ \t]*$/, '').replace(/['"]/g, '');
-      if (dep.length > 0) {
-        dependencies.push(dep);
-      }
-    }
-  }
-
-  return dependencies;
-};
-
-// Function to extract status from frontmatter
-const _extractStatus = (frontmatter) => {
-  const lines = frontmatter.split('\n');
-
-  for (const line of lines) {
-    if (line.match(/^status:/)) {
-      return line.replace(/^status:[ \t]*/, '').replace(/^["']/, '').replace(/["']$/, '').trim();
-    }
-  }
-
-  return null;
-};
-
-// Main function
 const _main = (startPath = process.cwd()) => {
-  // Check arguments
   if (process.argv.length !== 4) {
     _printError('Invalid number of arguments');
     console.log('Usage: node check-task-dependencies.cjs <plan-id-or-path> <task-id>');
@@ -137,13 +82,9 @@ const _main = (startPath = process.cwd()) => {
     process.exit(1);
   }
 
-  const {
-    planDir,
-    planId
-  } = resolved;
+  const { planDir, planId } = resolved;
   _printInfo(`Found plan directory: ${planDir}`);
 
-  // Find task file
   const taskFile = _findTaskFile(planDir, taskId);
 
   if (!taskFile || !fs.existsSync(taskFile)) {
@@ -154,27 +95,22 @@ const _main = (startPath = process.cwd()) => {
   _printInfo(`Checking task: ${path.basename(taskFile)}`);
   console.log('');
 
-  // Read and parse task file
   const taskContent = fs.readFileSync(taskFile, 'utf8');
-  const frontmatter = parseFrontmatter(taskContent);
-  const dependencies = _extractDependencies(frontmatter);
+  const dependencies = getMetaList(taskContent, 'dependencies');
 
-  // Check if there are any dependencies
   if (dependencies.length === 0) {
     _printSuccess('Task has no dependencies - ready to execute!');
     process.exit(0);
   }
 
-  // Display dependencies
   _printInfo('Task dependencies found:');
   dependencies.forEach(dep => {
     console.log(`  - Task ${dep}`);
   });
   console.log('');
 
-  // Check each dependency
   let allResolved = true;
-  let unresolvedDeps = [];
+  const unresolvedDeps = [];
   let resolvedCount = 0;
   const totalDeps = dependencies.length;
 
@@ -182,7 +118,6 @@ const _main = (startPath = process.cwd()) => {
   console.log('');
 
   for (const depId of dependencies) {
-    // Find dependency task file
     const depFile = _findTaskFile(planDir, depId);
 
     if (!depFile || !fs.existsSync(depFile)) {
@@ -192,12 +127,9 @@ const _main = (startPath = process.cwd()) => {
       continue;
     }
 
-    // Extract status from dependency task
     const depContent = fs.readFileSync(depFile, 'utf8');
-    const depFrontmatter = parseFrontmatter(depContent);
-    const status = _extractStatus(depFrontmatter);
+    const status = getMetaValue(depContent, 'status');
 
-    // Check if status is completed
     if (status === 'completed') {
       _printSuccess(`Task ${depId} - Status: completed ✓`);
       resolvedCount++;
@@ -230,7 +162,6 @@ const _main = (startPath = process.cwd()) => {
   }
 };
 
-// Run the script
 if (require.main === module) {
   _main();
 }

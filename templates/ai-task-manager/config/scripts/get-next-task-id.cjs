@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const {
   resolvePlan,
-  extractIdFromFrontmatter
+  extractIdFromHead,
+  TASK_FILE_EXTENSION
 } = require('./shared-utils.cjs');
 
 /**
@@ -26,12 +27,10 @@ function _getNextTaskId(inputId) {
     process.exit(1);
   }
 
-  const {
-    planDir
-  } = resolved;
+  const { planDir } = resolved;
   const tasksPath = path.join(planDir, 'tasks');
 
-  // Optimization: If no tasks directory exists, return 1 immediately (90% case)
+  // Optimization: If no tasks directory exists, return 1 immediately
   if (!fs.existsSync(tasksPath)) {
     return 1;
   }
@@ -39,9 +38,7 @@ function _getNextTaskId(inputId) {
   let maxId = 0;
 
   try {
-    const entries = fs.readdirSync(tasksPath, {
-      withFileTypes: true
-    });
+    const entries = fs.readdirSync(tasksPath, { withFileTypes: true });
 
     // Another optimization: If directory is empty, return 1 immediately
     if (entries.length === 0) {
@@ -49,11 +46,11 @@ function _getNextTaskId(inputId) {
     }
 
     entries.forEach(entry => {
-      if (entry.isFile() && entry.name.endsWith('.md')) {
+      if (entry.isFile() && entry.name.endsWith(TASK_FILE_EXTENSION)) {
         try {
           const filePath = path.join(tasksPath, entry.name);
           const content = fs.readFileSync(filePath, 'utf8');
-          const id = extractIdFromFrontmatter(content);
+          const id = extractIdFromHead(content);
 
           if (id !== null && id > maxId) {
             maxId = id;
@@ -70,7 +67,6 @@ function _getNextTaskId(inputId) {
   return maxId + 1;
 }
 
-// Get plan ID from command line argument
 if (require.main === module) {
   const inputId = process.argv[2];
   console.log(_getNextTaskId(inputId));

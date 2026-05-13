@@ -43,19 +43,36 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
       fs.writeFileSync(metadataPath, JSON.stringify({ version: '1.0.0' }));
     }
 
-    const planFile = path.join(planDir, `plan-${planId}--${planName}.md`);
-    let content = `---\nid: ${parseInt(planId, 10)}\n---\n\n# Plan ${planName}\n`;
-
-    if (hasBlueprint) {
-      content += '\n## Execution Blueprint\n\nPhases defined here...\n';
-    }
+    const planFile = path.join(planDir, `plan-${planId}--${planName}.html`);
+    const blueprintMarkup = hasBlueprint
+      ? '<section aria-labelledby="execution-blueprint"><h2 id="execution-blueprint">Execution Blueprint</h2><p>Phases defined here...</p></section>'
+      : '';
+    const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plan ${planName}</title>
+  <meta name="id" content="${parseInt(planId, 10)}">
+  <meta name="created" content="2025-10-16">
+</head>
+<body>
+  <article>
+    <header><h1>Plan ${planName}</h1></header>
+    ${blueprintMarkup}
+  </article>
+</body>
+</html>
+`;
 
     fs.writeFileSync(planFile, content);
 
     if (hasTasks) {
       const tasksDir = path.join(planDir, 'tasks');
       fs.mkdirpSync(tasksDir);
-      fs.writeFileSync(path.join(tasksDir, '01--task.md'), '# Task 1');
+      fs.writeFileSync(
+        path.join(tasksDir, '01--task.html'),
+        '<!DOCTYPE html><html><head><meta name="id" content="1"><meta name="status" content="pending"></head><body><article><h1>Task 1</h1></article></body></html>'
+      );
     }
 
     return { planDir, planFile };
@@ -95,7 +112,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('02--test-plan');
-      expect(result.stdout).toContain('plan-02--test-plan.md');
+      expect(result.stdout).toContain('plan-02--test-plan.html');
     });
 
     test('accepts padded ID "02" for zero-padded directory "02--name"', () => {
@@ -104,7 +121,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('02--test-plan');
-      expect(result.stdout).toContain('plan-02--test-plan.md');
+      expect(result.stdout).toContain('plan-02--test-plan.html');
     });
 
     test('accepts non-padded ID "54" for non-padded directory "54--name"', () => {
@@ -113,7 +130,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('54--test-plan');
-      expect(result.stdout).toContain('plan-54--test-plan.md');
+      expect(result.stdout).toContain('plan-54--test-plan.html');
     });
 
     test('accepts padded ID "054" for non-padded directory "54--name"', () => {
@@ -122,7 +139,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('54--test-plan');
-      expect(result.stdout).toContain('plan-54--test-plan.md');
+      expect(result.stdout).toContain('plan-54--test-plan.html');
     });
   });
 
@@ -153,7 +170,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
       // Test planFile field
       const planFileResult = runScript('5', 'planFile');
       expect(planFileResult.exitCode).toBe(0);
-      expect(planFileResult.stdout).toContain('plan-05--multi-field-test.md');
+      expect(planFileResult.stdout).toContain('plan-05--multi-field-test.html');
 
       // Test planDir field
       const planDirResult = runScript('5', 'planDir');
@@ -200,7 +217,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
       expect(json).toHaveProperty('planDir');
       expect(json).toHaveProperty('taskCount');
       expect(json).toHaveProperty('blueprintExists');
-      expect(json.planFile).toContain('plan-20--json-test.md');
+      expect(json.planFile).toContain('plan-20--json-test.html');
       expect(json.planDir).toContain('20--json-test');
       expect(json.taskCount).toBe(1);
       expect(json.blueprintExists).toBe('yes');
@@ -213,7 +230,7 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
 
       const result = runScript('03', 'planFile');
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('plan-03--backward-compat.md');
+      expect(result.stdout).toContain('plan-03--backward-compat.html');
     });
 
     test('handles three-digit padding correctly', () => {
@@ -222,15 +239,15 @@ describe('validate-plan-blueprint.cjs - flexible ID matching', () => {
       // Test with various padding levels
       const result1 = runScript('7', 'planFile');
       expect(result1.exitCode).toBe(0);
-      expect(result1.stdout).toContain('plan-007--bond.md');
+      expect(result1.stdout).toContain('plan-007--bond.html');
 
       const result2 = runScript('07', 'planFile');
       expect(result2.exitCode).toBe(0);
-      expect(result2.stdout).toContain('plan-007--bond.md');
+      expect(result2.stdout).toContain('plan-007--bond.html');
 
       const result3 = runScript('007', 'planFile');
       expect(result3.exitCode).toBe(0);
-      expect(result3.stdout).toContain('plan-007--bond.md');
+      expect(result3.stdout).toContain('plan-007--bond.html');
     });
   });
 });

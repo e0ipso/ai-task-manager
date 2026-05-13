@@ -57,7 +57,7 @@ function _validatePlanBlueprint(inputId, fieldName, startPath = process.cwd()) {
     _errorLog('');
     _errorLog('Examples:');
     _errorLog('  node validate-plan-blueprint.cjs 47                  # Output full JSON');
-    _errorLog('  node validate-plan-blueprint.cjs /path/to/plan.md    # Output full JSON for specific file');
+    _errorLog('  node validate-plan-blueprint.cjs /path/to/plan.html  # Output full JSON for specific file');
     _errorLog('  node validate-plan-blueprint.cjs 47 planFile         # Output just the plan file path');
     _errorLog('  node validate-plan-blueprint.cjs 47 blueprintExists  # Output yes/no');
     process.exit(1);

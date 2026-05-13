@@ -85,10 +85,10 @@ Use your internal Todo tool to track the entire refinement workflow:
 - [ ] Stage 1: Baseline Review
 - [ ] Stage 2: Autonomous Clarification
 - [ ] Stage 3: Refinement Implementation
-- [ ] Review the existing plan end-to-end (frontmatter, clarifications, architecture, risks, etc.)
+- [ ] Review the existing plan end-to-end (`<head>` metadata, clarifications, architecture, risks, etc.)
 - [ ] Surface strengths, contradictions, and potential risks, without updating the plan
 - [ ] Use the "Autonomous Clarification Algorithm" to resolve gaps via codebase inspection
-- [ ] Apply refinements using `$root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md` as the structural baseline
+- [ ] Apply refinements using `$root/.ai/task-manager/config/templates/PLAN_TEMPLATE.html` as the structural baseline (semantic HTML5)
 - [ ] Update the "Plan Clarifications" table with findings and assumptions
 - [ ] Update the plan file (stored in `plan_file`) with the refinements from steps above
 - [ ] Re-run `$root/.ai/task-manager/config/hooks/POST_PLAN.md`
@@ -141,7 +141,7 @@ flowchart TD
 Once you have sufficient context (or have documented the missing context), refine the plan directly in-place:
 
 1. **Maintain Identity**: Keep the existing `id` and directory. Do not create a new plan ID.
-2. **Structure Compliance**: Ensure the plan still follows `$root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md`. Add missing sections if necessary.
+2. **Structure Compliance**: Ensure the plan still follows `$root/.ai/task-manager/config/templates/PLAN_TEMPLATE.html` (semantic HTML5). Add missing sections if necessary.
 3. **Content Updates**:
    - Refresh the executive summary to reflect clarifications and new insights.
    - Update architectural sections, diagrams, and risk mitigations to resolve the identified gaps.

@@ -18,7 +18,7 @@ You are the coordinator responsible for executing all tasks defined in the execu
 
 ## Input Requirements
 - A plan document with an execution blueprint section. See /TASK_MANAGER.md to find the plan with ID $1
-- Task files with frontmatter metadata (id, group, dependencies, status)
+- Task files (semantic HTML5) with `<head>` `<meta>` metadata (id, group, dependencies, status)
 - Validation gates document: `/config/hooks/POST_PHASE.md`
 
 ### Input Error Handling
@@ -98,7 +98,7 @@ If either `$task_count` is 0 or `$blueprint_exists` is "no":
    - Reading and processing the plan document
    - Applying task minimization principles (20-30% reduction target)
    - Creating atomic tasks with 1-2 skills each
-   - Generating proper task files with frontmatter and body structure
+   - Generating proper task files as semantic HTML5 documents with `<head>` metadata and body structure
    - Running all validation checklists
    - Executing the POST_TASK_GENERATION_ALL hook
 
@@ -124,7 +124,7 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 - [ ] Phase 3: Execute 1 task(s) in parallel.
 - [ ] Execute $root/.ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 3.
 - [ ] Execute $root/.ai/task-manager/config/hooks/POST_EXECUTION.md hook after all phases complete.
-- [ ] Update the Plan 7 with execution summary using $root/.ai/task-manager/config/hooks/EXECUTION_SUMMARY_TEMPLATE.md.
+- [ ] Update the Plan 7 with execution summary using $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.html.
 - [ ] Archive Plan 7.
 
 ### Phase Pre-Execution
@@ -175,7 +175,7 @@ Read and execute $root/.ai/task-manager/config/hooks/POST_ERROR_DETECTION.md
 **Output Behavior:**
 
 Provide a concise execution summary:
-- Example: "Execution completed. Review summary: `$root/.ai/task-manager/archive/[plan]/plan-[id].md`"
+- Example: "Execution completed. Review summary: `$root/.ai/task-manager/archive/[plan]/plan-[id].html`"
 
 **CRITICAL - Structured Output for Command Coordination:**
 
@@ -214,7 +214,7 @@ If validation fails, halt execution. The plan remains in `plans/` for debugging.
 
 ### 1. Execution Summary Generation
 
-Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md
+Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.html. The appended section is a semantic HTML fragment &mdash; insert it inside the plan's `<article>` element.
 
 ### 2. Plan Archival
 

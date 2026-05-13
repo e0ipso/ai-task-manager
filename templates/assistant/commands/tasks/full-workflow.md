@@ -177,7 +177,7 @@ IMPORTANT: Once you have the user's answers go back to Step 2. Do this in a loop
 #### Step 3: Plan Generation
 Step 3 starts only after all items in Step 2 have been executed.
 
-Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.md
+Only after confirming sufficient context, create a plan according to the $root/.ai/task-manager/config/templates/PLAN_TEMPLATE.html. The plan must be written as a complete semantic HTML5 document (matching the template's structure, including the `<head>` metadata).
 
 ##### CRITICAL: Output Format
 
@@ -203,18 +203,21 @@ Do not include the following in your plan output.
 - Avoid task lists and mentions of phases (those are things we'll introduce later)
 - Avoid code examples
 
-###### Frontmatter Structure
+###### Head Metadata Structure
 
-Example:
-```yaml
----
-id: 1
-summary: "Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing"
-created: 2025-09-01
----
+Plans are semantic HTML5 documents. Encode the plan metadata in the document's `<head>` using `<meta>` tags:
+
+```html
+<head>
+  <meta charset="utf-8">
+  <title>Plan: Implement CI/CD pipeline</title>
+  <meta name="id" content="1">
+  <meta name="summary" content="Implement a comprehensive CI/CD pipeline using GitHub Actions for automated linting, testing, semantic versioning, and NPM publishing">
+  <meta name="created" content="2025-09-01">
+</head>
 ```
 
-The schema for this frontmatter is:
+The schema for the required `<meta>` values is:
 ```json
 {
   "type": "object",
@@ -222,7 +225,7 @@ The schema for this frontmatter is:
   "properties": {
     "id": {
       "type": ["number"],
-      "description": "Unique identifier for the task. An integer."
+      "description": "Unique identifier for the plan. An integer."
     },
     "summary": {
       "type": "string",
@@ -247,8 +250,9 @@ next_id=$(node $root/config/scripts/get-next-plan-id.cjs)
 ```
 
 **Key formatting:**
-- **Front-matter**: Use numeric values (`id: 7`)
+- **Metadata**: Use unquoted numeric values inside `content` (`<meta name="id" content="7">`)
 - **Directory names**: Use zero-padded strings (`07--plan-name`)
+- **Plan file name**: `plan-[id]--[slug].html` (HTML extension)
 
 **After completing Step 1:**
 - Extract the Plan ID from the structured output
@@ -446,24 +450,27 @@ Dependency Rule: Task B depends on Task A if:
 
 #### Step 3: Task Generation
 
-##### Frontmatter Structure
+##### Head Metadata Structure
 
-Example:
-```yaml
----
-id: 1
-group: "user-authentication"
-dependencies: []  # List of task IDs, e.g., [2, 3]
-status: "pending"  # pending | in-progress | completed | needs-clarification
-created: "2024-01-15"
-skills: ["react-components", "authentication"]  # Technical skills required for this task
-# Optional: Include complexity scores for high-complexity tasks or decomposition tracking
-# complexity_score: 4.2  # Composite complexity score (only if >4 or decomposed)
-# complexity_notes: "Decomposed from original task due to high technical depth"
----
+Tasks are semantic HTML5 documents. Encode the task metadata in the document's `<head>` using `<meta>` tags. Use comma-separated values for list-typed entries (`dependencies` and `skills`).
+
+```html
+<head>
+  <meta charset="utf-8">
+  <title>Add login form component</title>
+  <meta name="id" content="1">
+  <meta name="group" content="user-authentication">
+  <meta name="dependencies" content=""> <!-- comma-separated task IDs, e.g. "2,3" -->
+  <meta name="status" content="pending"> <!-- pending | in-progress | completed | needs-clarification -->
+  <meta name="created" content="2024-01-15">
+  <meta name="skills" content="react-components,authentication">
+  <!-- Optional: include complexity tracking for high-complexity or decomposed tasks -->
+  <!-- <meta name="complexity_score" content="4.2"> -->
+  <!-- <meta name="complexity_notes" content="Decomposed from original task due to high technical depth"> -->
+</head>
 ```
 
-The schema for this frontmatter is:
+The schema for the `<meta>` values is:
 ```json
 {
   "type": "object",
@@ -521,7 +528,7 @@ The schema for this frontmatter is:
 
 ##### Task Body Structure
 
-Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.md
+Use the task template in $root/.ai/task-manager/config/templates/TASK_TEMPLATE.html. Each task file must be a complete semantic HTML5 document (matching the template's structure, including the `<head>` metadata) and saved with a `.html` extension.
 
 ##### Task ID Generation
 
@@ -626,7 +633,7 @@ You are the coordinator responsible for executing all tasks defined in the execu
 
 ## Input Requirements
 - A plan document with an execution blueprint section. See /TASK_MANAGER.md to find the plan with ID [planId]
-- Task files with frontmatter metadata (id, group, dependencies, status)
+- Task files (semantic HTML5) with `<head>` `<meta>` metadata (id, group, dependencies, status)
 - Validation gates document: `/config/hooks/POST_PHASE.md`
 
 ### Input Error Handling
@@ -706,7 +713,7 @@ If either `$task_count` is 0 or `$blueprint_exists` is "no":
    - Reading and processing the plan document
    - Applying task minimization principles (20-30% reduction target)
    - Creating atomic tasks with 1-2 skills each
-   - Generating proper task files with frontmatter and body structure
+   - Generating proper task files as semantic HTML5 documents with `<head>` metadata and body structure
    - Running all validation checklists
    - Executing the POST_TASK_GENERATION_ALL hook
 
@@ -732,7 +739,7 @@ Use your internal Todo task tool to track the execution of all phases, and the f
 - [ ] Phase 3: Execute 1 task(s) in parallel.
 - [ ] Execute $root/.ai/task-manager/config/hooks/POST_PHASE.md hook after Phase 3.
 - [ ] Execute $root/.ai/task-manager/config/hooks/POST_EXECUTION.md hook after all phases complete.
-- [ ] Update the Plan 7 with execution summary using $root/.ai/task-manager/config/hooks/EXECUTION_SUMMARY_TEMPLATE.md.
+- [ ] Update the Plan 7 with execution summary using $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.html.
 - [ ] Archive Plan 7.
 
 ### Phase Pre-Execution
@@ -822,7 +829,7 @@ If validation fails, halt execution. The plan remains in `plans/` for debugging.
 
 ### 1. Execution Summary Generation
 
-Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.md
+Append an execution summary section to the plan document with the format described in $root/.ai/task-manager/config/templates/EXECUTION_SUMMARY_TEMPLATE.html. The appended section is a semantic HTML fragment &mdash; insert it inside the plan's `<article>` element.
 
 ### 2. Plan Archival
 
