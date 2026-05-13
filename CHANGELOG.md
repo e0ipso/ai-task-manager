@@ -1,3 +1,9 @@
+## <small>1.36.1 (2026-05-13)</small>
+
+* fix: update dev container ([b7d851a](https://github.com/e0ipso/ai-task-manager/commit/b7d851a))
+* fix: update dev container ([067cad0](https://github.com/e0ipso/ai-task-manager/commit/067cad0))
+* Merge remote-tracking branch 'origin/main' ([51ed941](https://github.com/e0ipso/ai-task-manager/commit/51ed941))
+
 ## 1.36.0 (2026-04-21)
 
 * feat(init): create archive directory on init ([944f0cb](https://github.com/e0ipso/ai-task-manager/commit/944f0cb))
