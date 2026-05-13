@@ -1,3 +1,7 @@
+## 1.36.0 (2026-04-21)
+
+* feat(init): create archive directory on init ([944f0cb](https://github.com/e0ipso/ai-task-manager/commit/944f0cb))
+
 ## 1.35.0 (2026-04-15)
 
 * feat(exec): spawn CLI with stream-json output (#17) ([e818ec6](https://github.com/e0ipso/ai-task-manager/commit/e818ec6)), closes [#17](https://github.com/e0ipso/ai-task-manager/issues/17)
