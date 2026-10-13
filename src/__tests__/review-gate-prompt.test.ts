@@ -87,6 +87,7 @@ describe('rendered execution skills compose the review gate', () => {
       expect(section).toContain('record that outcome');
       expect(section).toContain('verbatim');
       expect(section).toContain('top-level `action`');
+      expect(section).toContain('Copy `codeReview` verbatim');
       expect(section).toContain('`halt`');
       expect(section).toContain('`continue`');
       expect(section).toContain('top-level `detail`');
@@ -116,6 +117,8 @@ describe('rendered execution skills compose the review gate', () => {
 
       // No outcome table, and no per-outcome dispatch to re-derive halt/continue.
       expect(section).not.toMatch(/^\|/m);
+      // Activation stays compiled; the prompt consumes the returned decision.
+      expect(section).not.toContain('code_review.enabled');
       for (const kind of [
         '`skipped`',
         '`fallback`',

@@ -2,7 +2,7 @@
 
 ## Automated Code Review Gate
 
-This hook governs a review step that runs at the end of blueprint execution, after the mechanical gates (lint, tests, Self Validation) report success. A reviewer on a discovered external harness critiques the plan's cumulative diff and emits findings. The findings are validated against the vendored schema and recorded.
+After explicit opt-in through `code_review.enabled: true`, use this hook as the mandate for a review step that runs at the end of blueprint execution, after the mechanical gates (lint, tests, Self Validation) report success. A reviewer on a discovered external harness critiques the plan's cumulative diff and emits findings. The findings are validated against the vendored schema and recorded.
 
 The gate reports; it does not decide. Nothing is applied automatically, and the implementer reads the recorded findings and chooses what to act on.
 
@@ -41,10 +41,4 @@ Confidence matters most when it is low. LLM reviewers overstate certainty, so a 
 
 ## What the Gate Guarantees
 
-Exactly one thing, and it is enforced in code rather than here: a review that could not be certified is never reported as a clean one. A findings document that is absent, invalid against the schema, or unvalidatable because `xmllint` is missing halts the gate and says which of those happened. "The reviewer found nothing" and "the reviewer never ran" are never collapsed into each other.
-
-## Disable the Gate
-
-**Emptying this file, or deleting it, disables the review gate cleanly.** The gate skips with no error and records the skip in the execution summary. This is the documented sentinel for "do not review this plan"; there is no undefined behaviour and no error.
-
-Users who already have a code review step in their workflow disable this feature by editing or emptying the hook, matching the pattern of `PRE_TASK_EXECUTION` which ships an overridable default discipline.
+Exactly one thing, and it is enforced in code rather than here: a review that could not be certified is never reported as a clean one. A findings document that is absent or invalid against the schema halts the gate and says which happened. If `xmllint` is absent, the gate skips before dispatch; a skip is never reported as a pass. "The reviewer found nothing" and "the reviewer never ran" are never collapsed into each other.

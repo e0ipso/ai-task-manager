@@ -99,7 +99,7 @@ The LLM verifies all tasks reached `completed` status, checks that documentation
 
 **When:** After `POST_EXECUTION` reports green, before execution summary and archival.
 
-Terminal review gate, terminal only — runs once per plan, creates no task files, never mutates the blueprint. When a second harness is discovered and this hook is present and non-empty, a reviewer harness critiques the cumulative diff and emits schema-validated findings (`review.xml`). The findings are recorded for the implementer to read and act on; nothing is applied automatically. Any fix you then make forces a full `POST_EXECUTION` re-run before execution is declared complete.
+Terminal review gate, terminal only — runs once per plan, creates no task files, never mutates the blueprint. When `code_review.enabled` is explicitly `true`, a second harness is discovered, and this hook is present and non-empty, a reviewer harness critiques the cumulative diff and emits schema-validated findings (`review.xml`). The findings are recorded for the implementer to read and act on; nothing is applied automatically. Any fix you then make forces a full `POST_EXECUTION` re-run before execution is declared complete.
 
 Reviewer discovery uses the same local `harnesses.<name>.cli_args` and readiness check as task dispatch. Permission flags may give the reviewer CLI technical write access, but the reviewer prompt still says to detect and report without changing source files. The reviewer prints its findings document to stdout; the Strikethroo process writes `review.xml` and checks the artifact and diff. Local harness permissions do not turn review findings into automatic fixes.
 
@@ -107,9 +107,13 @@ Reviewer discovery uses the same local `harnesses.<name>.cli_args` and readiness
 
 **Configuration**: The hook body specifies the mandate — which finding categories are in scope and how the reviewer should grade `severity` (`critical`, `major`, `minor`, `info`) and `confidence` (`high`, `medium`, `low`). Both are advisory labels that help you sort the review; nothing is filtered or applied on the strength of them.
 
-**To disable**: Empty this file. The gate skips cleanly and notes it in the execution summary. No error. Deleting the file skips the gate too, but `init` and `update` restore a deleted shipped file, so only an empty file stays disabled through a refresh. `init` preserves your edits on re-run unless you pass `--force`.
+**Opt in**: Set `code_review.enabled: true` in `.ai/strikethroo/config/config.yaml`, or check **Enable code review** in Customize → Config and save. Both edit the same boolean. Review defaults to off; a missing file, section, or key also means disabled, including in existing workspaces with a nonempty shipped hook. The hook supplies the mandate after opt-in. Review is independent of **Allow external harness execution**, which controls task routing.
 
-**Uses `xmllint` when available**: findings are validated against the vendored schema by shelling out to it. It is a soft dependency — without it the gate skips cleanly and says so in the execution summary, exactly as it does when the hook is missing. Your plan still completes. Install `libxml2-utils` (Debian/Ubuntu), `libxml2` (Homebrew), or your platform's equivalent to turn the gate on. A skip is never reported as a review that passed. Findings documents that declare a DTD or entities (`<!DOCTYPE`, `<!ENTITY`) are refused as invalid, and a count of findings that `xmllint` cannot confirm is not recorded.
+**To disable**: Set `code_review.enabled: false`, or uncheck **Enable code review** and save. The gate skips before reviewer discovery, readiness probes, or dispatch, reports **Skipped**, and allows successful execution and archival to continue. Emptying or deleting the hook also suppresses opted-in review, but `init` and `update` restore a deleted shipped hook.
+
+**Refreshes**: Ordinary `init` and `update` preserve an edited configuration when you choose to keep it, including an explicit true or false preference. Explicit overwrite or `--force` replaces it with the incoming configuration; the shipped default is false.
+
+**Uses `xmllint` when available**: findings are validated against the vendored schema by shelling out to it. It is a soft dependency — without it the gate skips cleanly and says so in the execution summary, exactly as it does when the hook is missing. Your plan still completes. Install `libxml2-utils` (Debian/Ubuntu), `libxml2` (Homebrew), or your platform's equivalent to certify opted-in reviews. A skip is never reported as a review that passed. Findings documents that declare a DTD or entities (`<!DOCTYPE`, `<!ENTITY`) are refused as invalid, and a count of findings that `xmllint` cannot confirm is not recorded.
 
 **Limitations** — the complete list:
 - Harness diversity is not model diversity — discovery operates at harness level, so a second CLI on the same model family looks independent while sharing blind spots.
