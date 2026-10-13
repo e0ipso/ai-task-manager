@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SUPPORTED_HARNESSES, type Harness } from '../types';
 import { execGit, execGitDiffAllowingChanges, splitNulDelimited } from './shared/git-utils';
-import { findStrikethrooRoot } from './shared/root';
+import { checkWorkspaceSchema, discoverStrikethrooRoot } from './shared/root';
+import { loadCodeReviewConfiguration } from './shared/code-review-configuration';
 import { resolvePlan } from './shared/plan-resolve';
 import { discoverHarnesses } from './shared/harness-discovery';
 import { executableResolves } from './shared/executable-resolution';
@@ -64,6 +65,7 @@ const writeTranscript = (reviewDir: string, transcript: string | undefined): voi
 
 /** Every condition that disables the gate cleanly. Exit 0, empty stderr. */
 export type ReviewSkipReason =
+  | 'review-disabled'
   | 'hook-absent'
   | 'hook-empty'
   | 'xsd-absent'
@@ -286,6 +288,9 @@ export const _classify = (outcome: ReviewOutcome): ReviewClassification => {
 
 /** Presentation only; findings never change the gate action or exit code. */
 const reviewSummary = (outcome: ReviewOutcome): string => {
+  if (outcome.kind === 'skipped' && outcome.reason === 'review-disabled') {
+    return `Skipped; ${outcome.detail}`;
+  }
   const reviewer =
     'harness' in outcome
       ? `Harness: ${outcome.harness}; model: CLI-selected (exact model unknown).`
@@ -609,8 +614,7 @@ const resolveReviewContext = (
   startPath: string,
   validatorAvailable: () => boolean = () => executableResolves('xmllint')
 ): { kind: 'resolved'; context: ReviewContext } | { kind: 'ended'; result: ReviewResult } => {
-  // findStrikethrooRoot owns the workspace schema check; never bypass it.
-  const strikethrooRoot = findStrikethrooRoot(startPath);
+  const strikethrooRoot = discoverStrikethrooRoot(startPath);
   if (!strikethrooRoot) {
     return {
       kind: 'ended',
@@ -620,6 +624,26 @@ const resolveReviewContext = (
       }),
     };
   }
+
+  const configuration = loadCodeReviewConfiguration(strikethrooRoot);
+  if (configuration.kind === 'invalid') {
+    return {
+      kind: 'ended',
+      result: decide({ kind: 'infrastructure-failure', detail: configuration.detail }),
+    };
+  }
+  if (!configuration.enabled) {
+    return {
+      kind: 'ended',
+      result: skip(
+        'review-disabled',
+        'Code review is disabled. Set code_review.enabled to true in config/config.yaml or ' +
+          'select Enable code review in Customize to opt in.'
+      ),
+    };
+  }
+
+  checkWorkspaceSchema(strikethrooRoot);
 
   const hookFile = path.join(strikethrooRoot, HOOK_RELATIVE_PATH);
   const hookContent = readFileOrNull(hookFile);
@@ -638,8 +662,7 @@ const resolveReviewContext = (
       kind: 'ended',
       result: skip(
         'hook-empty',
-        `The code review mandate at ${hookFile} is empty, which is the documented way to ` +
-          'disable the gate, so the review gate was skipped.'
+        `The code review mandate at ${hookFile} is empty, so the opted-in review gate was skipped.`
       ),
     };
   }

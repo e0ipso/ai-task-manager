@@ -6,12 +6,11 @@
  * crosses into and out of that form: `parseWorkspaceConfig` lifts the file
  * into a typed form model (plus the untouched full document, so foreign
  * top-level sections owned by other features survive a save), and
- * `serializeWorkspaceConfig` writes the edited `harnesses` and
- * `execution_routing` sections back into that document and dumps the whole
- * thing, including the `execution_routing.enabled` switch. No component
- * parses or emits YAML on its own.
+ * `serializeWorkspaceConfig` writes the edited `harnesses`, `execution_routing`,
+ * and `code_review` sections back into that document and dumps the whole file.
+ * No component parses or emits YAML on its own.
  *
- * Safety rule: if either managed section exists but does not match the shape
+ * Safety rule: if a managed section exists but does not match the shape
  * this form understands, parsing reports `unsupported` and the UI
  * refuses to offer a form save — a form-driven rewrite of content it cannot
  * represent would silently destroy it. Saving also re-serializes the file
@@ -55,12 +54,20 @@ export interface HarnessArgsEntry {
 /** The whole harnesses section as the form edits it, in SUPPORTED_HARNESSES order. */
 export type HarnessArgsForm = Record<Harness, HarnessArgsEntry>;
 
+/** Review requires explicit opt-in; missing configuration means disabled. */
+export interface CodeReviewForm {
+  enabled: boolean;
+}
+
+export const EMPTY_CODE_REVIEW: CodeReviewForm = { enabled: false };
+
 export type ParsedWorkspaceConfig =
   | {
       kind: 'parsed';
       document: Record<string, unknown>;
       harnesses: HarnessArgsForm;
       routing: RoutingForm;
+      codeReview: CodeReviewForm;
     }
   | { kind: 'unsupported'; message: string };
 
@@ -149,9 +156,9 @@ const parseHarnesses = (section: unknown): HarnessArgsForm | { message: string }
 };
 
 /**
- * Parses config.yaml content into the full document plus the harness and
- * routing form models. An empty/comment-only file, and an absent or empty
- * section, both parse to the empty form.
+ * Parses config.yaml content into the full document plus the harness,
+ * routing, and review form models. An empty/comment-only file, and an absent
+ * or empty mapping section, both parse to the empty form.
  */
 export function parseWorkspaceConfig(content: string): ParsedWorkspaceConfig {
   // Deliberate mirror of `hasYamlContent` in
@@ -165,7 +172,7 @@ export function parseWorkspaceConfig(content: string): ParsedWorkspaceConfig {
   let document: unknown = {};
   if (hasContent) {
     try {
-      document = load(content) ?? {};
+      document = load(content);
     } catch (err) {
       return unsupported(
         `config.yaml is not valid YAML: ${err instanceof Error ? err.message : String(err)}`
@@ -179,9 +186,24 @@ export function parseWorkspaceConfig(content: string): ParsedWorkspaceConfig {
   const harnesses = parseHarnesses(document.harnesses);
   if ('message' in harnesses) return unsupported(harnesses.message);
 
+  const reviewSection = document.code_review;
+  let codeReview = EMPTY_CODE_REVIEW;
+  if ('code_review' in document) {
+    if (!isPlainObject(reviewSection)) {
+      return unsupported('The code_review section is not a mapping.');
+    }
+    for (const key of Object.keys(reviewSection)) {
+      if (key !== 'enabled') return unsupported(`code_review.${key} is not supported.`);
+    }
+    if ('enabled' in reviewSection && typeof reviewSection.enabled !== 'boolean') {
+      return unsupported('code_review.enabled must be true or false.');
+    }
+    codeReview = { enabled: reviewSection.enabled === true };
+  }
+
   const section = document.execution_routing;
   if (section === undefined || section === null) {
-    return { kind: 'parsed', document, harnesses, routing: EMPTY_ROUTING };
+    return { kind: 'parsed', document, harnesses, routing: EMPTY_ROUTING, codeReview };
   }
   if (!isPlainObject(section)) {
     return unsupported('The execution_routing section is not a mapping.');
@@ -262,19 +284,20 @@ export function parseWorkspaceConfig(content: string): ParsedWorkspaceConfig {
     kind: 'parsed',
     document,
     harnesses,
+    codeReview,
     routing: { enabled, allowExternalHarnessExecution, profiles, resolverScript },
   };
 }
 
 /**
- * Writes the edited harness and routing forms back into the parsed document
- * (preserving every foreign top-level section structurally) and dumps the
- * whole file.
+ * Writes the edited feature forms back into the parsed document, preserving
+ * foreign top-level sections structurally, and dumps the whole file.
  */
 export function serializeWorkspaceConfig(
   document: Record<string, unknown>,
   harnesses: HarnessArgsForm,
-  routing: RoutingForm
+  routing: RoutingForm,
+  codeReview: CodeReviewForm
 ): string {
   // Profile names are user-supplied and unrestricted, so one can be
   // `__proto__`. On a plain object literal that assignment hits the inherited
@@ -310,13 +333,19 @@ export function serializeWorkspaceConfig(
     SUPPORTED_HARNESSES.map(harness => [harness, { cli_args: [...harnesses[harness].cliArgs] }])
   );
 
-  // Dropped first so both managed sections are emitted in a stable order
+  // Dropped first so managed sections are emitted in a stable order
   // after whatever foreign sections the document carried.
-  const { harnesses: _oldHarnesses, execution_routing: _oldRouting, ...rest } = document;
+  const {
+    harnesses: _oldHarnesses,
+    execution_routing: _oldRouting,
+    code_review: _oldCodeReview,
+    ...rest
+  } = document;
   const next: Record<string, unknown> = {
     ...rest,
     harnesses: harnessSection,
     execution_routing: section,
+    code_review: { enabled: codeReview.enabled },
   };
   return dump(next, { lineWidth: 100, noRefs: true });
 }

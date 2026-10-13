@@ -69,11 +69,16 @@ export const checkWorkspaceSchema = (strikethrooRoot: string): void => {
   process.exit(1);
 };
 
-export const findStrikethrooRoot = (startPath: string = process.cwd()): string | null => {
+/** Discovery only, for gates that must decide whether schema-dependent work is enabled. */
+export const discoverStrikethrooRoot = (startPath: string = process.cwd()): string | null => {
   const paths = getParentPaths(startPath);
   const found = paths.find(p => getStrikethrooAt(p));
   if (!found) return null;
-  const root = getStrikethrooAt(found);
+  return getStrikethrooAt(found);
+};
+
+export const findStrikethrooRoot = (startPath: string = process.cwd()): string | null => {
+  const root = discoverStrikethrooRoot(startPath);
   if (root) checkWorkspaceSchema(root);
   return root;
 };

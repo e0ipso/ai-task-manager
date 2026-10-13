@@ -36,6 +36,145 @@ const oneFinding: FindingsGate = async () => ({
   findingsFile: '/dev/null',
 });
 
+describe('code review gate — explicit opt-in', () => {
+  it.each([
+    ['missing file', 'absent'],
+    ['blank file', ' \n\t\n'],
+    ['comment-only file', '# no review preference\n'],
+    ['absent section', 'harnesses: invalid-but-unrelated\n'],
+    ['absent key', 'code_review: {}\n'],
+    ['explicit false', 'code_review:\n  enabled: false\n'],
+  ])('skips %s before any review work', async (_label, config) => {
+    const ws = makeReviewGateWorkspace({ config });
+    const dependencies = stubDeps({
+      validatorAvailable: vi.fn(() => true),
+      discover: vi.fn(async () => ({ outcomes: [], reviewerCandidates: [] })),
+      readDiff: vi.fn(() => ''),
+      dispatch: vi.fn(async () => ({ kind: 'launched-success', exitCode: 0 })),
+      evaluateFindings: vi.fn(oneFinding),
+    });
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      // The shipped mandate never authorizes review without a preference.
+      // Disabled review also needs neither a current schema nor a plan.
+      fs.writeFileSync(
+        path.join(ws.strikethrooRoot, '.init-metadata.json'),
+        JSON.stringify({ version: 'test', workspaceSchemaVersion: 1 })
+      );
+      fs.rmSync(ws.planFile);
+      const result = await runReview(
+        { plan: 'invalid', currentHarness: 'claude', startPath: ws.root },
+        dependencies
+      );
+      expect(result).toMatchObject({
+        kind: 'skipped',
+        reason: 'review-disabled',
+        action: 'continue',
+      });
+      expect(result.codeReview).toMatch(/^Skipped;/);
+      expect(_classify(result).exitCode).toBe(0);
+      expect(stderr).not.toHaveBeenCalled();
+      for (const dependency of Object.values(dependencies)) {
+        expect(dependency).not.toHaveBeenCalled();
+      }
+      expect(fs.existsSync(path.join(ws.planDir, 'review'))).toBe(false);
+    } finally {
+      stderr.mockRestore();
+      ws.cleanup();
+    }
+  });
+
+  it.each([
+    ['malformed YAML', 'code_review: ['],
+    ['sequence document', '[]'],
+    ['scalar document', 'false'],
+    ['null document', 'null'],
+    ['null section', 'code_review: null'],
+    ['sequence section', 'code_review: []'],
+    ['scalar section', 'code_review: false'],
+    ['string preference', 'code_review: { enabled: "true" }'],
+    ['null preference', 'code_review: { enabled: null }'],
+    ['numeric preference', 'code_review: { enabled: 1 }'],
+    ['sequence preference', 'code_review: { enabled: [] }'],
+    ['mapping preference', 'code_review: { enabled: {} }'],
+    ['unsupported owned key', 'code_review: { enabled: false, typo: true }'],
+  ])('rejects %s before reviewer work', async (_label, config) => {
+    const ws = makeReviewGateWorkspace({ config, baseCommit: FAKE_SHA });
+    const dependencies = stubDeps({
+      validatorAvailable: vi.fn(() => true),
+      discover: vi.fn(async () => ({ outcomes: [], reviewerCandidates: [] })),
+      readDiff: vi.fn(() => ''),
+      dispatch: vi.fn(async () => ({ kind: 'launched-success', exitCode: 0 })),
+      evaluateFindings: vi.fn(oneFinding),
+    });
+    try {
+      fs.writeFileSync(
+        path.join(ws.strikethrooRoot, '.init-metadata.json'),
+        JSON.stringify({ version: 'test', workspaceSchemaVersion: 1 })
+      );
+      const result = await runReview(
+        { plan: '1', currentHarness: 'claude', startPath: ws.root },
+        dependencies
+      );
+      expect(result).toMatchObject({ kind: 'infrastructure-failure', action: 'halt' });
+      expect(result.detail).toContain('config.yaml');
+      expect(_classify(result).exitCode).toBe(2);
+      for (const dependency of Object.values(dependencies)) {
+        expect(dependency).not.toHaveBeenCalled();
+      }
+    } finally {
+      ws.cleanup();
+    }
+  });
+
+  it('rejects an unreadable configuration instead of treating it as absent', async () => {
+    const ws = makeReviewGateWorkspace();
+    const dispatch = vi.fn(stubDeps().dispatch);
+    try {
+      fs.rmSync(ws.configFile);
+      fs.mkdirSync(ws.configFile);
+      const result = await runReview(
+        { plan: '1', currentHarness: 'claude', startPath: ws.root },
+        stubDeps({ dispatch })
+      );
+      expect(result).toMatchObject({ kind: 'infrastructure-failure', action: 'halt' });
+      expect(result.detail).toContain('could not be read');
+      expect(_classify(result).exitCode).toBe(2);
+      expect(dispatch).not.toHaveBeenCalled();
+    } finally {
+      ws.cleanup();
+    }
+  });
+
+  it('keeps schema enforcement after explicit opt-in', async () => {
+    const ws = makeReviewGateWorkspace();
+    const exit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('schema check exited');
+    });
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const validatorAvailable = vi.fn(() => true);
+    try {
+      fs.writeFileSync(
+        path.join(ws.strikethrooRoot, '.init-metadata.json'),
+        JSON.stringify({ version: 'test', workspaceSchemaVersion: 1 })
+      );
+      await expect(
+        runReview(
+          { plan: '1', currentHarness: 'claude', startPath: ws.root },
+          stubDeps({ validatorAvailable })
+        )
+      ).rejects.toThrow('schema check exited');
+      expect(exit).toHaveBeenCalledWith(1);
+      expect(stderr).toHaveBeenCalledWith(expect.stringContaining('Workspace schema v1'));
+      expect(validatorAvailable).not.toHaveBeenCalled();
+    } finally {
+      exit.mockRestore();
+      stderr.mockRestore();
+      ws.cleanup();
+    }
+  });
+});
+
 describe('code review gate — fail-safe skips', () => {
   it.each([
     ['hook-absent', { hook: 'absent' as const }],
