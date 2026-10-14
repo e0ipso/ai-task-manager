@@ -1,7 +1,7 @@
 ---
 schema_version: 3
-nodes_hash: 'sha256:6fec805bc1397350b5bd0fba8f632f3a258285c0d2915262114295bfa670a688'
-node_count: 87
+nodes_hash: 'sha256:f52ba01ed5e76035c9fc21768352ceb594aae60193d0e7eef68ddedc6a1b981a'
+node_count: 104
 ---
 # kenkeep
 
@@ -9,6 +9,7 @@ node_count: 87
 
 ## Branches
 - Load [`capture/`](nodes/capture/index.md) for more information on the documentation-visual capture harness — its committed fixture workspace and Playwright SPA-driving technique.
+- Load [`cli/`](nodes/cli/index.md) for more information on the strikethroo CLI commands: init and update refresh contract, setup profiles, workspace validation, and the workspace schema version.
 - Load [`code-review/`](nodes/code-review/index.md) for more information on the report-only code review gate — reviewer discovery and dispatch, the stdout delivery channel, XSD certification, and cumulative-diff scoping.
 - Load [`conventions/`](nodes/conventions/index.md) for more information on documentation and terminology conventions — current-state-only docs and the reserved meaning of phase.
 - Load [`dev/`](nodes/dev/index.md) for more information on the local development loop — dev:serve hot reload, the three concurrent processes, and rebuilding the SPA for serve.
@@ -23,7 +24,8 @@ node_count: 87
 
 ## Conventions (how we build)
 - Open [**Never hand-commit generated skill artifacts in either tree**](nodes/practice-never-hand-commit-generated-skill-artifacts.md) to learn about: dist-test is gitignored build output; the root skills/ mirror is tracked but written only by the release sync. .gitattributes and the pre-commit guard cover both trees and the review gate skips them. #build #skills #git #gitattributes #review-gate #generated-artifacts
-- Open [**Review gate artifacts are git-ignored by a workspace-root .gitignore**](nodes/practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore.md) to learn about: init ships .ai/strikethroo/.gitignore covering plans/*/review/ and archive/*/review/, keeping reviewer output out of git and its own diff. #code-review #gitignore #workspace #init #generated-artifacts
 - Open [**Workspace tracking is project-owned except local configuration and runtime output**](nodes/practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace.md) to learn about: Projects choose whether to track plans and authored workspace files, while init ignores machine-local config.yaml, review artifacts, and runtime output. #gitignore #workspace #documentation #code-review #init
+- Open [**Review gate artifacts are git-ignored by a workspace-root .gitignore**](nodes/practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore.md) to learn about: init ships .ai/strikethroo/.gitignore covering plans/*/review/ and archive/*/review/, keeping reviewer output out of git and its own diff. #code-review #gitignore #workspace #init #generated-artifacts
+- Open [**Design thesis: configuration is Markdown, guarantees are compiled**](nodes/practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled.md) to learn about: Hooks and templates are editable Markdown. Rules a user must not loosen live in TypeScript. #design-thesis #enforcement
 - Open [**Keep comment prose terse and single-sourced**](nodes/practice-keep-comment-prose-terse-and-single-sourced.md) to learn about: Do not write long doc comments or repeat the same rationale across call sites and file copies. State it once where it belongs. #comments #code-style #documentation #xsd #prose
 - Open [**Strikethroo profile packages tolerate inert package-root extras**](nodes/practice-strikethroo-profile-packages-tolerate-inert-package-root-extras.md) to learn about: validateProfilePackage scopes to profile.yaml plus config/; entries at the package root are accepted and are never copied, hash-tracked, or executed. #profiles #init #validation #security

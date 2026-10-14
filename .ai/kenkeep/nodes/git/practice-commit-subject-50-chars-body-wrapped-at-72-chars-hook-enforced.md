@@ -26,5 +26,5 @@ When authoring commit messages, keep the subject imperative and ≤50 chars; har
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-project-commit-hook-rejects-ai-co-authorship-attribution-trailers](/git/practice-project-commit-hook-rejects-ai-co-authorship-attribution-trailers.md)
+- Related: [practice-project-commit-hook-rejects-ai-co-authorship-attribution-trailers](practice-project-commit-hook-rejects-ai-co-authorship-attribution-trailers.md)
 <!-- kk:related:end -->

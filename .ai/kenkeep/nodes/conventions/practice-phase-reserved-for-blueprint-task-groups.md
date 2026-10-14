@@ -25,5 +25,5 @@ In documentation, AGENTS.md, and skill definitions: use "step" or the named stag
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](/serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
+- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
 <!-- kk:related:end -->

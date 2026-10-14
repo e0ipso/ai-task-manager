@@ -27,5 +27,5 @@ Always create and push the matching tag immediately after a manual publish.
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-manual-npm-publish-requires-force-adding-git-ignored-skill-artifacts-into-git](/release/practice-manual-npm-publish-requires-force-adding-git-ignored-skill-artifacts-into-git.md)
+- Related: [practice-manual-npm-publish-requires-force-adding-git-ignored-skill-artifacts-into-git](practice-manual-npm-publish-requires-force-adding-git-ignored-skill-artifacts-into-git.md)
 <!-- kk:related:end -->

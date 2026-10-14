@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { load } from 'js-yaml';
 import {
   EMPTY_HARNESSES,
+  EMPTY_CODE_REVIEW,
   parseWorkspaceConfig,
   serializeWorkspaceConfig,
   validateHarnessForm,
@@ -120,7 +121,12 @@ describe('parseWorkspaceConfig', () => {
     expect(parsed.kind).toBe('parsed');
     if (parsed.kind !== 'parsed') return;
     expect(parsed.routing.allowExternalHarnessExecution).toBe(value);
-    const output = serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing);
+    const output = serializeWorkspaceConfig(
+      parsed.document,
+      parsed.harnesses,
+      parsed.routing,
+      parsed.codeReview
+    );
     expect(
       (load(output) as { execution_routing: Record<string, unknown> }).execution_routing
         .allow_external_harness_execution
@@ -159,6 +165,56 @@ describe('parseWorkspaceConfig', () => {
     expect(parsed.kind).toBe('unsupported');
     if (parsed.kind !== 'unsupported') return;
     expect(parsed.message).toContain('execution_routing.enabled');
+  });
+});
+
+describe('code review preference', () => {
+  it('defaults to disabled for empty, legacy, and missing-key configuration', () => {
+    for (const content of ['', '# only a comment\n', SHIPPED, 'code_review: {}\n']) {
+      expect(parseWorkspaceConfig(content)).toMatchObject({
+        kind: 'parsed',
+        codeReview: { enabled: false },
+      });
+    }
+  });
+  it.each([true, false])('round-trips explicit review %s independently of routing', enabled => {
+    const parsed = parseWorkspaceConfig(`${FULL}code_review:\n  enabled: ${enabled}\n`);
+    expect(parsed.kind).toBe('parsed');
+    if (parsed.kind !== 'parsed') return;
+    expect(parsed.codeReview.enabled).toBe(enabled);
+    const output = serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing, {
+      enabled: !enabled,
+    });
+    expect(load(output)).toMatchObject({ code_review: { enabled: !enabled } });
+    expect(parseWorkspaceConfig(output)).toMatchObject({
+      kind: 'parsed',
+      codeReview: { enabled: !enabled },
+      routing: parsed.routing,
+      harnesses: parsed.harnesses,
+      document: { other_feature: parsed.document.other_feature },
+    });
+  });
+
+  it.each([
+    'code_review: null\n',
+    'code_review: []\n',
+    'code_review: true\n',
+    'code_review: 2026-10-13\n',
+    'code_review: { enabled: "true" }\n',
+    'code_review: { enabled: null }\n',
+    'code_review: { enabled: 1 }\n',
+    'code_review: { enabled: [] }\n',
+    'code_review: { enabled: {} }\n',
+    'code_review: { enabled: false, extra: 1 }\n',
+  ])('rejects unsupported owned review configuration: %s', content => {
+    expect(parseWorkspaceConfig(content)).toMatchObject({
+      kind: 'unsupported',
+      message: expect.stringContaining('code_review'),
+    });
+  });
+
+  it.each(['null\n', '~\n', '2026-10-13\n'])('rejects a nonmapping YAML scalar: %s', content => {
+    expect(parseWorkspaceConfig(content)).toMatchObject({ kind: 'unsupported' });
   });
 });
 
@@ -225,7 +281,12 @@ describe('serializeWorkspaceConfig round-trip', () => {
     expect(parsed.kind).toBe('parsed');
     if (parsed.kind !== 'parsed') return;
 
-    const output = serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing);
+    const output = serializeWorkspaceConfig(
+      parsed.document,
+      parsed.harnesses,
+      parsed.routing,
+      parsed.codeReview
+    );
     const reloaded = load(output) as Record<string, unknown>;
     expect(reloaded.other_feature).toEqual({ nested: { flag: true } });
     expect(reloaded.harnesses).toEqual({
@@ -250,7 +311,7 @@ describe('serializeWorkspaceConfig round-trip', () => {
     if (parsed.kind !== 'parsed') return;
 
     const output = load(
-      serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing)
+      serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing, parsed.codeReview)
     ) as Record<string, unknown>;
     const source = load(FULL) as Record<string, unknown>;
     // Absent switches are written back with their defaults.
@@ -276,7 +337,7 @@ describe('serializeWorkspaceConfig round-trip', () => {
       ],
       resolverScript: '',
     };
-    const output = serializeWorkspaceConfig({}, EMPTY_HARNESSES, routing);
+    const output = serializeWorkspaceConfig({}, EMPTY_HARNESSES, routing, EMPTY_CODE_REVIEW);
     const reloaded = load(output) as {
       execution_routing: { profiles: Record<string, { models: unknown[] }>; resolver?: unknown };
     };
@@ -285,26 +346,36 @@ describe('serializeWorkspaceConfig round-trip', () => {
   });
 
   it('an emptied form serializes back to the disabled state', () => {
-    const output = serializeWorkspaceConfig({}, EMPTY_HARNESSES, {
-      enabled: true,
-      allowExternalHarnessExecution: false,
-      profiles: [],
-      resolverScript: '',
-    });
+    const output = serializeWorkspaceConfig(
+      {},
+      EMPTY_HARNESSES,
+      {
+        enabled: true,
+        allowExternalHarnessExecution: false,
+        profiles: [],
+        resolverScript: '',
+      },
+      EMPTY_CODE_REVIEW
+    );
     const reloaded = load(output) as { execution_routing: { profiles: unknown } };
     expect(reloaded.execution_routing.profiles).toEqual({});
   });
 
   it('writes all six harnesses in order, before execution_routing, after foreign sections', () => {
-    const output = serializeWorkspaceConfig({ other_feature: 1 }, EMPTY_HARNESSES, {
-      enabled: true,
-      allowExternalHarnessExecution: false,
-      profiles: [],
-      resolverScript: '',
-    });
+    const output = serializeWorkspaceConfig(
+      { other_feature: 1 },
+      EMPTY_HARNESSES,
+      {
+        enabled: true,
+        allowExternalHarnessExecution: false,
+        profiles: [],
+        resolverScript: '',
+      },
+      EMPTY_CODE_REVIEW
+    );
     const reloaded = load(output) as Record<string, { cli_args: string[] }>;
     const keys = Object.keys(reloaded);
-    expect(keys).toEqual(['other_feature', 'harnesses', 'execution_routing']);
+    expect(keys).toEqual(['other_feature', 'harnesses', 'execution_routing', 'code_review']);
     expect(Object.keys(reloaded.harnesses!)).toEqual([...SUPPORTED_HARNESSES]);
     expect(Object.values(reloaded.harnesses!)).toEqual(
       SUPPORTED_HARNESSES.map(() => ({ cli_args: [] }))
@@ -317,8 +388,17 @@ describe('serializeWorkspaceConfig round-trip', () => {
     );
     expect(parsed.kind).toBe('parsed');
     if (parsed.kind !== 'parsed') return;
-    const output = serializeWorkspaceConfig(parsed.document, parsed.harnesses, parsed.routing);
-    expect(Object.keys(load(output) as object)).toEqual(['harnesses', 'execution_routing']);
+    const output = serializeWorkspaceConfig(
+      parsed.document,
+      parsed.harnesses,
+      parsed.routing,
+      parsed.codeReview
+    );
+    expect(Object.keys(load(output) as object)).toEqual([
+      'harnesses',
+      'execution_routing',
+      'code_review',
+    ]);
   });
 
   it('writes enabled first and round-trips a disabled section with its profiles', () => {
@@ -334,7 +414,7 @@ describe('serializeWorkspaceConfig round-trip', () => {
       ],
       resolverScript: '',
     };
-    const output = serializeWorkspaceConfig({}, EMPTY_HARNESSES, routing);
+    const output = serializeWorkspaceConfig({}, EMPTY_HARNESSES, routing, EMPTY_CODE_REVIEW);
     const reloaded = load(output) as {
       execution_routing: { enabled: unknown; profiles: Record<string, unknown> };
     };
@@ -364,7 +444,12 @@ describe('serializeWorkspaceConfig round-trip', () => {
       resolverScript: '',
     };
 
-    const output = serializeWorkspaceConfig({ other_feature: 1 }, EMPTY_HARNESSES, routing);
+    const output = serializeWorkspaceConfig(
+      { other_feature: 1 },
+      EMPTY_HARNESSES,
+      routing,
+      EMPTY_CODE_REVIEW
+    );
     expect(output).toContain('__proto__:');
 
     const reloaded = load(output) as {
@@ -381,12 +466,17 @@ describe('serializeWorkspaceConfig round-trip', () => {
   });
 
   it('never trims a cli_args value', () => {
-    const output = serializeWorkspaceConfig({}, harnessForm({ gemini: [' spaced ', '--x '] }), {
-      enabled: true,
-      allowExternalHarnessExecution: false,
-      profiles: [],
-      resolverScript: '',
-    });
+    const output = serializeWorkspaceConfig(
+      {},
+      harnessForm({ gemini: [' spaced ', '--x '] }),
+      {
+        enabled: true,
+        allowExternalHarnessExecution: false,
+        profiles: [],
+        resolverScript: '',
+      },
+      EMPTY_CODE_REVIEW
+    );
     const reloaded = load(output) as { harnesses: Record<Harness, { cli_args: string[] }> };
     expect(reloaded.harnesses.gemini.cli_args).toEqual([' spaced ', '--x ']);
   });

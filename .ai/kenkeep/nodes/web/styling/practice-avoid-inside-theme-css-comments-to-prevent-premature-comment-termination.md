@@ -25,5 +25,5 @@ Reword any comment inside `@theme` blocks to avoid `*/`. For example, replace `(
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](/web/styling/map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
+- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
 <!-- kk:related:end -->

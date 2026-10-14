@@ -32,11 +32,11 @@ Any CLI command, library module, or long-lived process that must survive a stale
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root](/skills/map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root.md)
+- Related: [map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root](map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root.md)
 <!-- kk:related:end -->
 
 <!-- kk:citations:start -->
 # Citations
 
-[1] [ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:0](ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:0)
+[1] ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:0
 <!-- kk:citations:end -->

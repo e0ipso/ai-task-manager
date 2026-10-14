@@ -24,5 +24,5 @@ For `e0ipso/strikethroo`, the installer uses the git clone path and calls `copyD
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts](/release/practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts.md)
+- Related: [practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts](practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts.md)
 <!-- kk:related:end -->

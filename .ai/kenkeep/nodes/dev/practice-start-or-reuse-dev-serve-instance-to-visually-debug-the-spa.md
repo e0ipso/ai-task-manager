@@ -25,6 +25,6 @@ When you need to visually inspect or screenshot the served SPA for debugging, fi
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-npm-run-dev-serve-ts-node-backend-hot-reload-script](/dev/map-npm-run-dev-serve-ts-node-backend-hot-reload-script.md)
-- Related: [practice-hot-reload-dev-loop-requires-three-concurrent-processes](/dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md)
+- Related: [map-npm-run-dev-serve-ts-node-backend-hot-reload-script](map-npm-run-dev-serve-ts-node-backend-hot-reload-script.md)
+- Related: [practice-hot-reload-dev-loop-requires-three-concurrent-processes](practice-hot-reload-dev-loop-requires-three-concurrent-processes.md)
 <!-- kk:related:end -->

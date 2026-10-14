@@ -10,9 +10,10 @@
 _None._
 
 ## Conventions (how we build)
-- Open [**Set suppressErrorRendering: true in mermaid initialization**](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md) to learn about: Without this flag, mermaid v11 injects an orphaned error SVG into <body> on parse failure even when the caller catches the error. #mermaid #spa #rendering #error-handling
 - Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) to learn about: markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab. #web #rendering #mermaid #dompurify #sanitization #gotcha
+- Open [**Set suppressErrorRendering: true in mermaid initialization**](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md) to learn about: Without this flag, mermaid v11 injects an orphaned error SVG into <body> on parse failure even when the caller catches the error. #mermaid #spa #rendering #error-handling
 - Open [**Reuse shared SPA prose-rendering components across all markdown-rendering screens**](practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens.md) to learn about: The project has a standing code-reuse mandate: all markdown-rendering screens must use the shared Section/ReaderProse renderer. #web #spa #components #reuse #architecture
+- Open [**SPA renders through two modules under a header CSP**](practice-spa-render-and-csp-boundaries.md) to learn about: renderMarkdown and renderMermaid are the only render paths. The CSP header is why theme-guard.js is external. #sanitization #csp
 
 ## Components (what exists)
 - Open [**MermaidError.tsx — shared mermaid render-error component**](map-mermaiderror-tsx-shared-mermaid-render-error-component.md) to learn about: src/web/plans/detail/MermaidError.tsx renders a Lucide Frown icon with a collapsed Details disclosure for the verbatim parse error. #mermaid #spa #components #error-handling
@@ -36,8 +37,11 @@ _None._
 - Open [**Set suppressErrorRendering: true in mermaid initialization**](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md) — Without this flag, mermaid v11 injects an orphaned error SVG into <body> on parse failure even when the caller catches the error.
 - Open [**Serve layer uses discriminated-union result types for guarded operations**](../../serve/practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes.md) — Archive, config-write, and self-review operations return typed result unions; route handlers map their variants to HTTP responses.
 ### #rendering
-- Open [**Set suppressErrorRendering: true in mermaid initialization**](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md) — Without this flag, mermaid v11 injects an orphaned error SVG into <body> on parse failure even when the caller catches the error.
 - Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) — markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab.
+- Open [**Set suppressErrorRendering: true in mermaid initialization**](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md) — Without this flag, mermaid v11 injects an orphaned error SVG into <body> on parse failure even when the caller catches the error.
+### #sanitization
+- Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) — markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab.
+- Open [**SPA renders through two modules under a header CSP**](practice-spa-render-and-csp-boundaries.md) — renderMarkdown and renderMermaid are the only render paths. The CSP header is why theme-guard.js is external.
 ### #web
 - Open [**Serve SPA has two sanctioned workspace mutations; self-review writes nothing**](../../serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md) — Archive moves done plans into archive/. Config writes overwrite one existing allowlisted file. Self-review spawns a process but writes no files.
 - Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
@@ -46,6 +50,8 @@ _None._
 - Open [**Serve layer uses discriminated-union result types for guarded operations**](../../serve/practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes.md) — Archive, config-write, and self-review operations return typed result unions; route handlers map their variants to HTTP responses.
 - Open [**CLI exposes five thin commands and no plan-management surface**](../../skills/map-cli-exposes-only-init-and-serve-commands-all-visualization-management-commands-removed.md) — src/cli.ts registers init, update, export profile, serve, and validate; there are no visualization/management (status, plan) commands.
 - Open [**Serve SPA has two sanctioned workspace mutations; self-review writes nothing**](../../serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md) — Archive moves done plans into archive/. Config writes overwrite one existing allowlisted file. Self-review spawns a process but writes no files.
+### #csp
+- Open [**SPA renders through two modules under a header CSP**](practice-spa-render-and-csp-boundaries.md) — renderMarkdown and renderMermaid are the only render paths. The CSP header is why theme-guard.js is external.
 ### #dompurify
 - Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) — markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab.
 ### #gotcha
@@ -54,5 +60,3 @@ _None._
 - Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) — markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab.
 ### #reuse
 - Open [**Reuse shared SPA prose-rendering components across all markdown-rendering screens**](practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens.md) — The project has a standing code-reuse mandate: all markdown-rendering screens must use the shared Section/ReaderProse renderer.
-### #sanitization
-- Open [**markdown.ts needs a private DOMPurify instance or mermaid loses every SVG attribute**](practice-markdown-policy-needs-its-own-dompurify-instance.md) — markdown.ts registers its sanitize hooks on a private DOMPurify instance; on the shared default they also apply to mermaid's strict-mode SVG pass and blank the Graph tab.

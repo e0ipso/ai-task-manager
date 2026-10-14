@@ -36,5 +36,5 @@ Adding representative fixture files is the correct fix when new test assertions 
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore](/git/practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore.md)
+- Related: [practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore](../git/practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore.md)
 <!-- kk:related:end -->

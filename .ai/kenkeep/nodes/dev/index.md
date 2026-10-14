@@ -32,9 +32,9 @@ _None._
 - Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
 - Open [**serve UI PRD and tickets live under .ai/strikethroo/scratch/ui/**](../serve/map-serve-ui-prd-and-tickets-live-under-ai-strikethroo-scratch-ui.md) — The PRD and 13 dependency-ordered tickets for the serve SPA feature are in .ai/strikethroo/scratch/ui/, not in the formal plans/ flow.
 ### #build
+- Open [**Adding a skill means editing five registries**](../skills/practice-adding-a-skill-touches-five-registries.md) — Template, SKILL_ENTRYPOINTS, plugin.json, STRIKETHROO_WORKFLOW_SKILLS, EXPECTED_SKILLS. The mirror test blocks it until release.
 - Open [**Use build-time composition to eliminate cross-skill prompt duplication**](../skills/prompts/practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md) — Shared procedural blocks in SKILL.md files must live as Handlebars partials under src/skill-prompts/_partials/, not copy-pasted per skill.
 - Open [**SPA source changes require npm run build:web before serve reflects them**](practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them.md) — serve hosts the prebuilt dist-web/ bundle. SPA source changes are not visible until npm run build:web is run; a hard-refresh clears cached content-hashed chunks.
-- Open [**Avoid */ inside @theme CSS comments to prevent premature comment termination**](../web/styling/practice-avoid-inside-theme-css-comments-to-prevent-premature-comment-termination.md) — A comment containing */ inside a Tailwind @theme block terminates the comment early, producing a cryptic parse error that halts the build.
 ### #debugging
 - Open [**Start or reuse a dev:serve instance to visually debug the SPA**](practice-start-or-reuse-dev-serve-instance-to-visually-debug-the-spa.md) — To see/screenshot the SPA, reuse or start dev:serve on :4317; rebuild dist-web for source changes, or use dev:web HMR at :5173.
 ### #dev-workflow

@@ -111,7 +111,7 @@ Each task's implementation notes capture what actually happened during execution
 
 ### 5. Automated Code Review (Optional)
 
-After `POST_EXECUTION` reports green, an optional code review gate runs if a second harness is discovered and the [`CODE_REVIEW`](customization.html#code_review) hook is present and non-empty. A discovered reviewer harness critiques the cumulative diff against the plan's requirements and emits schema-validated findings.
+After `POST_EXECUTION` reports green, an opted-in code review gate runs when `code_review.enabled` is explicitly `true`, a second harness is discovered, and the [`CODE_REVIEW`](customization.html#code_review) hook is present and non-empty. A discovered reviewer harness critiques the cumulative diff against the plan's requirements and emits schema-validated findings.
 
 **How it works:**
 
@@ -123,7 +123,8 @@ Blueprint execution and the execution step of the full workflow always include a
 
 - **Pass**: the review was certified and reported no findings.
 - **Address**: the review was certified and reported findings for the implementer to assess.
-- **Failed**: the review was skipped, could not run, or could not be certified. The entry includes the reason.
+- **Skipped**: review is disabled because `code_review.enabled` is absent or false; successful execution and archival can continue.
+- **Failed**: another skip occurred, the review could not run, or it could not be certified. The entry includes the reason.
 
 The entry names the selected reviewer harness. Model selection belongs to that harness's CLI, so the exact model is reported as unknown. A skipped review can accompany an archived plan; these labels do not change the gate's halt/continue behavior. Address remains the recorded review outcome after fixes because the gate does not run again.
 
@@ -133,7 +134,7 @@ The review never creates task files and never mutates the execution blueprint. F
 
 The reviewed scope runs from a base commit recorded before phase execution against the working tree, so committed phase work, uncommitted fixes, and untracked new files are all in scope — nothing needs to be staged or committed for the reviewer to see it. Ignored, generated, and vendored paths are excluded; see [Customization](customization.html#code_review) for the complete list of limitations.
 
-**To disable:** Empty `.ai/strikethroo/config/hooks/CODE_REVIEW.md`. The gate skips cleanly with a note in the execution summary. Deleting the file does not last, because `init` and `update` restore it.
+**To opt in:** Set `code_review.enabled: true` in `.ai/strikethroo/config/config.yaml`, or check **Enable code review** in Customize → Config and save. The default is false, and missing settings disable review in existing workspaces too. A nonempty hook supplies the mandate only after opt-in. This preference is independent of external task routing. To disable, set false or uncheck the toggle and save. Ordinary refreshes retain edited preferences when you keep the configuration; explicit overwrite or `--force` replaces them with the incoming configuration.
 
 **Important:** A passing review is not a correctness guarantee. The gate reduces exposure to the same class of error a human PR approval reduces, and leaves the same exposure behind. See [Customization](customization.html#code_review) for limitations.
 

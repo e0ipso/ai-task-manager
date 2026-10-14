@@ -4,8 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SUPPORTED_HARNESSES, type Harness } from '../types';
 import { execGit, execGitDiffAllowingChanges, splitNulDelimited } from './shared/git-utils';
-import { findStrikethrooRoot } from './shared/root';
-import { resolvePlan } from './shared/plan-resolve';
+import { checkWorkspaceSchema } from './shared/root';
+import { loadCodeReviewConfiguration } from './shared/code-review-configuration';
+import { discoverPlanWorkspace, resolvePlan } from './shared/plan-resolve';
 import { discoverHarnesses } from './shared/harness-discovery';
 import { executableResolves } from './shared/executable-resolution';
 import { dispatchReview } from './shared/external-dispatch';
@@ -23,7 +24,7 @@ import {
  * The code review gate: scope the plan's cumulative diff, dispatch a second
  * harness to review it, certify the findings, and emit one JSON line. It
  * reports; it never fixes, commits, or judges findings. Rationale for each
- * decision below is in AGENTS.md, "Code Review Gate".
+ * decision below is in `.ai/kenkeep/nodes/code-review/`.
  */
 
 const HOOK_RELATIVE_PATH = path.join('config', 'hooks', 'CODE_REVIEW.md');
@@ -64,6 +65,7 @@ const writeTranscript = (reviewDir: string, transcript: string | undefined): voi
 
 /** Every condition that disables the gate cleanly. Exit 0, empty stderr. */
 export type ReviewSkipReason =
+  | 'review-disabled'
   | 'hook-absent'
   | 'hook-empty'
   | 'xsd-absent'
@@ -286,6 +288,9 @@ export const _classify = (outcome: ReviewOutcome): ReviewClassification => {
 
 /** Presentation only; findings never change the gate action or exit code. */
 const reviewSummary = (outcome: ReviewOutcome): string => {
+  if (outcome.kind === 'skipped' && outcome.reason === 'review-disabled') {
+    return `Skipped; ${outcome.detail}`;
+  }
   const reviewer =
     'harness' in outcome
       ? `Harness: ${outcome.harness}; model: CLI-selected (exact model unknown).`
@@ -435,7 +440,7 @@ const untrackedDiff = (workspace: string, file: string): string | null =>
 /**
  * Scope: two-dot `git diff <base>` against the working tree, plus an add-diff
  * per untracked unignored path, minus paths `.gitattributes` marks generated
- * or vendored. Why each: AGENTS.md, "Code Review Gate".
+ * or vendored. Why each: `.ai/kenkeep/nodes/code-review/`.
  *
  * Every Git step is argv-based: paths from the repository are data, never part
  * of a command string. Any step failing — the listings, the attribute check,
@@ -604,22 +609,46 @@ interface ReviewContext {
   xsdFile: string;
 }
 
-/** The workspace shape the gate needs, or the skip or failure that ends the run. */
+/**
+ * The shape of the workspace the plan addresses, or the skip or failure that
+ * ends the run. An absolute plan path can address a workspace other than the
+ * one around `startPath`, and its own preference decides.
+ */
 const resolveReviewContext = (
+  plan: string | number,
   startPath: string,
   validatorAvailable: () => boolean = () => executableResolves('xmllint')
 ): { kind: 'resolved'; context: ReviewContext } | { kind: 'ended'; result: ReviewResult } => {
-  // findStrikethrooRoot owns the workspace schema check; never bypass it.
-  const strikethrooRoot = findStrikethrooRoot(startPath);
+  const strikethrooRoot = discoverPlanWorkspace(plan, startPath);
   if (!strikethrooRoot) {
     return {
       kind: 'ended',
       result: decide({
         kind: 'infrastructure-failure',
-        detail: `No Strikethroo workspace was found from ${startPath}.`,
+        detail: `No Strikethroo workspace was found for plan "${plan}" from ${startPath}.`,
       }),
     };
   }
+
+  const configuration = loadCodeReviewConfiguration(strikethrooRoot);
+  if (configuration.kind === 'invalid') {
+    return {
+      kind: 'ended',
+      result: decide({ kind: 'infrastructure-failure', detail: configuration.detail }),
+    };
+  }
+  if (!configuration.enabled) {
+    return {
+      kind: 'ended',
+      result: skip(
+        'review-disabled',
+        'Code review is disabled. Set code_review.enabled to true in config/config.yaml or ' +
+          'select Enable code review in Customize to opt in.'
+      ),
+    };
+  }
+
+  checkWorkspaceSchema(strikethrooRoot);
 
   const hookFile = path.join(strikethrooRoot, HOOK_RELATIVE_PATH);
   const hookContent = readFileOrNull(hookFile);
@@ -638,8 +667,7 @@ const resolveReviewContext = (
       kind: 'ended',
       result: skip(
         'hook-empty',
-        `The code review mandate at ${hookFile} is empty, which is the documented way to ` +
-          'disable the gate, so the review gate was skipped.'
+        `The code review mandate at ${hookFile} is empty, so the opted-in review gate was skipped.`
       ),
     };
   }
@@ -690,7 +718,7 @@ export const runReview = async (
   const dependencies = { ...defaultDependencies, ...overrides };
   const startPath = request.startPath ?? process.cwd();
 
-  const resolution = resolveReviewContext(startPath, dependencies.validatorAvailable);
+  const resolution = resolveReviewContext(request.plan, startPath, dependencies.validatorAvailable);
   if (resolution.kind === 'ended') return resolution.result;
   const { strikethrooRoot, workspace, hookFile, hookContent, xsdFile } = resolution.context;
 
@@ -699,6 +727,12 @@ export const runReview = async (
     return decide({
       kind: 'infrastructure-failure',
       detail: `Plan "${request.plan}" was not found or is invalid.`,
+    });
+  }
+  if (resolved.strikethrooRoot !== strikethrooRoot) {
+    return decide({
+      kind: 'infrastructure-failure',
+      detail: `Plan "${request.plan}" resolved outside the workspace whose review preference was checked.`,
     });
   }
   const { planDir, planFile, planId } = resolved;

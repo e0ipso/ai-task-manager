@@ -22,5 +22,5 @@ kk_confidence: high
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](/web/styling/map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
+- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](../web/styling/map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
 <!-- kk:related:end -->

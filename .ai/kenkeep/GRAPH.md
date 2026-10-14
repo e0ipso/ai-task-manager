@@ -1,11 +1,11 @@
 ---
 schema_version: 3
-nodes_hash: 'sha256:6fec805bc1397350b5bd0fba8f632f3a258285c0d2915262114295bfa670a688'
-node_count: 87
+nodes_hash: 'sha256:f52ba01ed5e76035c9fc21768352ceb594aae60193d0e7eef68ddedc6a1b981a'
+node_count: 104
 ---
 # kenkeep Graph
 
-Total nodes: 87
+Total nodes: 104
 
 ## map-archive-ui-control-confirmation-gated-archive-button-on-done-plans
 
@@ -244,6 +244,14 @@ Total nodes: 87
 - **tags:** vite, codemirror, dev-server, lazy-loading, optimization
 - **depends_on:** map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r
 
+## practice-adding-a-skill-touches-five-registries
+
+- **kind:** practice
+- **title:** Adding a skill means editing five registries
+- **path:** skills/practice-adding-a-skill-touches-five-registries.md
+- **tags:** skills, build
+- **relates_to:** practice-never-hand-commit-generated-skill-artifacts
+
 ## practice-after-a-git-merge-always-rebuild-dist-web-before-running-e2e-tests
 
 - **kind:** practice
@@ -283,6 +291,14 @@ Total nodes: 87
 - **tags:** tailwind, css, comments, build
 - **relates_to:** map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles
 
+## practice-bump-workspace-schema-version-only-for-incompatible-shape
+
+- **kind:** practice
+- **title:** Bump the workspace schema version only for incompatible shape changes
+- **path:** cli/practice-bump-workspace-schema-version-only-for-incompatible-shape.md
+- **tags:** schema-version, metadata
+- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off
+
 ## practice-commit-subject-50-chars-body-wrapped-at-72-chars-hook-enforced
 
 - **kind:** practice
@@ -291,6 +307,22 @@ Total nodes: 87
 - **tags:** git, commit, hooks, formatting
 - **relates_to:** practice-project-commit-hook-rejects-ai-co-authorship-attribution-trailers
 
+## practice-config-editors-keep-draft-baseline-and-disk-apart
+
+- **kind:** practice
+- **title:** Customize editors keep draft, baseline, and disk apart
+- **path:** web/editor/practice-config-editors-keep-draft-baseline-and-disk-apart.md
+- **tags:** customize, config-yaml
+- **relates_to:** practice-config-yaml-is-local-and-empty-means-unconfigured
+
+## practice-config-yaml-is-local-and-empty-means-unconfigured
+
+- **kind:** practice
+- **title:** config.yaml is local, and empty means unconfigured
+- **path:** skills/practice-config-yaml-is-local-and-empty-means-unconfigured.md
+- **tags:** config-yaml, execution-routing
+- **relates_to:** practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace
+
 ## practice-convey-done-state-with-strikethrough-color-or-emoji-not-non-interactive-checkboxes
 
 - **kind:** practice
@@ -298,6 +330,14 @@ Total nodes: 87
 - **path:** web/ui/practice-convey-done-state-with-strikethrough-color-or-emoji-not-non-interactive-checkboxes.md
 - **tags:** web, ui, ux, accessibility, affordance
 - **relates_to:** practice-use-baseui-components-for-interactive-ui-elements-in-the-spa
+
+## practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled
+
+- **kind:** practice
+- **title:** Design thesis: configuration is Markdown, guarantees are compiled
+- **path:** practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled.md
+- **tags:** design-thesis, enforcement
+- **relates_to:** practice-uncertified-review-is-never-reported-clean, practice-review-gate-reports-it-does-not-fix
 
 ## practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts
 
@@ -337,12 +377,29 @@ Total nodes: 87
 - **path:** testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md
 - **tags:** linting, eslint, globals, testing, e2e
 
+## practice-exclude-host-specific-knowledge-from-the-repository-knowledge-base
+
+- **kind:** practice
+- **title:** Exclude host-specific knowledge from the repository knowledge base
+- **path:** conventions/practice-exclude-host-specific-knowledge-from-the-repository-knowledge-base.md
+- **tags:** kenkeep, knowledge, conventions
+- **relates_to:** practice-documentation-captures-current-state-only
+- **derived_from:** 68d05db0-7902-42a1-b6d6-b0c8fb214ab9:practice:1
+
 ## practice-hot-reload-dev-loop-requires-three-concurrent-processes
 
 - **kind:** practice
 - **title:** Hot-reload dev loop requires three concurrent processes
 - **path:** dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md
 - **tags:** dev, tooling, web, serve
+
+## practice-init-refresh-kept-file-keeps-its-old-baseline
+
+- **kind:** practice
+- **title:** Init refresh: a kept file keeps its old baseline
+- **path:** cli/practice-init-refresh-kept-file-keeps-its-old-baseline.md
+- **tags:** init, refresh
+- **relates_to:** practice-bump-workspace-schema-version-only-for-incompatible-shape, practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace
 
 ## practice-isolate-concurrent-agent-changes-before-committing-by-excluding-entangled-files
 
@@ -351,6 +408,14 @@ Total nodes: 87
 - **path:** git/practice-isolate-concurrent-agent-changes-before-committing-by-excluding-entangled-files.md
 - **tags:** git, concurrent-agents, staging, pre-commit
 - **relates_to:** practice-do-not-use-no-verify-to-skip-git-commit-hooks
+
+## practice-js-yaml-stays-in-dependencies
+
+- **kind:** practice
+- **title:** js-yaml stays in dependencies; frontend libraries do not
+- **path:** tooling/practice-js-yaml-stays-in-dependencies.md
+- **tags:** dependencies, npm
+- **relates_to:** practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily
 
 ## practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
 
@@ -383,6 +448,15 @@ Total nodes: 87
 - **path:** devcontainer/practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge.md
 - **tags:** devcontainer, docker, security, t3
 - **derived_from:** 05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:1
+
+## practice-keep-uncommitted-workflow-identifiers-out-of-public-issue-and-pr-text
+
+- **kind:** practice
+- **title:** Keep uncommitted workflow identifiers out of public issue and PR text
+- **path:** git/practice-keep-uncommitted-workflow-identifiers-out-of-public-issue-and-pr-text.md
+- **tags:** documentation, github, git, workspace
+- **relates_to:** practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
+- **derived_from:** 68d05db0-7902-42a1-b6d6-b0c8fb214ab9:practice:0
 
 ## practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite
 
@@ -486,6 +560,14 @@ Total nodes: 87
 - **relates_to:** practice-after-a-git-merge-always-rebuild-dist-web-before-running-e2e-tests, practice-never-hand-commit-generated-skill-artifacts
 - **derived_from:** dd3c135d-8ffc-4046-97c1-60fbf493ff03:practice:0
 
+## practice-release-workflow-splits-verify-from-publish
+
+- **kind:** practice
+- **title:** Release workflow splits verify from publish
+- **path:** release/practice-release-workflow-splits-verify-from-publish.md
+- **tags:** release, ci
+- **relates_to:** practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime
+
 ## practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens
 
 - **kind:** practice
@@ -511,6 +593,22 @@ Total nodes: 87
 - **relates_to:** map-model-optional-dispatch-reviewer-harness-omits-model, practice-optional-by-absence-new-files-absent-means-feature-off, practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
 - **derived_from:** .ai/strikethroo/plans/116--streamline-review-gate-contract-and-prompt/tasks/03--clean-review-gate-terminology.md
 
+## practice-review-gate-runs-only-on-explicit-opt-in
+
+- **kind:** practice
+- **title:** Review gate runs only on explicit opt-in
+- **path:** code-review/practice-review-gate-runs-only-on-explicit-opt-in.md
+- **tags:** review-gate, config-yaml
+- **relates_to:** practice-review-gate-reports-it-does-not-fix
+
+## practice-route-workspace-file-access-through-safe-fs
+
+- **kind:** practice
+- **title:** Route workspace file access through safe-fs
+- **path:** skills/practice-route-workspace-file-access-through-safe-fs.md
+- **tags:** safe-fs, security
+- **relates_to:** practice-serve-request-security-model
+
 ## practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
 
 - **kind:** practice
@@ -524,6 +622,14 @@ Total nodes: 87
 - **title:** Serve layer uses discriminated-union result types for guarded operations
 - **path:** serve/practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes.md
 - **tags:** serve, architecture, error-handling
+
+## practice-serve-request-security-model
+
+- **kind:** practice
+- **title:** Serve guards every request; mutations need a session token
+- **path:** serve/practice-serve-request-security-model.md
+- **tags:** serve, security
+- **relates_to:** practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
 
 ## practice-set-suppresserrorrendering-true-in-mermaid-initialization
 
@@ -540,6 +646,14 @@ Total nodes: 87
 - **tags:** release, distribution, npm, skills, web, spa, build, serve, semantic-release
 - **depends_on:** practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf
 - **derived_from:** 7f15ae61-53e1-4644-8689-567a37c4ff39:practice:0
+
+## practice-spa-render-and-csp-boundaries
+
+- **kind:** practice
+- **title:** SPA renders through two modules under a header CSP
+- **path:** web/rendering/practice-spa-render-and-csp-boundaries.md
+- **tags:** sanitization, csp
+- **relates_to:** practice-markdown-policy-needs-its-own-dompurify-instance
 
 ## practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them
 
@@ -588,6 +702,22 @@ Total nodes: 87
 - **path:** practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace.md
 - **tags:** gitignore, workspace, documentation, code-review, init
 - **relates_to:** practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore, practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
+
+## practice-task-routing-and-harness-dispatch
+
+- **kind:** practice
+- **title:** Task routing: one profile writer, strict dispatch
+- **path:** skills/practice-task-routing-and-harness-dispatch.md
+- **tags:** execution-routing, dispatch
+- **relates_to:** practice-config-yaml-is-local-and-empty-means-unconfigured, map-model-optional-dispatch-reviewer-harness-omits-model
+
+## practice-uncertified-review-is-never-reported-clean
+
+- **kind:** practice
+- **title:** An uncertified review is never reported clean
+- **path:** code-review/practice-uncertified-review-is-never-reported-clean.md
+- **tags:** review-gate, certification
+- **relates_to:** practice-review-gate-reports-it-does-not-fix
 
 ## practice-use-baseui-components-for-interactive-ui-elements-in-the-spa
 
@@ -657,6 +787,14 @@ Total nodes: 87
 - **title:** Use @theme token utilities everywhere in the SPA; never arbitrary-value brackets for design values
 - **path:** web/styling/practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f.md
 - **tags:** tailwind, tokens, css, dark-mode, spa
+
+## practice-validate-reports-deletions-not-hash-drift
+
+- **kind:** practice
+- **title:** validate reports deleted files, never hash drift
+- **path:** cli/practice-validate-reports-deletions-not-hash-drift.md
+- **tags:** validate, frontmatter
+- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off, practice-init-refresh-kept-file-keeps-its-old-baseline
 
 ## practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups
 

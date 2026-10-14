@@ -31,5 +31,5 @@ Both unit/integration suites (`workspace-model.integration.test.ts`, `serve-serv
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore](/git/practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore.md)
+- Related: [practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore](../git/practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore.md)
 <!-- kk:related:end -->

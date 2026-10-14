@@ -24,5 +24,5 @@ The modal passes the plan's composite `name`, `{id}--{slug}`, to `archivePlan()`
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-src-serve-archive-ts-archiveplan-operation](/serve/map-src-serve-archive-ts-archiveplan-operation.md)
+- Related: [map-src-serve-archive-ts-archiveplan-operation](../../serve/map-src-serve-archive-ts-archiveplan-operation.md)
 <!-- kk:related:end -->

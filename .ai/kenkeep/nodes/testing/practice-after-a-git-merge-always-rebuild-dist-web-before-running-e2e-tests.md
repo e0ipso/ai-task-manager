@@ -30,5 +30,5 @@ Fix: `rm -rf dist-web && npm run build:web`. Since `dist-web/` is gitignored on 
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime](/release/practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime.md)
+- Related: [practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime](../release/practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime.md)
 <!-- kk:related:end -->

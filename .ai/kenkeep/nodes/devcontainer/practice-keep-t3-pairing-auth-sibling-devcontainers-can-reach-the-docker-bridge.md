@@ -27,5 +27,5 @@ If pairing friction is the concern, pair once and let the session persist in the
 <!-- kk:citations:start -->
 # Citations
 
-[1] [05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:1](05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:1)
+[1] 05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:1
 <!-- kk:citations:end -->

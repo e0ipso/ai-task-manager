@@ -95,7 +95,9 @@ No. A green review gate reduces the same class of error a human PR approval redu
 
 **Why didn't the review gate run?**
 
-Five reasons it may skip cleanly:
+Reasons it may skip cleanly:
+
+- **Review disabled** — `code_review.enabled` is absent or false. This is the default in new and existing workspaces and produces a **Skipped** summary before reviewer discovery or probes.
 
 - **Hook file missing** — code review is optional. `init` copies the default hook; older workspaces don't have it until they update, and `init` or `update` restores a hook you deleted.
 - **Hook file empty** — if you delete the contents, the gate skips.
@@ -107,11 +109,13 @@ Any of these routes to a clean skip with a note in the execution summary. No err
 
 **The gate ran but did not certify. What does that mean?**
 
-An uncertified review is not a skip: the gate ran and could not certify the result, so it exits non-zero rather than reporting a clean review. The reviewer's findings reach the gate on its own output: the reviewer prints the document, the gate extracts it from that output, writes it to the expected path, and validates it against the same schema. So an uncertified review means the reviewer could not perform the review: it could not inspect the repository, or it produced no valid findings document. When that happens, look at `review/reviewer-output.txt` -- it holds the reviewer's captured output for exactly this case, so you can see what it actually did. Read the reported detail, fix the cause, and re-run the gate.
+An uncertified review is not a skip: the gate ran and could not certify the result, so it exits non-zero rather than reporting a clean review. The reviewer's findings reach the gate on its own output: the reviewer prints the document, the gate extracts it from that output, writes it to the expected path, and validates it against the same schema. So an uncertified review means the reviewer could not perform the review: it could not inspect the repository, or it produced no valid findings document. When that happens, look at `review/reviewer-output.txt` -- it holds the reviewer's captured output for exactly this case, so you can see what it actually did. Read the reported detail and report the cause for user-directed follow-up. The workflow runs the gate once; it does not automatically fix and re-review.
 
-**How do I disable code review?**
+**How do I enable or disable code review?**
 
-Empty `.ai/strikethroo/config/hooks/CODE_REVIEW.md`. The gate skips cleanly on next run. No error. Deleting the file also skips the gate, but `init` and `update` restore a deleted file, so an empty file is the one that lasts.
+Set `code_review.enabled: true` in `.ai/strikethroo/config/config.yaml`, or check **Enable code review** in Customize → Config and save. Set false or uncheck and save to disable it. Missing settings mean disabled, even when an existing workspace has a nonempty shipped hook. The hook supplies the opted-in review mandate; emptying or deleting it also suppresses review. This preference is independent of external task routing.
+
+Ordinary `init` and `update` preserve an edited preference when you keep the configuration. Explicit overwrite or `--force` replaces it with the incoming configuration, whose shipped default is false. Deleted shipped hooks are restored on refresh.
 
 **Can I configure how findings are graded?**
 

@@ -33,5 +33,5 @@ When a styling migration removes CSS classes that tests depended on, add minimal
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f](/web/styling/practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f.md)
+- Related: [practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f](../web/styling/practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f.md)
 <!-- kk:related:end -->

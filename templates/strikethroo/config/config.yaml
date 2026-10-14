@@ -7,6 +7,9 @@
 # web UI rewrites this file and does not preserve comments.
 #
 # Sections:
+#   code_review — report-only review on a second harness, enabled only by an
+#     explicit true boolean. Missing also means false. CODE_REVIEW.md supplies
+#     the mandate after opt-in; its presence alone never enables review.
 #   harnesses — exact ordered argv elements added when Strikethroo invokes the
 #     named external CLI. The local user owns the resulting permissions. Values
 #     are never split or shell-expanded. Keep secrets and machine paths out of
@@ -26,6 +29,9 @@
 #     `profiles` is empty; an absent `enabled` means on. See the customization
 #     guide for the full contract and an illustrative example:
 #     https://strikethroo.canpicasoft.com/customization.html
+
+code_review:
+  enabled: false
 
 harnesses:
   claude:

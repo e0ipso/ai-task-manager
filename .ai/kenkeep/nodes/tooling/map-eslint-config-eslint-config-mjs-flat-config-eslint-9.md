@@ -24,5 +24,5 @@ The flat config defines separate blocks for source files, test files, and the SP
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks](/testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md)
+- Related: [practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks](../testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md)
 <!-- kk:related:end -->

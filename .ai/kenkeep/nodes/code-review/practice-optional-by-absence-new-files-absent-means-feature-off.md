@@ -61,5 +61,5 @@ This is the pattern established by `PRE_TASK_EXECUTION`, which ships a default t
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-documentation-captures-current-state-only](/conventions/practice-documentation-captures-current-state-only.md)
+- Related: [practice-documentation-captures-current-state-only](../conventions/practice-documentation-captures-current-state-only.md)
 <!-- kk:related:end -->

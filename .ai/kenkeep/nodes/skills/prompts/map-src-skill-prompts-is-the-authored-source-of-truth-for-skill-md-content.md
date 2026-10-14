@@ -31,5 +31,5 @@ Read `src/skill-prompts/README.md` and `src/skill-prompts/AUTHORING.md` before e
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication](/skills/prompts/practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md)
+- Related: [practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication](practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md)
 <!-- kk:related:end -->

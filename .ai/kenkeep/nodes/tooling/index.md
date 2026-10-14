@@ -10,6 +10,7 @@
 _None._
 
 ## Conventions (how we build)
+- Open [**js-yaml stays in dependencies; frontend libraries do not**](practice-js-yaml-stays-in-dependencies.md) to learn about: dist/profiles.js loads js-yaml at runtime. SPA libraries are build-only because serve ships prebuilt assets. #dependencies #npm
 - Open [**src/web/vendor/ and dist-web/ are excluded from Prettier formatting**](practice-src-web-vendor-and-dist-web-are-excluded-from-prettier-formatting.md) to learn about: Vendored CSS under src/web/vendor/ must not be reformatted. Both src/web/vendor/ and dist-web/ are excluded via .prettierignore. #prettier #vendor #css #build
 - Open [**The required gate lints tsx and type-checks the web production code**](practice-npm-run-lint-only-covers-ts-files-tsx-web-files-need-separate-type-check.md) to learn about: npm run lint globs ts and tsx, and the web type check runs inside npm run build as typecheck:web, with the SPA suites checked by typecheck:web-tests. #web #lint #tsx #build
 
@@ -19,9 +20,9 @@ _None._
 ## By topic
 
 ### #build
+- Open [**Adding a skill means editing five registries**](../skills/practice-adding-a-skill-touches-five-registries.md) — Template, SKILL_ENTRYPOINTS, plugin.json, STRIKETHROO_WORKFLOW_SKILLS, EXPECTED_SKILLS. The mirror test blocks it until release.
 - Open [**Use build-time composition to eliminate cross-skill prompt duplication**](../skills/prompts/practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md) — Shared procedural blocks in SKILL.md files must live as Handlebars partials under src/skill-prompts/_partials/, not copy-pasted per skill.
 - Open [**SPA source changes require npm run build:web before serve reflects them**](../dev/practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them.md) — serve hosts the prebuilt dist-web/ bundle. SPA source changes are not visible until npm run build:web is run; a hard-refresh clears cached content-hashed chunks.
-- Open [**Avoid */ inside @theme CSS comments to prevent premature comment termination**](../web/styling/practice-avoid-inside-theme-css-comments-to-prevent-premature-comment-termination.md) — A comment containing */ inside a Tailwind @theme block terminates the comment early, producing a cryptic parse error that halts the build.
 ### #config
 - Open [**.releaserc.json repositoryUrl must match current GitHub repo slug**](../release/map-releaserc-json-repositoryurl-must-match-current-github-repo-slug.md) — .releaserc.json's repositoryUrl feeds @semantic-release/github; it must match the current GitHub repo slug or releases fail.
 - Open [**ESLint config: eslint.config.mjs (flat config, ESLint 9)**](map-eslint-config-eslint-config-mjs-flat-config-eslint-9.md) — The active ESLint config is eslint.config.mjs (flat config, ESLint 9). A legacy .eslintrc.js at the repo root is dead cruft ignored by ESLint 9.
@@ -30,12 +31,18 @@ _None._
 - Open [**Use @theme token utilities everywhere in the SPA; never arbitrary-value brackets for design values**](../web/styling/practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f.md) — All SPA brand/status/signature values must be @theme-backed utilities (bg-cream, text-ink, etc.). Zero \[oklch\], \[var()\], or \[px\] bracket values for design tokens.
 - Open [**Always-dark surfaces need explicit dark-mode color fixups when using dual-purpose tokens**](../web/styling/practice-always-dark-surfaces-need-explicit-dark-mode-color-fixups-when-using-dual-purpos.md) — Tokens like --cream that flip in .dark break text on always-dark backgrounds. Add a scoped dark-mode rule to re-light them with --ink.
 - Open [**Dark mode requires both the foundational .dark token block and per-component fixups, both in tokens.css**](../web/styling/practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups.md) — Both the @theme token block and the .dark palette-swap must live in tokens.css. Deleting CSS files without relocating these blocks silently breaks dark mode.
+### #dependencies
+- Open [**js-yaml stays in dependencies; frontend libraries do not**](practice-js-yaml-stays-in-dependencies.md) — dist/profiles.js loads js-yaml at runtime. SPA libraries are build-only because serve ships prebuilt assets.
 ### #eslint
 - Open [**lint-staged scopes lint/format but pre-commit still runs the full test suite**](../git/practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite.md) — lint-staged runs eslint+prettier on staged src files; the pre-commit hook still runs the full npm test suite after lint-staged completes.
 - Open [**ESLint config: eslint.config.mjs (flat config, ESLint 9)**](map-eslint-config-eslint-config-mjs-flat-config-eslint-9.md) — The active ESLint config is eslint.config.mjs (flat config, ESLint 9). A legacy .eslintrc.js at the repo root is dead cruft ignored by ESLint 9.
 - Open [**ESLint test block must include browser globals for page.evaluate callbacks**](../testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md) — Playwright e2e tests use page.evaluate with browser globals (location, URL, document); the ESLint test block must include browserGlobals to avoid no-undef errors.
 ### #lint
 - Open [**The required gate lints tsx and type-checks the web production code**](practice-npm-run-lint-only-covers-ts-files-tsx-web-files-need-separate-type-check.md) — npm run lint globs ts and tsx, and the web type check runs inside npm run build as typecheck:web, with the SPA suites checked by typecheck:web-tests.
+### #npm
+- Open [**Manual npm publish must be paired with a matching git tag to prevent semantic-release failure**](../release/practice-manual-npm-publish-must-be-paired-with-a-matching-git-tag-to-prevent-semantic-release-failure.md) — Without a matching vX.Y.Z tag, semantic-release on the next push tries the same version again and gets a 403 from npm.
+- Open [**Manual npm publish requires force-adding git-ignored skill artifacts into git**](../release/practice-manual-npm-publish-requires-force-adding-git-ignored-skill-artifacts-into-git.md) — When bypassing semantic-release, manually force-add SKILL.md and .cjs bundles into git before tagging, or npx skills add finds no skills.
+- Open [**Two-channel release: npm tarball vs GitHub git tree**](../release/practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime.md) — npm publish ships dist/ and dist-web/; npx skills add reads the tracked root skills/ tree from the GitHub git tree. skills/ is rebuilt only by @semantic-release/exec (npm run build:release-skills) and staged by @semantic-release/git.
 ### #prettier
 - Open [**lint-staged scopes lint/format but pre-commit still runs the full test suite**](../git/practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite.md) — lint-staged runs eslint+prettier on staged src files; the pre-commit hook still runs the full npm test suite after lint-staged completes.
 - Open [**src/web/vendor/ and dist-web/ are excluded from Prettier formatting**](practice-src-web-vendor-and-dist-web-are-excluded-from-prettier-formatting.md) — Vendored CSS under src/web/vendor/ must not be reformatted. Both src/web/vendor/ and dist-web/ are excluded via .prettierignore.

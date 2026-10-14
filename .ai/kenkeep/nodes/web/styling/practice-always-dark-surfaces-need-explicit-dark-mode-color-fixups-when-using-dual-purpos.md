@@ -35,5 +35,5 @@ The `--deep` background stays the same in both themes; only the text token needs
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups](/web/styling/practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups.md)
+- Related: [practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups](practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups.md)
 <!-- kk:related:end -->

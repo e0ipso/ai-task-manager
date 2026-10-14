@@ -30,12 +30,12 @@ The import direction is fixed: `src/serve/` and `src/validation/` may import `sr
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-parseblueprintphases-slices-blueprint-section-to-end-of-document](/serve/map-parseblueprintphases-slices-blueprint-section-to-end-of-document.md)
-- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](/serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
+- Related: [map-parseblueprintphases-slices-blueprint-section-to-end-of-document](map-parseblueprintphases-slices-blueprint-section-to-end-of-document.md)
+- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
 <!-- kk:related:end -->
 
 <!-- kk:citations:start -->
 # Citations
 
-[1] [ecba74ac-907e-4ecc-bb2b-60c89a695f4a:map:0](ecba74ac-907e-4ecc-bb2b-60c89a695f4a:map:0)
+[1] ecba74ac-907e-4ecc-bb2b-60c89a695f4a:map:0
 <!-- kk:citations:end -->

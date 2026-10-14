@@ -28,5 +28,5 @@ So there is nothing to run by hand for `.tsx` work: `npm run build` and `npm run
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite](/git/practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite.md)
+- Related: [practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite](../git/practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite.md)
 <!-- kk:related:end -->

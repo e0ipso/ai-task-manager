@@ -107,6 +107,22 @@ describe('CLI Integration', () => {
   });
 
   describe('init — Claude harness', () => {
+    it('initializes review disabled while keeping the shipped review mandate', async () => {
+      const result = executeCommand(`node "${cliPath}" init --harnesses claude`);
+      expect(result.exitCode).toBe(0);
+
+      const workspace = path.join(testDir, '.ai/strikethroo');
+      const config = load(
+        await fs.readFile(path.join(workspace, 'config/config.yaml'), 'utf8')
+      ) as {
+        code_review: { enabled: boolean };
+      };
+      expect(config.code_review?.enabled).toBe(false);
+      expect(
+        (await fs.readFile(path.join(workspace, 'config/hooks/CODE_REVIEW.md'), 'utf8')).trim()
+      ).not.toBe('');
+    });
+
     it('bootstraps .ai/strikethroo and copies Claude agents', async () => {
       const result = executeCommand(`node "${cliPath}" init --harnesses claude`);
       expect(result.exitCode).toBe(0);
@@ -616,6 +632,42 @@ process.exit(Number(process.env.NPX_EXIT_CODE || '0'));
       expect(await fs.readFile(target, 'utf8')).toBe(customized);
       expect(await fs.pathExists(path.join(testDir, 'npx-log.json'))).toBe(false);
     });
+
+    it.each([true, false])(
+      'protects review enabled=%s on noninteractive updates and resets only with --force',
+      async enabled => {
+        initWorkspace();
+        await writeFakeNpx(path.join(testDir, 'fake-bin'));
+        const configPath = path.join(testDir, '.ai/strikethroo/config/config.yaml');
+        const shipped = await fs.readFile(configPath, 'utf8');
+        const baseline = (await fs.readJson(metadataPath())).files['config/config.yaml'];
+
+        expect(runUpdate().exitCode).toBe(0);
+        expect(await fs.readFile(configPath, 'utf8')).toBe(shipped);
+        expect((load(shipped) as { code_review: { enabled: boolean } }).code_review.enabled).toBe(
+          false
+        );
+        await fs.remove(path.join(testDir, 'npx-log.json'));
+
+        const customized = `# Explicit local review preference\ncode_review:\n  enabled: ${enabled}\n`;
+        await fs.writeFile(configPath, customized, 'utf8');
+        const metadataBeforeConflict = await fs.readFile(metadataPath(), 'utf8');
+        for (let run = 0; run < 2; run += 1) {
+          const result = runUpdate();
+          expect(result.exitCode).toBe(1);
+          expect(result.stdout + result.stderr).toContain('config/config.yaml');
+          expect(await fs.readFile(configPath, 'utf8')).toBe(customized);
+          expect(await fs.readFile(metadataPath(), 'utf8')).toBe(metadataBeforeConflict);
+          expect(await fs.pathExists(path.join(testDir, 'npx-log.json'))).toBe(false);
+        }
+
+        expect(runUpdate('--force').exitCode).toBe(0);
+        expect(await fs.readFile(configPath, 'utf8')).toBe(shipped);
+        const metadata = await fs.readJson(metadataPath());
+        expect(metadata.files['config/config.yaml']).toBe(baseline);
+        expect(await fs.pathExists(path.join(testDir, 'npx-log.json'))).toBe(true);
+      }
+    );
 
     it('overwrites customized files when --force is explicit', async () => {
       initWorkspace('claude');

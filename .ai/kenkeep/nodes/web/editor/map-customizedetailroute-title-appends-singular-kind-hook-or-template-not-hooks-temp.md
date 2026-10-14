@@ -25,5 +25,5 @@ In `src/web/customize/CustomizeDetailRoute.tsx`, the page title is formatted as 
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r](/web/editor/map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r.md)
+- Related: [map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r](map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r.md)
 <!-- kk:related:end -->

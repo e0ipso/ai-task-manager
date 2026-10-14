@@ -36,7 +36,7 @@ Creates the shared `.ai/strikethroo/` directory (plans, archive, config, hooks, 
 
 **Missing or unusable metadata:** If `.ai/strikethroo/` already holds files but `.init-metadata.json` is missing, unparsable, or has no `files` map, Strikethroo has no record of what it wrote. Every existing file that differs from the incoming version is then a conflict, and the prompt says the file is not tracked. A file identical to the incoming version refreshes without a question. A file you keep stays untracked and is offered again on the next run.
 
-**Deleted files:** `init` and `update` restore a shipped file you deleted, including the optional `config/hooks/CODE_REVIEW.md`, `config/schemas/self-review-v2.xsd`, and `config/templates/UPDATE_NOTICE_TEMPLATE.md`. To keep the [code review gate](customization.html#code_review) off through a refresh, empty `CODE_REVIEW.md` instead of deleting it.
+**Deleted files:** `init` and `update` restore a shipped file you deleted, including the optional `config/hooks/CODE_REVIEW.md`, `config/schemas/self-review-v2.xsd`, and `config/templates/UPDATE_NOTICE_TEMPLATE.md`. The [code review gate](customization.html#code_review) defaults off: `code_review.enabled` must be explicitly `true` in `config/config.yaml`, or enabled and saved through Customize → Config’s **Enable code review** toggle. Missing settings also disable review in existing workspaces; restoring a hook alone never enables it. Ordinary refreshes preserve an edited true or false preference when you keep the configuration. Explicit overwrite or `--force` replaces it with the incoming configuration, whose shipped default is false.
 
 **Examples:**
 

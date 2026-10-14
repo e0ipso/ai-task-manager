@@ -30,6 +30,6 @@ Hand-author a fixed-size HTML/CSS card against the Dalia token system, then scre
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency](/web/styling/map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency.md)
-- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](/web/styling/map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
+- Related: [map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency](../styling/map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency.md)
+- Related: [map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles](../styling/map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles.md)
 <!-- kk:related:end -->

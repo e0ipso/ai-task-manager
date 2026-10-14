@@ -21,5 +21,5 @@ kk_confidence: medium
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-releaserc-json-repositoryurl-must-match-current-github-repo-slug](/release/map-releaserc-json-repositoryurl-must-match-current-github-repo-slug.md)
+- Related: [map-releaserc-json-repositoryurl-must-match-current-github-repo-slug](map-releaserc-json-repositoryurl-must-match-current-github-repo-slug.md)
 <!-- kk:related:end -->

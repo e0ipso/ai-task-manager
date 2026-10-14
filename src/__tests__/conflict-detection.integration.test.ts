@@ -14,8 +14,9 @@ import { spawnSync } from 'child_process';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
+import { load } from 'js-yaml';
 import { init } from '../index';
-import { update } from '../update';
+import { update, buildSkillsInstallerArgs } from '../update';
 import { loadMetadata, saveMetadata, calculateFileHash } from '../metadata';
 import { promptForConflicts } from '../prompts';
 import { metadataGate } from '../validation/metadata-gate';
@@ -420,7 +421,77 @@ describe('Workspace refresh outcomes', () => {
     consoleErrorSpy.mockRestore();
     promptMock.mockReset();
     promptMock.mockResolvedValue(new Map());
+    vi.unstubAllEnvs();
   });
+
+  it.each([
+    { command: 'init', enabled: true },
+    { command: 'init', enabled: false },
+    { command: 'update', enabled: true },
+    { command: 'update', enabled: false },
+  ])(
+    'preserves review enabled=$enabled through kept $command refreshes until overwrite',
+    async ({ command, enabled }) => {
+      const configRel = 'config/config.yaml';
+      const configPath = path.join(workspace, configRel);
+      const shipped = await shippedContent(configRel);
+      const baseline = (await loadMetadata(metadataPath))!.files[configRel];
+      const customized = `# Explicit local review preference\ncode_review:\n  enabled: ${enabled}\n`;
+      await fs.writeFile(configPath, customized, 'utf8');
+
+      const installerLog = path.join(sandbox, 'installer-log.jsonl');
+      if (command === 'update') {
+        const fakeBin = path.join(sandbox, 'fake-bin');
+        await fs.ensureDir(fakeBin);
+        await fs.writeFile(
+          path.join(fakeBin, 'npx'),
+          `#!${process.execPath}\nrequire('fs').appendFileSync(${JSON.stringify(installerLog)}, JSON.stringify({ argv: process.argv.slice(2), cwd: process.cwd() }) + '\\n');\n`,
+          { mode: 0o755 }
+        );
+        vi.stubEnv('PATH', `${fakeBin}${path.delimiter}${process.env.PATH ?? ''}`);
+      }
+      const refresh = () =>
+        command === 'update'
+          ? update({ destinationDirectory: project })
+          : init({ destinationDirectory: project });
+
+      answerEveryConflict('keep');
+      for (const run of [1, 2]) {
+        expect((await refresh()).success).toBe(true);
+        expect(promptMock).toHaveBeenCalledTimes(run);
+        expect(promptedPaths(run - 1)).toEqual([configRel]);
+        expect(promptMock.mock.calls[run - 1]![0][0]?.originalHash).toBe(baseline);
+        expect(await fs.readFile(configPath, 'utf8')).toBe(customized);
+        expect((await loadMetadata(metadataPath))!.files[configRel]).toBe(baseline);
+        expect(await calculateFileHash(configPath)).not.toBe(baseline);
+      }
+
+      answerEveryConflict('overwrite');
+      expect((await refresh()).success).toBe(true);
+      expect(promptMock).toHaveBeenCalledTimes(3);
+      expect(promptedPaths(2)).toEqual([configRel]);
+      expect(await fs.readFile(configPath, 'utf8')).toBe(shipped);
+      expect((load(shipped) as { code_review: { enabled: boolean } }).code_review.enabled).toBe(
+        false
+      );
+      expect((await loadMetadata(metadataPath))!.files[configRel]).toBe(
+        await calculateFileHash(configPath)
+      );
+
+      if (command === 'update') {
+        const calls = (await fs.readFile(installerLog, 'utf8'))
+          .trim()
+          .split('\n')
+          .map(line => JSON.parse(line));
+        expect(calls).toEqual(
+          Array.from({ length: 3 }, () => ({
+            argv: buildSkillsInstallerArgs(),
+            cwd: project,
+          }))
+        );
+      }
+    }
+  );
 
   it('keeps a customization across repeated refreshes and prompts for it every time', async () => {
     const hookPath = path.join(workspace, 'config/hooks/PRE_PLAN.md');

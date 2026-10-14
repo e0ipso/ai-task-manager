@@ -28,5 +28,5 @@ For active frontend development, use `npm run dev:web` (Vite HMR at localhost:51
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-hot-reload-dev-loop-requires-three-concurrent-processes](/dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md)
+- Related: [practice-hot-reload-dev-loop-requires-three-concurrent-processes](practice-hot-reload-dev-loop-requires-three-concurrent-processes.md)
 <!-- kk:related:end -->

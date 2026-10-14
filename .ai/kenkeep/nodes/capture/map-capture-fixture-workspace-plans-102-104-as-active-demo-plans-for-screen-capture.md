@@ -31,5 +31,5 @@ The fixture also contains archived plans across distinct months for Archive tabl
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-use-committed-fixture-workspaces-not-the-live-ai-strikethroo-tree](/testing/practice-use-committed-fixture-workspaces-not-the-live-ai-strikethroo-tree.md)
+- Related: [practice-use-committed-fixture-workspaces-not-the-live-ai-strikethroo-tree](../testing/practice-use-committed-fixture-workspaces-not-the-live-ai-strikethroo-tree.md)
 <!-- kk:related:end -->

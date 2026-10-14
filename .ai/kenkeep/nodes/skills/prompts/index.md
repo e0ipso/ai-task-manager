@@ -18,9 +18,9 @@ _None._
 ## By topic
 
 ### #build
+- Open [**Adding a skill means editing five registries**](../practice-adding-a-skill-touches-five-registries.md) — Template, SKILL_ENTRYPOINTS, plugin.json, STRIKETHROO_WORKFLOW_SKILLS, EXPECTED_SKILLS. The mirror test blocks it until release.
 - Open [**Use build-time composition to eliminate cross-skill prompt duplication**](practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md) — Shared procedural blocks in SKILL.md files must live as Handlebars partials under src/skill-prompts/_partials/, not copy-pasted per skill.
 - Open [**SPA source changes require npm run build:web before serve reflects them**](../../dev/practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them.md) — serve hosts the prebuilt dist-web/ bundle. SPA source changes are not visible until npm run build:web is run; a hard-refresh clears cached content-hashed chunks.
-- Open [**Avoid */ inside @theme CSS comments to prevent premature comment termination**](../../web/styling/practice-avoid-inside-theme-css-comments-to-prevent-premature-comment-termination.md) — A comment containing */ inside a Tailwind @theme block terminates the comment early, producing a cryptic parse error that halts the build.
 ### #skill-prompts
 - Open [**Skill-prompt build system — src/skill-prompts/ Handlebars source, assembler, shared partials**](map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content.md) — src/skill-prompts/skills/<name>/SKILL.md.hbs plus _partials/ are authored source; build-skill-prompts.cjs compiles them with Handlebars into dist-test/<name>/SKILL.md.
 - Open [**Use build-time composition to eliminate cross-skill prompt duplication**](practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md) — Shared procedural blocks in SKILL.md files must live as Handlebars partials under src/skill-prompts/_partials/, not copy-pasted per skill.

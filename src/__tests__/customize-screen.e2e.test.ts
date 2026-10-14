@@ -235,6 +235,83 @@ test.describe('Customize section (Playwright, fixture)', () => {
     expect(exposed).not.toContain(capability);
   });
 
+  test('Config tab: code review opt-in saves, reloads, and reconciles disk edits', async ({
+    page,
+  }) => {
+    page.setDefaultTimeout(15_000);
+    const configPath = path.join(root, 'config', 'config.yaml');
+    const config = (review?: boolean) =>
+      'other_feature: { retained: true }\n' +
+      'execution_routing:\n  enabled: false\n  allow_external_harness_execution: false\n  profiles: {}\n' +
+      (review === undefined ? '' : `code_review:\n  enabled: ${review}\n`);
+    fs.writeFileSync(configPath, config(), 'utf8');
+
+    const openConfig = async () => {
+      await page.goto(`${handle.url}/customize`, { waitUntil: 'domcontentloaded' });
+      await page.getByTestId('config-card').first().waitFor();
+      await page.getByRole('tab').nth(2).click();
+      await page.getByTestId('workspace-config-form').waitFor();
+    };
+    const reconcileDisk = async (content: string) => {
+      fs.writeFileSync(configPath, content, 'utf8');
+      // A previous atomic save replaced config.yaml's inode. Trigger the
+      // ordinary workspace revalidation through another watched file.
+      const hookPath = path.join(root, 'config', 'hooks', 'PRE_PLAN.md');
+      await writeAndRevalidate(page, hookPath, fs.readFileSync(hookPath, 'utf8') + '\n');
+    };
+    const review = page.getByRole('checkbox', { name: 'Enable code review', exact: true });
+    const status = page.getByTestId('workspace-config-status');
+    const conflict = page.getByTestId('config-disk-conflict');
+    const routing = page.getByRole('checkbox', { name: 'Enable execution routing', exact: true });
+
+    await openConfig();
+    await expect(review).not.toBeChecked();
+    await review.check();
+    await expect(status).toContainText('Unsaved changes');
+    await page.getByRole('button', { name: 'Save configuration' }).click();
+    await expect(status).toContainText('Saved');
+    expect(fs.readFileSync(configPath, 'utf8')).toContain('code_review:\n  enabled: true');
+    expect(fs.readFileSync(configPath, 'utf8')).toContain('retained: true');
+    await expect(routing).not.toBeChecked();
+    await expect(page.getByTestId('allow-external-harness-execution')).not.toBeChecked();
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.getByTestId('config-card').first().waitFor();
+    await page.getByRole('tab').nth(2).click();
+    await expect(review).toBeChecked();
+    await review.uncheck();
+    await page.getByRole('button', { name: 'Save configuration' }).click();
+    await expect(status).toContainText('Saved');
+    expect(fs.readFileSync(configPath, 'utf8')).toContain('code_review:\n  enabled: false');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.getByTestId('config-card').first().waitFor();
+    await page.getByRole('tab').nth(2).click();
+    await expect(review).not.toBeChecked();
+
+    // A clean form adopts a direct edit of the same preference.
+    await reconcileDisk(config(true));
+    await expect(review).toBeChecked();
+    await expect(conflict).toHaveCount(0);
+
+    // A review-only draft stays unsaved while an unrelated disk edit arrives.
+    await review.uncheck();
+    await expect(status).toContainText('Unsaved changes');
+    await reconcileDisk(config(true) + 'external_feature: disk\n');
+    await expect(conflict).toBeVisible();
+    await expect(review).not.toBeChecked();
+    await page.getByRole('button', { name: 'Load disk version' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Discard and load' }).click();
+    await expect(review).toBeChecked();
+    await expect(conflict).toHaveCount(0);
+    await expect(status).not.toContainText('Unsaved changes');
+
+    // Revalidation also adopts a direct disable and a legacy missing setting.
+    await reconcileDisk(config(false));
+    await expect(review).not.toBeChecked();
+    await reconcileDisk(config());
+    await expect(review).not.toBeChecked();
+  });
+
   test('Config tab: the routing form populates config.yaml and preserves foreign sections', async ({
     page,
   }) => {
@@ -267,7 +344,7 @@ test.describe('Customize section (Playwright, fixture)', () => {
     });
     await expect(externalExecution).not.toBeChecked();
     await expect(externalExecution).toHaveAccessibleDescription(
-      /code review gate still uses a second harness/i
+      /code review has its own opt-in above and uses a second harness when enabled/i
     );
     await externalExecution.check();
 

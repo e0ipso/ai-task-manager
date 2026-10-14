@@ -39,6 +39,8 @@ export const REAL_XSD_PATH = REAL_XSD_SOURCE;
 export const FAKE_SHA = 'a'.repeat(40);
 
 export interface ReviewGateWorkspaceOptions {
+  /** Review scenarios opt in by default; `'absent'` skips config, otherwise write literal YAML. */
+  config?: string;
   /** `'default'` copies the real shipped hook; `'absent'` skips the file; a string is literal content. */
   hook?: 'default' | 'absent' | string;
   /** `'default'` copies the real vendored XSD; `'absent'` skips the file. */
@@ -58,6 +60,7 @@ export interface ReviewGateWorkspace {
   hookFile: string;
   xsdFile: string;
   baseCommitFile: string;
+  configFile: string;
   cleanup: () => void;
 }
 
@@ -77,6 +80,10 @@ export const makeReviewGateWorkspace = (
   fs.mkdirSync(planDir, { recursive: true });
   fs.mkdirSync(path.join(strikethrooRoot, 'config', 'hooks'), { recursive: true });
   fs.mkdirSync(path.join(strikethrooRoot, 'config', 'schemas'), { recursive: true });
+
+  const configFile = path.join(strikethrooRoot, 'config', 'config.yaml');
+  const config = options.config ?? 'code_review:\n  enabled: true\n';
+  if (config !== 'absent') fs.writeFileSync(configFile, config);
 
   fs.writeFileSync(
     path.join(strikethrooRoot, '.init-metadata.json'),
@@ -126,6 +133,7 @@ export const makeReviewGateWorkspace = (
     hookFile,
     xsdFile,
     baseCommitFile,
+    configFile,
     cleanup: () => fs.rmSync(root, { recursive: true, force: true }),
   };
 };

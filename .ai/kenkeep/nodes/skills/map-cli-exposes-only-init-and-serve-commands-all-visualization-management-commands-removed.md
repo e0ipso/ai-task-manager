@@ -23,5 +23,5 @@ There is no CLI visualization/management surface — plan inspection and managem
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-skills-are-auto-loaded-by-intent-matching-not-slash-command-prefix](/skills/map-skills-are-auto-loaded-by-intent-matching-not-slash-command-prefix.md)
+- Related: [map-skills-are-auto-loaded-by-intent-matching-not-slash-command-prefix](map-skills-are-auto-loaded-by-intent-matching-not-slash-command-prefix.md)
 <!-- kk:related:end -->

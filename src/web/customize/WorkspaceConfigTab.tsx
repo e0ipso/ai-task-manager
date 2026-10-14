@@ -6,8 +6,8 @@
  * every configurable feature claims one top-level section in it instead of
  * shipping its own YAML file. This tab is the web app's UI for setting that
  * file up: it frames the whole file, and renders one form section per feature
- * section it understands (`harnesses` and `execution_routing`). Populating the
- * form is a manual process; the form serializes back through the single
+ * section it understands (`harnesses`, `execution_routing`, and `code_review`).
+ * Populating the form is a manual process; it serializes through the single
  * {@link parseWorkspaceConfig}/{@link serializeWorkspaceConfig} boundary,
  * which preserves foreign top-level sections structurally (comments are not
  * preserved — the file header and this UI both say so).
@@ -45,6 +45,7 @@ import {
   serializeWorkspaceConfig,
   validateHarnessForm,
   validateRoutingForm,
+  type CodeReviewForm,
   type HarnessArgsEntry,
   type HarnessArgsForm,
   type RoutingForm,
@@ -66,10 +67,11 @@ const ROW_BUTTON =
 
 const EMPTY_TARGET: RoutingTargetForm = { model: '', harness: '', reasoningEffort: '' };
 
-/** Both managed sections of config.yaml, edited as one form. */
+/** Managed sections of config.yaml, edited as one form. */
 interface ConfigFormModel {
   harnesses: HarnessArgsForm;
   routing: RoutingForm;
+  codeReview: CodeReviewForm;
 }
 
 /** The form's draft: the managed sections plus the document they are written into. */
@@ -81,7 +83,12 @@ interface ConfigDraft {
 
 /** Serialized YAML is the comparison key for drafts, baseline, and disk. */
 const keyOf = (draft: ConfigDraft): string =>
-  serializeWorkspaceConfig(draft.document, draft.model.harnesses, draft.model.routing);
+  serializeWorkspaceConfig(
+    draft.document,
+    draft.model.harnesses,
+    draft.model.routing,
+    draft.model.codeReview
+  );
 
 type DiskView =
   | { kind: 'parsed'; disk: DiskContent<ConfigDraft, string> }
@@ -92,7 +99,7 @@ const viewDisk = (content: string): DiskView => {
   const parsed = parseWorkspaceConfig(content);
   if (parsed.kind === 'unsupported') return parsed;
   const draft: ConfigDraft = {
-    model: { harnesses: parsed.harnesses, routing: parsed.routing },
+    model: { harnesses: parsed.harnesses, routing: parsed.routing, codeReview: parsed.codeReview },
     document: parsed.document,
   };
   return { kind: 'parsed', disk: { key: keyOf(draft), adopt: () => draft } };
@@ -434,7 +441,7 @@ function ConfigForm({ file, readError }: { file: ConfigFile; readError?: Error }
   }
 
   const { dirty, conflictVisible } = flags;
-  const { harnesses, routing } = model;
+  const { harnesses, routing, codeReview } = model;
 
   // Ordered by what the user must know first. A `saved` phase with a dirty
   // draft means edits were made while the save was in flight.
@@ -498,6 +505,28 @@ function ConfigForm({ file, readError }: { file: ConfigFile; readError?: Error }
         </section>
 
         <section className="flex flex-col gap-3">
+          <h2 className="font-display text-lg font-semibold text-ink">Code review</h2>
+          <label className="flex items-center gap-2 font-sans text-sm text-ink">
+            <input
+              type="checkbox"
+              className="size-4 accent-ink"
+              aria-describedby="code-review-help"
+              checked={codeReview.enabled}
+              onChange={e => update({ ...model, codeReview: { enabled: e.target.checked } })}
+            />
+            <span className="font-medium">Enable code review</span>
+          </label>
+          <p
+            id="code-review-help"
+            className="max-w-3xl font-sans text-sm leading-relaxed text-ink-2"
+          >
+            Off by default, including when this setting is absent from config.yaml. Turn it on to
+            request a report-only review on a second harness after execution. The CODE_REVIEW.md
+            hook supplies the review instructions and must also be present and nonempty.
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-3">
           <h2 className="font-display text-lg font-semibold text-ink">Execution routing</h2>
           <label className="flex items-center gap-2 font-sans text-sm text-ink">
             <input
@@ -549,8 +578,8 @@ function ConfigForm({ file, readError }: { file: ConfigFile; readError?: Error }
               using the orchestrator&apos;s harness are eligible, including targets with no harness
               specified. If none remain in the selected profile, tasks use the current
               harness&apos;s default model and reasoning. Turn this on to also allow targets on
-              other harnesses. This applies to custom selectors too. The code review gate still uses
-              a second harness.
+              other harnesses. This applies to custom selectors too. Code review has its own opt-in
+              above and uses a second harness when enabled.
             </p>
             {routing.profiles.map((profile, index) => (
               <ProfileCard

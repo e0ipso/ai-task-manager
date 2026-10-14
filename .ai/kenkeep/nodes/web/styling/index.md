@@ -52,9 +52,9 @@ _None._
 ### #app-shell
 - Open [**Apply sticky positioning to .sb sidebar to keep footer visible on all pages**](practice-apply-sticky-positioning-to-sb-sidebar-to-keep-footer-visible-on-all-pages.md) — Without sticky+100vh, .sb stretches to content height in the grid; its footer disappears below the fold on long plans.
 ### #build
+- Open [**Adding a skill means editing five registries**](../../skills/practice-adding-a-skill-touches-five-registries.md) — Template, SKILL_ENTRYPOINTS, plugin.json, STRIKETHROO_WORKFLOW_SKILLS, EXPECTED_SKILLS. The mirror test blocks it until release.
 - Open [**Use build-time composition to eliminate cross-skill prompt duplication**](../../skills/prompts/practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication.md) — Shared procedural blocks in SKILL.md files must live as Handlebars partials under src/skill-prompts/_partials/, not copy-pasted per skill.
 - Open [**SPA source changes require npm run build:web before serve reflects them**](../../dev/practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them.md) — serve hosts the prebuilt dist-web/ bundle. SPA source changes are not visible until npm run build:web is run; a hard-refresh clears cached content-hashed chunks.
-- Open [**Avoid */ inside @theme CSS comments to prevent premature comment termination**](practice-avoid-inside-theme-css-comments-to-prevent-premature-comment-termination.md) — A comment containing */ inside a Tailwind @theme block terminates the comment early, producing a cryptic parse error that halts the build.
 ### #comments
 - Open [**Avoid */ inside @theme CSS comments to prevent premature comment termination**](practice-avoid-inside-theme-css-comments-to-prevent-premature-comment-termination.md) — A comment containing */ inside a Tailwind @theme block terminates the comment early, producing a cryptic parse error that halts the build.
 - Open [**Keep comment prose terse and single-sourced**](../../practice-keep-comment-prose-terse-and-single-sourced.md) — Do not write long doc comments or repeat the same rationale across call sites and file copies. State it once where it belongs.

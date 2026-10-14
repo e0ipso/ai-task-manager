@@ -30,5 +30,5 @@ The rule was stated when the Task Detail screen was found using a one-off `<div 
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-mermaiderror-tsx-shared-mermaid-render-error-component](/web/rendering/map-mermaiderror-tsx-shared-mermaid-render-error-component.md)
+- Related: [map-mermaiderror-tsx-shared-mermaid-render-error-component](map-mermaiderror-tsx-shared-mermaid-render-error-component.md)
 <!-- kk:related:end -->
