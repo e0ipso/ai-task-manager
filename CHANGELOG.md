@@ -1,3 +1,9 @@
+## [4.2.0](https://github.com/e0ipso/strikethroo/compare/v4.1.1...v4.2.0) (2026-10-14)
+
+### Features
+
+* require explicit code review opt-in ([#119](https://github.com/e0ipso/strikethroo/issues/119)) ([01c60aa](https://github.com/e0ipso/strikethroo/commit/01c60aafddf5d4f94289146048a79e7fc7788fee)), closes [#117](https://github.com/e0ipso/strikethroo/issues/117)
+
 ## [4.1.1](https://github.com/e0ipso/strikethroo/compare/v4.1.0...v4.1.1) (2026-10-08)
 
 ### Bug Fixes

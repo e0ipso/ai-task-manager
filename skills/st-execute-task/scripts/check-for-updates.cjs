@@ -2086,11 +2086,14 @@ var checkWorkspaceSchema = (strikethrooRoot) => {
   }
   process.exit(1);
 };
-var findStrikethrooRoot = (startPath = process.cwd()) => {
+var discoverStrikethrooRoot = (startPath = process.cwd()) => {
   const paths = getParentPaths(startPath);
   const found = paths.find((p) => getStrikethrooAt(p));
   if (!found) return null;
-  const root = getStrikethrooAt(found);
+  return getStrikethrooAt(found);
+};
+var findStrikethrooRoot = (startPath = process.cwd()) => {
+  const root = discoverStrikethrooRoot(startPath);
   if (root) checkWorkspaceSchema(root);
   return root;
 };
@@ -2253,7 +2256,7 @@ var writeFileAtomicSync = (root, input, content, options = {}) => {
 };
 
 // src/skill-scripts/shared/update-check.ts
-var DEFAULT_SKILL_VERSION = true ? "4.1.1" : (() => {
+var DEFAULT_SKILL_VERSION = true ? "4.2.0" : (() => {
   try {
     return null.version;
   } catch {

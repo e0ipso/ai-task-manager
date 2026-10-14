@@ -89,11 +89,14 @@ var checkWorkspaceSchema = (strikethrooRoot) => {
   }
   process.exit(1);
 };
-var findStrikethrooRoot = (startPath = process.cwd()) => {
+var discoverStrikethrooRoot = (startPath = process.cwd()) => {
   const paths = getParentPaths(startPath);
   const found = paths.find((p) => getStrikethrooAt(p));
   if (!found) return null;
-  const root = getStrikethrooAt(found);
+  return getStrikethrooAt(found);
+};
+var findStrikethrooRoot = (startPath = process.cwd()) => {
+  const root = discoverStrikethrooRoot(startPath);
   if (root) checkWorkspaceSchema(root);
   return root;
 };
@@ -202,11 +205,11 @@ var checkStandardRootShortcut = (filePath) => {
   if (path3.basename(dotAiDir) !== ".ai") return null;
   return isValidRootDir(possibleRoot) ? possibleRoot : null;
 };
+var discoverRootForPlanFile = (planFile) => checkStandardRootShortcut(planFile) ?? discoverStrikethrooRoot(path3.dirname(planFile));
 var locateRootForPlanFile = (planFile) => {
-  const shortcut = checkStandardRootShortcut(planFile);
-  if (!shortcut) return findStrikethrooRoot(path3.dirname(planFile));
-  checkWorkspaceSchema(shortcut);
-  return shortcut;
+  const root = discoverRootForPlanFile(planFile);
+  if (root) checkWorkspaceSchema(root);
+  return root;
 };
 var resolveByPath = (absolutePath) => {
   let content;

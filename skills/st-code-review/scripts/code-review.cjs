@@ -47,8 +47,8 @@ __export(code_review_exports, {
 });
 module.exports = __toCommonJS(code_review_exports);
 var crypto = __toESM(require("crypto"));
-var fs7 = __toESM(require("fs"));
-var path8 = __toESM(require("path"));
+var fs8 = __toESM(require("fs"));
+var path9 = __toESM(require("path"));
 
 // src/types.ts
 var SUPPORTED_HARNESSES = [
@@ -142,182 +142,17 @@ var checkWorkspaceSchema = (strikethrooRoot) => {
   }
   process.exit(1);
 };
-var findStrikethrooRoot = (startPath = process.cwd()) => {
+var discoverStrikethrooRoot = (startPath = process.cwd()) => {
   const paths = getParentPaths(startPath);
   const found = paths.find((p) => getStrikethrooAt(p));
   if (!found) return null;
-  const root = getStrikethrooAt(found);
+  return getStrikethrooAt(found);
+};
+var findStrikethrooRoot = (startPath = process.cwd()) => {
+  const root = discoverStrikethrooRoot(startPath);
   if (root) checkWorkspaceSchema(root);
   return root;
 };
-
-// src/skill-scripts/shared/plan-resolve.ts
-var fs3 = __toESM(require("fs"));
-var path3 = __toESM(require("path"));
-
-// src/skill-scripts/shared/plan-scan.ts
-var fs2 = __toESM(require("fs"));
-var path2 = __toESM(require("path"));
-
-// src/skill-scripts/shared/frontmatter.ts
-var ID_PATTERNS = [
-  /^\s*["']?id["']?\s*:\s*["']?([+-]?\d+)["']?\s*(?:#.*)?$/im,
-  /^\s*id\s*:\s*([+-]?\d+)\s*(?:#.*)?$/im,
-  /^\s*["']?id["']?\s*:\s*"([+-]?\d+)"\s*(?:#.*)?$/im,
-  /^\s*["']?id["']?\s*:\s*'([+-]?\d+)'\s*(?:#.*)?$/im,
-  /^\s*["']id["']\s*:\s*([+-]?\d+)\s*(?:#.*)?$/im,
-  /^\s*id\s*:\s*[|>]\s*([+-]?\d+)\s*$/im
-];
-var validateId = (rawId) => {
-  const id = parseInt(rawId, 10);
-  if (Number.isNaN(id) || id < 0 || id > Number.MAX_SAFE_INTEGER) return null;
-  return id;
-};
-var extractIdFromMarkdown = (content) => {
-  const frontmatterMatch = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
-  if (!frontmatterMatch || !frontmatterMatch[1]) return null;
-  const block = frontmatterMatch[1];
-  for (const pattern of ID_PATTERNS) {
-    const match = block.match(pattern);
-    if (match && match[1]) {
-      const id = validateId(match[1]);
-      if (id !== null) return id;
-    }
-  }
-  return null;
-};
-var extractPlanId = (content, _filePath) => {
-  return extractIdFromMarkdown(content);
-};
-
-// src/skill-scripts/shared/plan-scan.ts
-var PLAN_EXTENSIONS = [".md"];
-var scanPlanDir = (planDirPath, dirName, isArchive) => {
-  let entries;
-  try {
-    entries = fs2.readdirSync(planDirPath, { withFileTypes: true });
-  } catch (_err) {
-    return [];
-  }
-  return entries.filter((e) => e.isFile() && PLAN_EXTENSIONS.some((ext) => e.name.endsWith(ext))).flatMap((e) => {
-    const filePath = path2.join(planDirPath, e.name);
-    try {
-      const content = fs2.readFileSync(filePath, "utf8");
-      const id = extractPlanId(content, filePath);
-      if (id === null) return [];
-      return [{ id, file: filePath, dir: planDirPath, isArchive, name: dirName }];
-    } catch (_err) {
-      return [];
-    }
-  });
-};
-var getAllPlans = (taskManagerRoot) => {
-  const sources = [
-    { dir: path2.join(taskManagerRoot, "plans"), isArchive: false },
-    { dir: path2.join(taskManagerRoot, "archive"), isArchive: true }
-  ];
-  return sources.flatMap(({ dir, isArchive }) => {
-    if (!fs2.existsSync(dir)) return [];
-    let entries;
-    try {
-      entries = fs2.readdirSync(dir, { withFileTypes: true });
-    } catch (_err) {
-      return [];
-    }
-    return entries.filter((e) => e.isDirectory()).flatMap((e) => scanPlanDir(path2.join(dir, e.name), e.name, isArchive));
-  });
-};
-
-// src/skill-scripts/shared/plan-resolve.ts
-var _classifyPlanInput = (input, isAbsolute2 = path3.isAbsolute) => {
-  if (input === null || input === void 0 || input === "") return { kind: "invalid" };
-  const candidate = String(input);
-  if (isAbsolute2(candidate)) return { kind: "path", planFile: candidate };
-  const planId = parseInt(candidate, 10);
-  return Number.isNaN(planId) ? { kind: "invalid" } : { kind: "id", planId };
-};
-var isValidRootDir = (strikethrooPath) => {
-  try {
-    if (!fs3.existsSync(strikethrooPath)) return false;
-    if (!fs3.lstatSync(strikethrooPath).isDirectory()) return false;
-    const metadataPath = path3.join(strikethrooPath, ".init-metadata.json");
-    if (!fs3.existsSync(metadataPath)) return false;
-    const metadata = JSON.parse(fs3.readFileSync(metadataPath, "utf8"));
-    return typeof metadata === "object" && metadata !== null;
-  } catch (_err) {
-    return false;
-  }
-};
-var checkStandardRootShortcut = (filePath) => {
-  const planDir = path3.dirname(filePath);
-  const parentDir = path3.dirname(planDir);
-  const possibleRoot = path3.dirname(parentDir);
-  const parentBase = path3.basename(parentDir);
-  if (parentBase !== "plans" && parentBase !== "archive") return null;
-  if (path3.basename(possibleRoot) !== "strikethroo") return null;
-  const dotAiDir = path3.dirname(possibleRoot);
-  if (path3.basename(dotAiDir) !== ".ai") return null;
-  return isValidRootDir(possibleRoot) ? possibleRoot : null;
-};
-var locateRootForPlanFile = (planFile) => {
-  const shortcut = checkStandardRootShortcut(planFile);
-  if (!shortcut) return findStrikethrooRoot(path3.dirname(planFile));
-  checkWorkspaceSchema(shortcut);
-  return shortcut;
-};
-var resolveByPath = (absolutePath) => {
-  let content;
-  try {
-    content = fs3.readFileSync(absolutePath, "utf8");
-  } catch (_err) {
-    return null;
-  }
-  const planId = extractPlanId(content, absolutePath);
-  if (planId === null) return null;
-  const tmRoot = locateRootForPlanFile(absolutePath);
-  if (!tmRoot) return null;
-  return {
-    planFile: absolutePath,
-    planDir: path3.dirname(absolutePath),
-    strikethrooRoot: tmRoot,
-    planId
-  };
-};
-var resolveById = (planId, startPath) => {
-  const tmRoot = findStrikethrooRoot(startPath);
-  if (!tmRoot) return null;
-  const match = getAllPlans(tmRoot).find((p) => p.id === planId);
-  if (!match) return null;
-  return {
-    planFile: match.file,
-    planDir: match.dir,
-    strikethrooRoot: tmRoot,
-    planId
-  };
-};
-var resolvePlan = (input, startPath = process.cwd()) => {
-  const classified = _classifyPlanInput(input);
-  switch (classified.kind) {
-    case "path":
-      return resolveByPath(classified.planFile);
-    case "id":
-      return resolveById(classified.planId, startPath);
-    case "invalid":
-      return null;
-  }
-};
-
-// src/skill-scripts/shared/harness-availability.ts
-var import_crypto2 = require("crypto");
-var import_child_process3 = require("child_process");
-var fs6 = __toESM(require("fs"));
-var os = __toESM(require("os"));
-var path7 = __toESM(require("path"));
-
-// src/skill-scripts/shared/harness-configuration.ts
-var import_crypto = require("crypto");
-var fs4 = __toESM(require("fs"));
-var path5 = __toESM(require("path"));
 
 // node_modules/js-yaml/dist/js-yaml.mjs
 var NOT_RESOLVED = /* @__PURE__ */ Symbol("NOT_RESOLVED");
@@ -2779,7 +2614,7 @@ var CHOMPING_STRIP = CHOMPING_MODE.STRIP;
 var CHOMPING_KEEP = CHOMPING_MODE.KEEP;
 
 // src/skill-scripts/shared/execution-routing.ts
-var path4 = __toESM(require("path"));
+var path2 = __toESM(require("path"));
 
 // src/skill-scripts/shared/task-frontmatter.ts
 var MAX_FRONTMATTER_BYTES = 64 * 1024;
@@ -2789,12 +2624,336 @@ var hasYamlContent = (block) => block.split(/\r?\n/).some((line) => {
 });
 
 // src/skill-scripts/shared/execution-routing.ts
-var WORKSPACE_CONFIG_RELPATH = path4.join("config", "config.yaml");
+var WORKSPACE_CONFIG_RELPATH = path2.join("config", "config.yaml");
+
+// src/skill-scripts/shared/safe-fs.ts
+var fs2 = __toESM(require("fs"));
+var path3 = __toESM(require("path"));
+var DEFAULT_MAX_READ_BYTES = 8 * 1024 * 1024;
+var fail = (error, message) => ({ error, message });
+var errno = (err) => typeof err === "object" && err !== null && "code" in err ? String(err.code) : void 0;
+var canonicalRootOf = (root) => {
+  try {
+    return fs2.realpathSync.native(path3.resolve(root));
+  } catch {
+    return fail("not-found", "Workspace root does not exist.");
+  }
+};
+var resolveContained = (root, input, options = {}) => {
+  if (typeof input !== "string" || input.includes("\0")) {
+    return fail("invalid-path", "Path is not valid.");
+  }
+  const givenRoot = path3.resolve(root);
+  const canonicalRoot = canonicalRootOf(givenRoot);
+  if (typeof canonicalRoot !== "string") return canonicalRoot;
+  const rel = path3.isAbsolute(input) ? path3.relative(givenRoot, input) : input;
+  const target = path3.resolve(canonicalRoot, rel);
+  const relative2 = path3.relative(canonicalRoot, target);
+  if (path3.isAbsolute(relative2) || relative2 === ".." || relative2.startsWith(`..${path3.sep}`) || relative2.includes("\0")) {
+    return fail("outside-root", "Path is outside the workspace root.");
+  }
+  const kind = options.expect ?? "file";
+  const parts = relative2 === "" ? [] : relative2.split(path3.sep);
+  let current = canonicalRoot;
+  let stats;
+  try {
+    stats = fs2.lstatSync(canonicalRoot);
+  } catch {
+    return fail("fs-error", "Could not inspect path.");
+  }
+  for (let i = 0; i < parts.length; i += 1) {
+    const isLeaf = i === parts.length - 1;
+    current = path3.join(current, parts[i]);
+    try {
+      stats = fs2.lstatSync(current);
+    } catch (err) {
+      const code = errno(err);
+      if (code === "ENOENT" || code === "ENOTDIR") {
+        if (isLeaf && options.allowMissingLeaf) {
+          return { path: current, relative: relative2, exists: false };
+        }
+        return fail("not-found", "Path does not exist.");
+      }
+      return fail("fs-error", "Could not inspect path.");
+    }
+    if (stats.isSymbolicLink()) {
+      return fail("symlink", "Symbolic links inside the workspace are not allowed.");
+    }
+    if (!isLeaf && !stats.isDirectory()) {
+      return fail("not-a-directory", "A path component is not a directory.");
+    }
+  }
+  if (kind === "directory" && !stats.isDirectory()) {
+    return fail("not-a-directory", "Path is not a directory.");
+  }
+  if (kind === "file" && !stats.isFile()) {
+    return fail("not-a-file", "Path is not a regular file.");
+  }
+  return { path: current, relative: relative2, exists: true, stats };
+};
+var readContainedFile = (root, input, options = {}) => {
+  const resolved = resolveContained(root, input);
+  if ("error" in resolved) return resolved;
+  const maxBytes = options.maxBytes ?? DEFAULT_MAX_READ_BYTES;
+  const { O_RDONLY, O_NOFOLLOW, O_NONBLOCK } = fs2.constants;
+  const flags = (O_RDONLY ?? 0) | (O_NOFOLLOW ?? 0) | (O_NONBLOCK ?? 0);
+  let fd;
+  try {
+    fd = fs2.openSync(resolved.path, flags);
+  } catch (err) {
+    const code = errno(err);
+    if (code === "ELOOP")
+      return fail("symlink", "Symbolic links inside the workspace are not allowed.");
+    if (code === "ENOENT") return fail("not-found", "Path does not exist.");
+    return fail("fs-error", "Could not open file.");
+  }
+  try {
+    const opened = fs2.fstatSync(fd);
+    if (!opened.isFile()) return fail("not-a-file", "Path is not a regular file.");
+    if (O_NOFOLLOW === void 0 && resolved.stats) {
+      if (opened.dev !== resolved.stats.dev || opened.ino !== resolved.stats.ino) {
+        return fail("symlink", "Path changed between inspection and open.");
+      }
+    }
+    if (opened.size > maxBytes) return fail("too-large", "File exceeds the size limit.");
+    const chunks = [];
+    let total = 0;
+    const chunk = Buffer.alloc(64 * 1024);
+    for (; ; ) {
+      const read = fs2.readSync(fd, chunk, 0, chunk.length, null);
+      if (read === 0) break;
+      total += read;
+      if (total > maxBytes) return fail("too-large", "File exceeds the size limit.");
+      chunks.push(Buffer.from(chunk.subarray(0, read)));
+    }
+    return { path: resolved.path, content: Buffer.concat(chunks, total).toString("utf8") };
+  } catch {
+    return fail("fs-error", "Could not read file.");
+  } finally {
+    fs2.closeSync(fd);
+  }
+};
+
+// src/skill-scripts/shared/code-review-configuration.ts
+var isPlainObject2 = (value) => {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
+var loadCodeReviewConfiguration = (strikethrooRoot) => {
+  const read = readContainedFile(strikethrooRoot, WORKSPACE_CONFIG_RELPATH);
+  if ("error" in read) {
+    if (read.error === "not-found") return { kind: "config", enabled: false };
+    return { kind: "invalid", detail: `config.yaml could not be read: ${read.message}` };
+  }
+  const contents = read.content;
+  if (!hasYamlContent(contents)) return { kind: "config", enabled: false };
+  let document;
+  try {
+    document = load(contents);
+  } catch (error) {
+    return {
+      kind: "invalid",
+      detail: `config.yaml is not valid YAML: ${error instanceof Error ? error.message : String(error)}`
+    };
+  }
+  if (!isPlainObject2(document)) {
+    return { kind: "invalid", detail: "config.yaml must be a YAML mapping." };
+  }
+  if (!Object.prototype.hasOwnProperty.call(document, "code_review")) {
+    return { kind: "config", enabled: false };
+  }
+  const section = document.code_review;
+  if (!isPlainObject2(section)) {
+    return { kind: "invalid", detail: "config.yaml code_review must be a YAML mapping." };
+  }
+  const unsupported = Object.keys(section).find((key) => key !== "enabled");
+  if (unsupported !== void 0) {
+    return { kind: "invalid", detail: `config.yaml code_review.${unsupported} is not supported.` };
+  }
+  if (!Object.prototype.hasOwnProperty.call(section, "enabled")) {
+    return { kind: "config", enabled: false };
+  }
+  if (typeof section.enabled !== "boolean") {
+    return { kind: "invalid", detail: "config.yaml code_review.enabled must be a boolean." };
+  }
+  return { kind: "config", enabled: section.enabled };
+};
+
+// src/skill-scripts/shared/plan-resolve.ts
+var fs4 = __toESM(require("fs"));
+var path5 = __toESM(require("path"));
+
+// src/skill-scripts/shared/plan-scan.ts
+var fs3 = __toESM(require("fs"));
+var path4 = __toESM(require("path"));
+
+// src/skill-scripts/shared/frontmatter.ts
+var ID_PATTERNS = [
+  /^\s*["']?id["']?\s*:\s*["']?([+-]?\d+)["']?\s*(?:#.*)?$/im,
+  /^\s*id\s*:\s*([+-]?\d+)\s*(?:#.*)?$/im,
+  /^\s*["']?id["']?\s*:\s*"([+-]?\d+)"\s*(?:#.*)?$/im,
+  /^\s*["']?id["']?\s*:\s*'([+-]?\d+)'\s*(?:#.*)?$/im,
+  /^\s*["']id["']\s*:\s*([+-]?\d+)\s*(?:#.*)?$/im,
+  /^\s*id\s*:\s*[|>]\s*([+-]?\d+)\s*$/im
+];
+var validateId = (rawId) => {
+  const id = parseInt(rawId, 10);
+  if (Number.isNaN(id) || id < 0 || id > Number.MAX_SAFE_INTEGER) return null;
+  return id;
+};
+var extractIdFromMarkdown = (content) => {
+  const frontmatterMatch = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
+  if (!frontmatterMatch || !frontmatterMatch[1]) return null;
+  const block = frontmatterMatch[1];
+  for (const pattern of ID_PATTERNS) {
+    const match = block.match(pattern);
+    if (match && match[1]) {
+      const id = validateId(match[1]);
+      if (id !== null) return id;
+    }
+  }
+  return null;
+};
+var extractPlanId = (content, _filePath) => {
+  return extractIdFromMarkdown(content);
+};
+
+// src/skill-scripts/shared/plan-scan.ts
+var PLAN_EXTENSIONS = [".md"];
+var scanPlanDir = (planDirPath, dirName, isArchive) => {
+  let entries;
+  try {
+    entries = fs3.readdirSync(planDirPath, { withFileTypes: true });
+  } catch (_err) {
+    return [];
+  }
+  return entries.filter((e) => e.isFile() && PLAN_EXTENSIONS.some((ext) => e.name.endsWith(ext))).flatMap((e) => {
+    const filePath = path4.join(planDirPath, e.name);
+    try {
+      const content = fs3.readFileSync(filePath, "utf8");
+      const id = extractPlanId(content, filePath);
+      if (id === null) return [];
+      return [{ id, file: filePath, dir: planDirPath, isArchive, name: dirName }];
+    } catch (_err) {
+      return [];
+    }
+  });
+};
+var getAllPlans = (taskManagerRoot) => {
+  const sources = [
+    { dir: path4.join(taskManagerRoot, "plans"), isArchive: false },
+    { dir: path4.join(taskManagerRoot, "archive"), isArchive: true }
+  ];
+  return sources.flatMap(({ dir, isArchive }) => {
+    if (!fs3.existsSync(dir)) return [];
+    let entries;
+    try {
+      entries = fs3.readdirSync(dir, { withFileTypes: true });
+    } catch (_err) {
+      return [];
+    }
+    return entries.filter((e) => e.isDirectory()).flatMap((e) => scanPlanDir(path4.join(dir, e.name), e.name, isArchive));
+  });
+};
+
+// src/skill-scripts/shared/plan-resolve.ts
+var _classifyPlanInput = (input, isAbsolute3 = path5.isAbsolute) => {
+  if (input === null || input === void 0 || input === "") return { kind: "invalid" };
+  const candidate = String(input);
+  if (isAbsolute3(candidate)) return { kind: "path", planFile: candidate };
+  const planId = parseInt(candidate, 10);
+  return Number.isNaN(planId) ? { kind: "invalid" } : { kind: "id", planId };
+};
+var isValidRootDir = (strikethrooPath) => {
+  try {
+    if (!fs4.existsSync(strikethrooPath)) return false;
+    if (!fs4.lstatSync(strikethrooPath).isDirectory()) return false;
+    const metadataPath = path5.join(strikethrooPath, ".init-metadata.json");
+    if (!fs4.existsSync(metadataPath)) return false;
+    const metadata = JSON.parse(fs4.readFileSync(metadataPath, "utf8"));
+    return typeof metadata === "object" && metadata !== null;
+  } catch (_err) {
+    return false;
+  }
+};
+var checkStandardRootShortcut = (filePath) => {
+  const planDir = path5.dirname(filePath);
+  const parentDir = path5.dirname(planDir);
+  const possibleRoot = path5.dirname(parentDir);
+  const parentBase = path5.basename(parentDir);
+  if (parentBase !== "plans" && parentBase !== "archive") return null;
+  if (path5.basename(possibleRoot) !== "strikethroo") return null;
+  const dotAiDir = path5.dirname(possibleRoot);
+  if (path5.basename(dotAiDir) !== ".ai") return null;
+  return isValidRootDir(possibleRoot) ? possibleRoot : null;
+};
+var discoverRootForPlanFile = (planFile) => checkStandardRootShortcut(planFile) ?? discoverStrikethrooRoot(path5.dirname(planFile));
+var locateRootForPlanFile = (planFile) => {
+  const root = discoverRootForPlanFile(planFile);
+  if (root) checkWorkspaceSchema(root);
+  return root;
+};
+var resolveByPath = (absolutePath) => {
+  let content;
+  try {
+    content = fs4.readFileSync(absolutePath, "utf8");
+  } catch (_err) {
+    return null;
+  }
+  const planId = extractPlanId(content, absolutePath);
+  if (planId === null) return null;
+  const tmRoot = locateRootForPlanFile(absolutePath);
+  if (!tmRoot) return null;
+  return {
+    planFile: absolutePath,
+    planDir: path5.dirname(absolutePath),
+    strikethrooRoot: tmRoot,
+    planId
+  };
+};
+var resolveById = (planId, startPath) => {
+  const tmRoot = findStrikethrooRoot(startPath);
+  if (!tmRoot) return null;
+  const match = getAllPlans(tmRoot).find((p) => p.id === planId);
+  if (!match) return null;
+  return {
+    planFile: match.file,
+    planDir: match.dir,
+    strikethrooRoot: tmRoot,
+    planId
+  };
+};
+var discoverPlanWorkspace = (input, startPath = process.cwd()) => {
+  const classified = _classifyPlanInput(input);
+  return classified.kind === "path" ? discoverRootForPlanFile(classified.planFile) : discoverStrikethrooRoot(startPath);
+};
+var resolvePlan = (input, startPath = process.cwd()) => {
+  const classified = _classifyPlanInput(input);
+  switch (classified.kind) {
+    case "path":
+      return resolveByPath(classified.planFile);
+    case "id":
+      return resolveById(classified.planId, startPath);
+    case "invalid":
+      return null;
+  }
+};
+
+// src/skill-scripts/shared/harness-availability.ts
+var import_crypto2 = require("crypto");
+var import_child_process3 = require("child_process");
+var fs7 = __toESM(require("fs"));
+var os = __toESM(require("os"));
+var path8 = __toESM(require("path"));
 
 // src/skill-scripts/shared/harness-configuration.ts
+var import_crypto = require("crypto");
+var fs5 = __toESM(require("fs"));
+var path6 = __toESM(require("path"));
 var HARNESS_CONFIGURATION_SECTION = "harnesses";
 var HARNESS_CONFIGURATION_NORMALIZATION_VERSION = 1;
-var isPlainObject2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
+var isPlainObject3 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var hashHarnessCliArgs = (harness, cliArgs, normalizationVersion = HARNESS_CONFIGURATION_NORMALIZATION_VERSION) => (0, import_crypto.createHash)("sha256").update(
   JSON.stringify({
     schema: normalizationVersion,
@@ -2817,7 +2976,7 @@ var emptyConfiguration = () => Object.freeze(
 );
 var validateHarnessEntry = (harness, raw, errors) => {
   const entryPath = `config.yaml ${HARNESS_CONFIGURATION_SECTION}.${harness}`;
-  if (!isPlainObject2(raw)) {
+  if (!isPlainObject3(raw)) {
     errors.push(`${entryPath} must be a mapping.`);
     return null;
   }
@@ -2845,10 +3004,10 @@ var validateHarnessEntry = (harness, raw, errors) => {
   return normalizeInvocation(harness, cliArgs);
 };
 var loadHarnessConfiguration = (strikethrooRoot) => {
-  const configPath = path5.join(strikethrooRoot, WORKSPACE_CONFIG_RELPATH);
+  const configPath = path6.join(strikethrooRoot, WORKSPACE_CONFIG_RELPATH);
   let contents;
   try {
-    contents = fs4.readFileSync(configPath, "utf8");
+    contents = fs5.readFileSync(configPath, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") {
       return { kind: "config", config: emptyConfiguration() };
@@ -2875,14 +3034,14 @@ var loadHarnessConfiguration = (strikethrooRoot) => {
   if (document === null || document === void 0) {
     return { kind: "config", config: emptyConfiguration() };
   }
-  if (!isPlainObject2(document)) {
+  if (!isPlainObject3(document)) {
     return { kind: "invalid", errors: ["config.yaml must be a YAML mapping."] };
   }
   const section = document[HARNESS_CONFIGURATION_SECTION];
   if (section === null || section === void 0) {
     return { kind: "config", config: emptyConfiguration() };
   }
-  if (!isPlainObject2(section)) {
+  if (!isPlainObject3(section)) {
     return {
       kind: "invalid",
       errors: [`config.yaml ${HARNESS_CONFIGURATION_SECTION} must be a YAML mapping.`]
@@ -2909,8 +3068,8 @@ var loadHarnessConfiguration = (strikethrooRoot) => {
 };
 
 // src/skill-scripts/shared/executable-resolution.ts
-var fs5 = __toESM(require("fs"));
-var path6 = __toESM(require("path"));
+var fs6 = __toESM(require("fs"));
+var path7 = __toESM(require("path"));
 var DEFAULT_PATHEXT = ".EXE;.CMD;.BAT;.COM";
 var hasPathSeparator = (executable) => /[\\/]/.test(executable);
 var resolveExecutablePath = (executable, environment = {}) => {
@@ -2918,14 +3077,14 @@ var resolveExecutablePath = (executable, environment = {}) => {
   const platform = environment.platform ?? process.platform;
   const win32 = platform === "win32";
   const suffixes = win32 ? ["", ...(env.PATHEXT ?? DEFAULT_PATHEXT).split(";").filter(Boolean)] : [""];
-  const directories = hasPathSeparator(executable) ? [""] : (env.PATH ?? "").split(path6.delimiter).filter(Boolean);
-  const mode = win32 ? fs5.constants.F_OK : fs5.constants.X_OK;
+  const directories = hasPathSeparator(executable) ? [""] : (env.PATH ?? "").split(path7.delimiter).filter(Boolean);
+  const mode = win32 ? fs6.constants.F_OK : fs6.constants.X_OK;
   for (const directory of directories) {
     for (const suffix of suffixes) {
-      const candidate = path6.resolve(directory, `${executable}${suffix}`);
+      const candidate = path7.resolve(directory, `${executable}${suffix}`);
       try {
-        fs5.accessSync(candidate, mode);
-        if (fs5.statSync(candidate).isFile()) return fs5.realpathSync(candidate);
+        fs6.accessSync(candidate, mode);
+        if (fs6.statSync(candidate).isFile()) return fs6.realpathSync(candidate);
       } catch {
       }
     }
@@ -3027,7 +3186,7 @@ var STDIO_SLOTS = {
   inherit: { stdout: "inherit" },
   capture: { stdout: "pipe" }
 };
-var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs) => new Promise((resolve4, reject) => {
+var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs) => new Promise((resolve5, reject) => {
   let settled = false;
   const child = (0, import_child_process2.spawn)(executable, argv, {
     cwd,
@@ -3042,15 +3201,15 @@ var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs
     if (settled) return;
     settled = true;
     child.kill("SIGKILL");
-    resolve4({ exitCode: 1, timedOut: true });
+    resolve5({ exitCode: 1, timedOut: true });
   }, timeoutMs);
   const settle = (outcome2) => {
     if (settled) return;
     settled = true;
     clearTimeout(timer);
-    resolve4(outcome2);
+    resolve5(outcome2);
   };
-  const fail = (error) => {
+  const fail2 = (error) => {
     if (settled) return;
     settled = true;
     clearTimeout(timer);
@@ -3059,7 +3218,7 @@ var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs
   let captured = "";
   if (outputMode === "capture") {
     child.stdout.setEncoding("utf8");
-    child.stdout.once("error", fail);
+    child.stdout.once("error", fail2);
     child.stdout.on("data", (chunk) => {
       process.stderr.write(chunk);
       captured += chunk;
@@ -3068,7 +3227,7 @@ var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs
       }
     });
   }
-  child.once("error", fail);
+  child.once("error", fail2);
   child.once("close", (code) => {
     settle({
       exitCode: code ?? 1,
@@ -3076,11 +3235,11 @@ var runProcess = (executable, argv, cwd, stdin, outputMode = "ignore", timeoutMs
     });
   });
   if (stdin !== void 0) {
-    child.stdin.once("error", fail);
+    child.stdin.once("error", fail2);
     try {
       child.stdin.end(stdin);
     } catch (error) {
-      fail(error instanceof Error ? error : new Error(String(error)));
+      fail2(error instanceof Error ? error : new Error(String(error)));
     }
   }
 });
@@ -3179,7 +3338,7 @@ var AVAILABILITY_REGISTRY_VERSION = 4;
 var AVAILABLE_TTL_MS = 30 * 60 * 1e3;
 var UNAVAILABLE_TTL_MS = 5 * 60 * 1e3;
 var PROBE_TIMEOUT_MS = 2e4;
-var AVAILABILITY_CACHE_RELATIVE_PATH = path7.join("runtime", "harness-availability.json");
+var AVAILABILITY_CACHE_RELATIVE_PATH = path8.join("runtime", "harness-availability.json");
 var CACHE_VERSION = 2;
 var availabilityDefinition = (harness) => {
   const adapter = EXTERNAL_HARNESS_ADAPTERS[harness];
@@ -3193,7 +3352,7 @@ var HARNESS_AVAILABILITY_REGISTRY = Object.freeze(
     SUPPORTED_HARNESSES.map((harness) => [harness, availabilityDefinition(harness)])
   )
 );
-var runProbe = (command2, timeoutMs) => new Promise((resolve4) => {
+var runProbe = (command2, timeoutMs) => new Promise((resolve5) => {
   let stdout = "";
   let stderr = "";
   let settled = false;
@@ -3201,7 +3360,7 @@ var runProbe = (command2, timeoutMs) => new Promise((resolve4) => {
   const finish = (result) => {
     if (settled) return;
     settled = true;
-    resolve4(result);
+    resolve5(result);
   };
   const child = (0, import_child_process3.spawn)(command2.executable, command2.argv, {
     cwd: command2.cwd,
@@ -3256,7 +3415,7 @@ var isCacheEntry = (value) => {
 var emptyCache = () => ({ version: CACHE_VERSION, entries: [] });
 var readCache = (cachePath) => {
   try {
-    const parsed = JSON.parse(fs6.readFileSync(cachePath, "utf8"));
+    const parsed = JSON.parse(fs7.readFileSync(cachePath, "utf8"));
     if (!parsed || typeof parsed !== "object") return emptyCache();
     const record = parsed;
     if (record.version !== CACHE_VERSION || !Array.isArray(record.entries)) return emptyCache();
@@ -3266,7 +3425,7 @@ var readCache = (cachePath) => {
   }
 };
 var writeCache = (cachePath, entry) => {
-  fs6.mkdirSync(path7.dirname(cachePath), { recursive: true });
+  fs7.mkdirSync(path8.dirname(cachePath), { recursive: true });
   const cache = readCache(cachePath);
   const existingIndex = cache.entries.findIndex((candidate) => candidate.key === entry.key);
   if (existingIndex === -1) cache.entries.push(entry);
@@ -3275,12 +3434,12 @@ var writeCache = (cachePath, entry) => {
   }
   const temporary = `${cachePath}.${process.pid}.${(0, import_crypto2.randomUUID)()}.tmp`;
   try {
-    fs6.writeFileSync(temporary, `${JSON.stringify(cache, null, 2)}
+    fs7.writeFileSync(temporary, `${JSON.stringify(cache, null, 2)}
 `, { mode: 384 });
-    fs6.renameSync(temporary, cachePath);
+    fs7.renameSync(temporary, cachePath);
   } finally {
     try {
-      fs6.unlinkSync(temporary);
+      fs7.unlinkSync(temporary);
     } catch {
     }
   }
@@ -3306,7 +3465,7 @@ var readinessPrompt = (evidence) => `Run a shell command that creates ${evidence
 STRIKETHROO_READINESS=${JSON.stringify(evidence)}
 `;
 var initializeProbeWorkspace = () => {
-  const workspace = fs6.mkdtempSync(path7.join(os.tmpdir(), "strikethroo-harness-probe-"));
+  const workspace = fs7.mkdtempSync(path8.join(os.tmpdir(), "strikethroo-harness-probe-"));
   const initialized = (0, import_child_process3.spawnSync)("git", ["init", "--quiet"], {
     cwd: workspace,
     shell: false,
@@ -3314,13 +3473,13 @@ var initializeProbeWorkspace = () => {
     timeout: 5e3
   });
   if (initialized.status === 0 && !initialized.error) return workspace;
-  fs6.rmSync(workspace, { recursive: true, force: true });
+  fs7.rmSync(workspace, { recursive: true, force: true });
   return void 0;
 };
 var hasReadinessEvidence = (workspace, evidence) => {
-  const target = path7.join(workspace, evidence.file);
+  const target = path8.join(workspace, evidence.file);
   try {
-    return fs6.lstatSync(target).isFile() && fs6.readFileSync(target, "utf8") === evidence.content;
+    return fs7.lstatSync(target).isFile() && fs7.readFileSync(target, "utf8") === evidence.content;
   } catch {
     return false;
   }
@@ -3364,7 +3523,7 @@ var checkHarnessAvailability = async (request, overrides = {}) => {
       `Harness executable '${definition.executable}' was not found on PATH.`
     );
   const key = cacheKey(harness, executableIdentity, invocation);
-  const cachePath = path7.join(request.strikethrooRoot, AVAILABILITY_CACHE_RELATIVE_PATH);
+  const cachePath = path8.join(request.strikethrooRoot, AVAILABILITY_CACHE_RELATIVE_PATH);
   const cached = readCache(cachePath).entries.find(
     (entry) => entry.key === key && entry.expiresAt > now
   );
@@ -3412,7 +3571,7 @@ var checkHarnessAvailability = async (request, overrides = {}) => {
       )
     );
   } finally {
-    fs6.rmSync(probeWorkspace, { recursive: true, force: true });
+    fs7.rmSync(probeWorkspace, { recursive: true, force: true });
   }
 };
 
@@ -3479,14 +3638,14 @@ var XMLLINT_TIMEOUT_MS = 3e4;
 var isSeverity = (value) => SEVERITIES.includes(value);
 var isConfidence = (value) => CONFIDENCES.includes(value);
 var OUTPUT_CAP = 2e3;
-var runXmllint = (args, timeoutMs) => new Promise((resolve4) => {
+var runXmllint = (args, timeoutMs) => new Promise((resolve5) => {
   let settled = false;
   let stdout = "";
   let stderr = "";
   const finish = (run2) => {
     if (settled) return;
     settled = true;
-    resolve4(run2);
+    resolve5(run2);
   };
   const capped = (current, chunk) => current.length < OUTPUT_CAP ? current + String(chunk).slice(0, OUTPUT_CAP - current.length) : current;
   const child = (0, import_child_process4.spawn)("xmllint", ["--nonet", ...args], {
@@ -3721,8 +3880,8 @@ var countFindings = (findings) => {
 };
 
 // src/skill-scripts/code-review.ts
-var HOOK_RELATIVE_PATH = path8.join("config", "hooks", "CODE_REVIEW.md");
-var XSD_RELATIVE_PATH = path8.join("config", "schemas", "self-review-v2.xsd");
+var HOOK_RELATIVE_PATH = path9.join("config", "hooks", "CODE_REVIEW.md");
+var XSD_RELATIVE_PATH = path9.join("config", "schemas", "self-review-v2.xsd");
 var REVIEW_DIR_NAME = "review";
 var BASE_COMMIT_FILE_NAME = "base-commit.json";
 var REVIEW_FILE_NAME = "review.xml";
@@ -3732,7 +3891,7 @@ var SHA_RE = /^[0-9a-f]{40}$/i;
 var errorMessage2 = (error) => error instanceof Error ? error.message : String(error);
 var readFileOrNull = (filePath) => {
   try {
-    return fs7.readFileSync(filePath, "utf8");
+    return fs8.readFileSync(filePath, "utf8");
   } catch {
     return null;
   }
@@ -3740,19 +3899,19 @@ var readFileOrNull = (filePath) => {
 var writeTranscript = (reviewDir, transcript) => {
   if (transcript === void 0 || transcript === "") return;
   try {
-    fs7.mkdirSync(reviewDir, { recursive: true });
-    fs7.writeFileSync(path8.join(reviewDir, TRANSCRIPT_FILE_NAME), transcript, "utf8");
+    fs8.mkdirSync(reviewDir, { recursive: true });
+    fs8.writeFileSync(path9.join(reviewDir, TRANSCRIPT_FILE_NAME), transcript, "utf8");
   } catch {
   }
 };
 var createFindingsGate = (options = {}) => async (context) => {
   const countComments = options.countComments ?? countCommentsWithXmllint;
-  const reviewDir = path8.dirname(context.reviewFile);
-  const findingsFile = path8.join(reviewDir, FINDINGS_FILE_NAME);
+  const reviewDir = path9.dirname(context.reviewFile);
+  const findingsFile = path9.join(reviewDir, FINDINGS_FILE_NAME);
   const record = (payload) => {
     try {
-      fs7.mkdirSync(reviewDir, { recursive: true });
-      fs7.writeFileSync(findingsFile, `${JSON.stringify(payload, null, 2)}
+      fs8.mkdirSync(reviewDir, { recursive: true });
+      fs8.writeFileSync(findingsFile, `${JSON.stringify(payload, null, 2)}
 `, "utf8");
     } catch (error) {
       throw new Error(
@@ -3768,8 +3927,8 @@ var createFindingsGate = (options = {}) => async (context) => {
     return { kind: "findings-absent", detail };
   }
   try {
-    fs7.mkdirSync(reviewDir, { recursive: true });
-    fs7.writeFileSync(
+    fs8.mkdirSync(reviewDir, { recursive: true });
+    fs8.writeFileSync(
       context.reviewFile,
       delivered.endsWith("\n") ? delivered : `${delivered}
 `,
@@ -3839,6 +3998,9 @@ var _classify = (outcome2) => {
   }
 };
 var reviewSummary = (outcome2) => {
+  if (outcome2.kind === "skipped" && outcome2.reason === "review-disabled") {
+    return `Skipped; ${outcome2.detail}`;
+  }
   const reviewer = "harness" in outcome2 ? `Harness: ${outcome2.harness}; model: CLI-selected (exact model unknown).` : "No reviewer performed a certified review.";
   if (outcome2.kind === "reviewed" && outcome2.verdict.kind === "review-recorded" && "counts" in outcome2) {
     return `${outcome2.counts.total === 0 ? "Pass" : "Address"}; ${reviewer} Findings: ${outcome2.counts.total}.`;
@@ -3950,7 +4112,7 @@ var defaultDependencies2 = {
   validatorAvailable: () => executableResolves("xmllint")
 };
 var readReviewerSkill = () => {
-  const skillFile = path8.resolve(__dirname, "..", "SKILL.md");
+  const skillFile = path9.resolve(__dirname, "..", "SKILL.md");
   const content = readFileOrNull(skillFile);
   return content === null ? "Load the `st-code-review` skill and follow its Operating Procedure. If that skill is not installed on this harness, follow the mandate below exactly." : content;
 };
@@ -4028,18 +4190,35 @@ ${input.diff}
   ""
 ].join("\n");
 var skip = (reason, detail) => decide({ kind: "skipped", reason, detail });
-var resolveReviewContext = (startPath, validatorAvailable = () => executableResolves("xmllint")) => {
-  const strikethrooRoot = findStrikethrooRoot(startPath);
+var resolveReviewContext = (plan, startPath, validatorAvailable = () => executableResolves("xmllint")) => {
+  const strikethrooRoot = discoverPlanWorkspace(plan, startPath);
   if (!strikethrooRoot) {
     return {
       kind: "ended",
       result: decide({
         kind: "infrastructure-failure",
-        detail: `No Strikethroo workspace was found from ${startPath}.`
+        detail: `No Strikethroo workspace was found for plan "${plan}" from ${startPath}.`
       })
     };
   }
-  const hookFile = path8.join(strikethrooRoot, HOOK_RELATIVE_PATH);
+  const configuration = loadCodeReviewConfiguration(strikethrooRoot);
+  if (configuration.kind === "invalid") {
+    return {
+      kind: "ended",
+      result: decide({ kind: "infrastructure-failure", detail: configuration.detail })
+    };
+  }
+  if (!configuration.enabled) {
+    return {
+      kind: "ended",
+      result: skip(
+        "review-disabled",
+        "Code review is disabled. Set code_review.enabled to true in config/config.yaml or select Enable code review in Customize to opt in."
+      )
+    };
+  }
+  checkWorkspaceSchema(strikethrooRoot);
+  const hookFile = path9.join(strikethrooRoot, HOOK_RELATIVE_PATH);
   const hookContent = readFileOrNull(hookFile);
   if (hookContent === null) {
     return {
@@ -4055,12 +4234,12 @@ var resolveReviewContext = (startPath, validatorAvailable = () => executableReso
       kind: "ended",
       result: skip(
         "hook-empty",
-        `The code review mandate at ${hookFile} is empty, which is the documented way to disable the gate, so the review gate was skipped.`
+        `The code review mandate at ${hookFile} is empty, so the opted-in review gate was skipped.`
       )
     };
   }
-  const xsdFile = path8.join(strikethrooRoot, XSD_RELATIVE_PATH);
-  if (!fs7.existsSync(xsdFile)) {
+  const xsdFile = path9.join(strikethrooRoot, XSD_RELATIVE_PATH);
+  if (!fs8.existsSync(xsdFile)) {
     return {
       kind: "ended",
       result: skip(
@@ -4082,7 +4261,7 @@ var resolveReviewContext = (startPath, validatorAvailable = () => executableReso
     kind: "resolved",
     context: {
       strikethrooRoot,
-      workspace: path8.dirname(path8.dirname(strikethrooRoot)),
+      workspace: path9.dirname(path9.dirname(strikethrooRoot)),
       hookFile,
       hookContent,
       xsdFile
@@ -4092,7 +4271,7 @@ var resolveReviewContext = (startPath, validatorAvailable = () => executableReso
 var runReview = async (request, overrides = {}) => {
   const dependencies2 = { ...defaultDependencies2, ...overrides };
   const startPath = request.startPath ?? process.cwd();
-  const resolution = resolveReviewContext(startPath, dependencies2.validatorAvailable);
+  const resolution = resolveReviewContext(request.plan, startPath, dependencies2.validatorAvailable);
   if (resolution.kind === "ended") return resolution.result;
   const { strikethrooRoot, workspace, hookFile, hookContent, xsdFile } = resolution.context;
   const resolved = resolvePlan(request.plan, startPath);
@@ -4102,8 +4281,14 @@ var runReview = async (request, overrides = {}) => {
       detail: `Plan "${request.plan}" was not found or is invalid.`
     });
   }
+  if (resolved.strikethrooRoot !== strikethrooRoot) {
+    return decide({
+      kind: "infrastructure-failure",
+      detail: `Plan "${request.plan}" resolved outside the workspace whose review preference was checked.`
+    });
+  }
   const { planDir, planFile, planId } = resolved;
-  const baseCommitFile = path8.join(planDir, REVIEW_DIR_NAME, BASE_COMMIT_FILE_NAME);
+  const baseCommitFile = path9.join(planDir, REVIEW_DIR_NAME, BASE_COMMIT_FILE_NAME);
   const baseCommit = _readBaseCommit(baseCommitFile);
   if (baseCommit === null) {
     return skip(
@@ -4147,20 +4332,20 @@ var runReview = async (request, overrides = {}) => {
       `The diff from ${baseCommit} to the working tree in ${workspace} is empty, so there was nothing to review. No reviewer was dispatched, and nothing was certified.`
     );
   }
-  const reviewDir = path8.join(planDir, REVIEW_DIR_NAME);
-  const reviewFile = path8.join(reviewDir, REVIEW_FILE_NAME);
+  const reviewDir = path9.join(planDir, REVIEW_DIR_NAME);
+  const reviewFile = path9.join(reviewDir, REVIEW_FILE_NAME);
   try {
-    fs7.mkdirSync(reviewDir, { recursive: true });
+    fs8.mkdirSync(reviewDir, { recursive: true });
   } catch (error) {
     return decide({
       kind: "infrastructure-failure",
       detail: `Could not create the review directory ${reviewDir}: ${errorMessage2(error)}`
     });
   }
-  const staleArtifacts = [reviewFile, path8.join(reviewDir, TRANSCRIPT_FILE_NAME)];
+  const staleArtifacts = [reviewFile, path9.join(reviewDir, TRANSCRIPT_FILE_NAME)];
   for (const stale of staleArtifacts) {
     try {
-      fs7.rmSync(stale, { force: true });
+      fs8.rmSync(stale, { force: true });
     } catch (error) {
       return decide({
         kind: "infrastructure-failure",
