@@ -85,8 +85,8 @@ _None._
 - Open [**After a git merge, always rebuild dist-web/ before running e2e tests**](practice-after-a-git-merge-always-rebuild-dist-web-before-running-e2e-tests.md) — E2e tests run against the prebuilt dist-web/ SPA. A merge can produce a corrupted mixed build that passes lint but fails e2e selectors with stale markup.
 ### #documentation
 - Open [**Documentation captures current state only**](../conventions/practice-documentation-captures-current-state-only.md) — All docs describe how things work now. No historical context, migration notes, or retired-term mappings.
-- Open [**Phase is reserved for execution blueprint task groups**](../conventions/practice-phase-reserved-for-blueprint-task-groups.md) — "Phase" means parallel task batches in the blueprint. The three workflow stages are "steps", never "phases".
 - Open [**Workspace tracking is project-owned except local configuration and runtime output**](../practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace.md) — Projects choose whether to track plans and authored workspace files, while init ignores machine-local config.yaml, review artifacts, and runtime output.
+- Open [**Keep uncommitted workflow identifiers out of public issue and PR text**](../git/practice-keep-uncommitted-workflow-identifiers-out-of-public-issue-and-pr-text.md) — Public issues and PRs describe changes without internal plan numbers or references to uncommitted workflow documents.
 ### #dom
 - Open [**Vitest test suite runs in node environment — browser APIs unavailable in tests**](practice-vitest-test-suite-runs-in-node-environment-browser-apis-unavailable-in-tests.md) — Vitest is configured with environment: node; localStorage, matchMedia, and document are unavailable. Isolate DOM-touching code behind pure interfaces.
 ### #eslint

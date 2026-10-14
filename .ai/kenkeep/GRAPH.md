@@ -1,11 +1,11 @@
 ---
 schema_version: 3
-nodes_hash: 'sha256:6fec805bc1397350b5bd0fba8f632f3a258285c0d2915262114295bfa670a688'
-node_count: 87
+nodes_hash: 'sha256:a56ecb5d7a561b8605e9b455a76f3b8b403544018466625b3876fa65f2a3ac5c'
+node_count: 89
 ---
 # kenkeep Graph
 
-Total nodes: 87
+Total nodes: 89
 
 ## map-archive-ui-control-confirmation-gated-archive-button-on-done-plans
 
@@ -337,6 +337,15 @@ Total nodes: 87
 - **path:** testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md
 - **tags:** linting, eslint, globals, testing, e2e
 
+## practice-exclude-host-specific-knowledge-from-the-repository-knowledge-base
+
+- **kind:** practice
+- **title:** Exclude host-specific knowledge from the repository knowledge base
+- **path:** conventions/practice-exclude-host-specific-knowledge-from-the-repository-knowledge-base.md
+- **tags:** kenkeep, knowledge, conventions
+- **relates_to:** practice-documentation-captures-current-state-only
+- **derived_from:** 68d05db0-7902-42a1-b6d6-b0c8fb214ab9:practice:1
+
 ## practice-hot-reload-dev-loop-requires-three-concurrent-processes
 
 - **kind:** practice
@@ -383,6 +392,15 @@ Total nodes: 87
 - **path:** devcontainer/practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge.md
 - **tags:** devcontainer, docker, security, t3
 - **derived_from:** 05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:1
+
+## practice-keep-uncommitted-workflow-identifiers-out-of-public-issue-and-pr-text
+
+- **kind:** practice
+- **title:** Keep uncommitted workflow identifiers out of public issue and PR text
+- **path:** git/practice-keep-uncommitted-workflow-identifiers-out-of-public-issue-and-pr-text.md
+- **tags:** documentation, github, git, workspace
+- **relates_to:** practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
+- **derived_from:** 68d05db0-7902-42a1-b6d6-b0c8fb214ab9:practice:0
 
 ## practice-lint-staged-scopes-lint-format-but-pre-commit-still-runs-the-full-test-suite
 
