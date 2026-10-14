@@ -1,11 +1,11 @@
 ---
 schema_version: 3
-nodes_hash: 'sha256:ab00e8af8d5caa6a53e9007dbbd6884d61fc1225983010f2b8552589868a4ff6'
-node_count: 128
+nodes_hash: 'sha256:f52ba01ed5e76035c9fc21768352ceb594aae60193d0e7eef68ddedc6a1b981a'
+node_count: 104
 ---
 # kenkeep Graph
 
-Total nodes: 128
+Total nodes: 104
 
 ## map-archive-ui-control-confirmation-gated-archive-button-on-done-plans
 
@@ -14,14 +14,6 @@ Total nodes: 128
 - **path:** web/ui/map-archive-ui-control-confirmation-gated-archive-button-on-done-plans.md
 - **tags:** web, plans, archive, ui
 - **relates_to:** map-src-serve-archive-ts-archiveplan-operation
-
-## map-auth-probe-deadline-and-the-single-executable-resolver
-
-- **kind:** map
-- **title:** Auth probe deadline and the single executable resolver
-- **path:** skills/map-auth-probe-deadline-and-the-single-executable-resolver.md
-- **tags:** dispatch, harness, executable-resolution, readiness, windows
-- **relates_to:** map-model-optional-dispatch-reviewer-harness-omits-model, practice-harness-cli-args-are-exact-local-strings-and-executable-authority, practice-task-routing-classifies-at-generation-and-selects-at-dispatch
 
 ## map-capture-fixture-workspace-plans-102-104-as-active-demo-plans-for-screen-capture
 
@@ -78,14 +70,6 @@ Total nodes: 128
 - **tags:** eslint, tooling, config
 - **relates_to:** practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks
 
-## map-export-profile-copies-workspace-config-verbatim-without-redaction
-
-- **kind:** map
-- **title:** export profile copies workspace config verbatim without redaction
-- **path:** cli/map-export-profile-copies-workspace-config-verbatim-without-redaction.md
-- **tags:** profiles, export, security, config
-- **relates_to:** map-init-profile-resolves-validates-and-stages-a-strikethroo-profile, practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace, practice-say-strikethroo-profile-or-execution-profile-never-bare-profile
-
 ## map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root
 
 - **kind:** map
@@ -101,14 +85,6 @@ Total nodes: 128
 - **path:** serve/map-get-api-capabilities-returns-project-name-and-path-via-deriveproject.md
 - **tags:** serve, api, capabilities, sidebar, project
 - **relates_to:** map-src-serve-self-review-ts-post-api-self-review-endpoint
-
-## map-init-profile-resolves-validates-and-stages-a-strikethroo-profile
-
-- **kind:** map
-- **title:** How init --profile resolves, validates, and stages a strikethroo profile
-- **path:** cli/map-init-profile-resolves-validates-and-stages-a-strikethroo-profile.md
-- **tags:** profiles, init, security, git
-- **relates_to:** practice-strikethroo-profile-packages-tolerate-inert-package-root-extras, practice-say-strikethroo-profile-or-execution-profile-never-bare-profile, map-export-profile-copies-workspace-config-verbatim-without-redaction, practice-init-refresh-decides-each-config-path-against-its-recorded-baseline
 
 ## map-installed-skills-in-claude-skills-are-decoupled-from-repo-builds
 
@@ -180,14 +156,6 @@ Total nodes: 128
 - **tags:** web, spa, serve, design, scratch
 - **relates_to:** practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
 
-## map-serve-workspace-model-reads-and-root-resolution
-
-- **kind:** map
-- **title:** workspace-model.ts has three reads, and serve/root.ts accepts bare workspaces
-- **path:** serve/map-serve-workspace-model-reads-and-root-resolution.md
-- **tags:** serve, workspace-model, root, fixtures, api
-- **relates_to:** practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles, map-src-tests-fixtures-serve-workspace-committed-fixture-workspace-for-tests, map-capture-fixture-workspace-plans-102-104-as-active-demo-plans-for-screen-capture
-
 ## map-skills-are-auto-loaded-by-intent-matching-not-slash-command-prefix
 
 - **kind:** map
@@ -244,22 +212,6 @@ Total nodes: 128
 - **depends_on:** practice-keep-host-0-0-0-0-in-t3-serve-docker-port-forwarding-needs-it
 - **derived_from:** 05a1bddf-ef9e-4147-8e07-0b971366c7d7:map:0
 
-## map-update-refreshes-the-workspace-then-runs-npx-skills-update
-
-- **kind:** map
-- **title:** update refreshes the workspace, then runs npx skills update
-- **path:** cli/map-update-refreshes-the-workspace-then-runs-npx-skills-update.md
-- **tags:** update, cli, skills, installer
-- **relates_to:** practice-init-refresh-decides-each-config-path-against-its-recorded-baseline, practice-init-and-update-take-harnesses-from-the-flag-or-saved-metadata-only, map-cli-exposes-only-init-and-serve-commands-all-visualization-management-commands-removed
-
-## map-validate-is-a-pure-read-only-consistency-check-over-plans
-
-- **kind:** map
-- **title:** validate is a pure, read-only consistency check over plans/
-- **path:** cli/map-validate-is-a-pure-read-only-consistency-check-over-plans.md
-- **tags:** validate, cli, validation, ci
-- **relates_to:** practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles, practice-validate-metadata-gate-reports-deleted-files-never-hash-drift, practice-validate-strict-pass-keeps-its-own-frontmatter-reader, practice-task-status-lists-must-agree-and-only-the-router-writes-execution-profile, map-cli-exposes-only-init-and-serve-commands-all-visualization-management-commands-removed
-
 ## map-vercel-labs-skills-installer-scans-standard-dirs-before-plugin-json
 
 - **kind:** map
@@ -295,10 +247,10 @@ Total nodes: 128
 ## practice-adding-a-skill-touches-five-registries
 
 - **kind:** practice
-- **title:** Adding a skill means registering it in five places
+- **title:** Adding a skill means editing five registries
 - **path:** skills/practice-adding-a-skill-touches-five-registries.md
-- **tags:** skills, skill-scripts, skill-prompts, build, registry
-- **relates_to:** map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root, map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content, practice-update-notice-only-from-parent-workflow-skills, practice-never-hand-commit-generated-skill-artifacts
+- **tags:** skills, build
+- **relates_to:** practice-never-hand-commit-generated-skill-artifacts
 
 ## practice-after-a-git-merge-always-rebuild-dist-web-before-running-e2e-tests
 
@@ -339,13 +291,13 @@ Total nodes: 128
 - **tags:** tailwind, css, comments, build
 - **relates_to:** map-spa-vendor-styles-five-retained-css-files-under-src-web-vendor-styles
 
-## practice-bump-the-workspace-schema-version-only-for-incompatible-shape-changes
+## practice-bump-workspace-schema-version-only-for-incompatible-shape
 
 - **kind:** practice
 - **title:** Bump the workspace schema version only for incompatible shape changes
-- **path:** cli/practice-bump-the-workspace-schema-version-only-for-incompatible-shape-changes.md
-- **tags:** schema-version, metadata, skills, build, compatibility
-- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off, practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles, practice-init-refresh-decides-each-config-path-against-its-recorded-baseline
+- **path:** cli/practice-bump-workspace-schema-version-only-for-incompatible-shape.md
+- **tags:** schema-version, metadata
+- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off
 
 ## practice-commit-subject-50-chars-body-wrapped-at-72-chars-hook-enforced
 
@@ -358,18 +310,18 @@ Total nodes: 128
 ## practice-config-editors-keep-draft-baseline-and-disk-apart
 
 - **kind:** practice
-- **title:** Config editors keep draft, saved baseline, and disk as separate values
+- **title:** Customize editors keep draft, baseline, and disk apart
 - **path:** web/editor/practice-config-editors-keep-draft-baseline-and-disk-apart.md
-- **tags:** web, customize, editor, revalidation, conflicts
-- **relates_to:** practice-spa-data-layer-shared-plans-resource-and-revalidation, practice-config-yaml-form-is-the-only-yaml-boundary-in-the-spa, map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r
+- **tags:** customize, config-yaml
+- **relates_to:** practice-config-yaml-is-local-and-empty-means-unconfigured
 
-## practice-config-yaml-form-is-the-only-yaml-boundary-in-the-spa
+## practice-config-yaml-is-local-and-empty-means-unconfigured
 
 - **kind:** practice
-- **title:** Customize Config tab: configYaml.ts is the only YAML boundary
-- **path:** web/editor/practice-config-yaml-form-is-the-only-yaml-boundary-in-the-spa.md
-- **tags:** web, customize, config-yaml, yaml, editor
-- **relates_to:** practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files, practice-config-editors-keep-draft-baseline-and-disk-apart
+- **title:** config.yaml is local, and empty means unconfigured
+- **path:** skills/practice-config-yaml-is-local-and-empty-means-unconfigured.md
+- **tags:** config-yaml, execution-routing
+- **relates_to:** practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace
 
 ## practice-convey-done-state-with-strikethrough-color-or-emoji-not-non-interactive-checkboxes
 
@@ -382,10 +334,10 @@ Total nodes: 128
 ## practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled
 
 - **kind:** practice
-- **title:** Design thesis: negotiable configuration is Markdown, guarantees are compiled
+- **title:** Design thesis: configuration is Markdown, guarantees are compiled
 - **path:** practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled.md
-- **tags:** design-thesis, architecture, skills, review-gate, enforcement
-- **relates_to:** practice-review-gate-reports-it-does-not-fix, map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content
+- **tags:** design-thesis, enforcement
+- **relates_to:** practice-uncertified-review-is-never-reported-clean, practice-review-gate-reports-it-does-not-fix
 
 ## practice-do-not-commit-agents-skills-or-skills-lock-json-they-are-local-installation-artifacts
 
@@ -418,14 +370,6 @@ Total nodes: 128
 - **tags:** testing, e2e, playwright, selectors, tailwind
 - **relates_to:** practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f
 
-## practice-empty-config-yaml-means-nothing-configured-in-every-reader
-
-- **kind:** practice
-- **title:** An empty config.yaml means nothing is configured, in every reader
-- **path:** skills/practice-empty-config-yaml-means-nothing-configured-in-every-reader.md
-- **tags:** config-yaml, execution-routing, harness, customize, gotcha
-- **relates_to:** practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace
-
 ## practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks
 
 - **kind:** practice
@@ -442,22 +386,6 @@ Total nodes: 128
 - **relates_to:** practice-documentation-captures-current-state-only
 - **derived_from:** 68d05db0-7902-42a1-b6d6-b0c8fb214ab9:practice:1
 
-## practice-frontend-libraries-in-devdependencies-js-yaml-in-dependencies
-
-- **kind:** practice
-- **title:** Frontend libraries stay in devDependencies; js-yaml stays in dependencies
-- **path:** tooling/practice-frontend-libraries-in-devdependencies-js-yaml-in-dependencies.md
-- **tags:** dependencies, devdependencies, js-yaml, npm, packaging, web
-- **relates_to:** practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily, practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime
-
-## practice-harness-cli-args-are-exact-local-strings-and-executable-authority
-
-- **kind:** practice
-- **title:** Harness cli_args are exact local strings and executable authority
-- **path:** skills/practice-harness-cli-args-are-exact-local-strings-and-executable-authority.md
-- **tags:** harness, cli-args, config-yaml, security, dispatch, profiles
-- **relates_to:** map-model-optional-dispatch-reviewer-harness-omits-model, practice-strikethroo-profile-packages-tolerate-inert-package-root-extras, practice-empty-config-yaml-means-nothing-configured-in-every-reader
-
 ## practice-hot-reload-dev-loop-requires-three-concurrent-processes
 
 - **kind:** practice
@@ -465,21 +393,13 @@ Total nodes: 128
 - **path:** dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md
 - **tags:** dev, tooling, web, serve
 
-## practice-init-and-update-take-harnesses-from-the-flag-or-saved-metadata-only
+## practice-init-refresh-kept-file-keeps-its-old-baseline
 
 - **kind:** practice
-- **title:** Init and update take harnesses from the flag or saved metadata only
-- **path:** cli/practice-init-and-update-take-harnesses-from-the-flag-or-saved-metadata-only.md
-- **tags:** init, update, harnesses, metadata
-- **relates_to:** practice-init-refresh-decides-each-config-path-against-its-recorded-baseline
-
-## practice-init-refresh-decides-each-config-path-against-its-recorded-baseline
-
-- **kind:** practice
-- **title:** Init refresh decides each config path against its recorded baseline
-- **path:** cli/practice-init-refresh-decides-each-config-path-against-its-recorded-baseline.md
-- **tags:** init, update, refresh, conflicts, metadata
-- **relates_to:** practice-init-and-update-take-harnesses-from-the-flag-or-saved-metadata-only, map-update-refreshes-the-workspace-then-runs-npx-skills-update, practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
+- **title:** Init refresh: a kept file keeps its old baseline
+- **path:** cli/practice-init-refresh-kept-file-keeps-its-old-baseline.md
+- **tags:** init, refresh
+- **relates_to:** practice-bump-workspace-schema-version-only-for-incompatible-shape, practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace
 
 ## practice-isolate-concurrent-agent-changes-before-committing-by-excluding-entangled-files
 
@@ -488,6 +408,14 @@ Total nodes: 128
 - **path:** git/practice-isolate-concurrent-agent-changes-before-committing-by-excluding-entangled-files.md
 - **tags:** git, concurrent-agents, staging, pre-commit
 - **relates_to:** practice-do-not-use-no-verify-to-skip-git-commit-hooks
+
+## practice-js-yaml-stays-in-dependencies
+
+- **kind:** practice
+- **title:** js-yaml stays in dependencies; frontend libraries do not
+- **path:** tooling/practice-js-yaml-stays-in-dependencies.md
+- **tags:** dependencies, npm
+- **relates_to:** practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily
 
 ## practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
 
@@ -632,29 +560,13 @@ Total nodes: 128
 - **relates_to:** practice-after-a-git-merge-always-rebuild-dist-web-before-running-e2e-tests, practice-never-hand-commit-generated-skill-artifacts
 - **derived_from:** dd3c135d-8ffc-4046-97c1-60fbf493ff03:practice:0
 
-## practice-release-invariant-check-commands
-
-- **kind:** practice
-- **title:** Commands that check the release invariants for skills/ and the npm tarball
-- **path:** release/practice-release-invariant-check-commands.md
-- **tags:** release, skills, npm, verification, recipe
-- **relates_to:** practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime, practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf, practice-release-workflow-splits-verify-from-publish
-
 ## practice-release-workflow-splits-verify-from-publish
 
 - **kind:** practice
-- **title:** The release workflow splits a read-only verify job from a credentialed release job
+- **title:** Release workflow splits verify from publish
 - **path:** release/practice-release-workflow-splits-verify-from-publish.md
-- **tags:** release, ci, github-actions, security, npm, semantic-release
-- **relates_to:** practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime, map-releaserc-json-repositoryurl-must-match-current-github-repo-slug, practice-security-check-audit-ci-exceptions-are-narrow
-
-## practice-resolve-plans-through-classifyplaninput
-
-- **kind:** practice
-- **title:** Resolve plan arguments through _classifyPlanInput and resolvePlan
-- **path:** skills/practice-resolve-plans-through-classifyplaninput.md
-- **tags:** skill-scripts, plan-resolution, workspace-root, schema-version
-- **relates_to:** practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles, map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root
+- **tags:** release, ci
+- **relates_to:** practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime
 
 ## practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens
 
@@ -663,22 +575,6 @@ Total nodes: 128
 - **path:** web/rendering/practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens.md
 - **tags:** web, spa, components, reuse, architecture
 - **relates_to:** map-mermaiderror-tsx-shared-mermaid-render-error-component
-
-## practice-review-certification-accepts-only-xsd-syntax-and-a-confirmed-count
-
-- **kind:** practice
-- **title:** Review certification accepts only XSD syntax and an xmllint-confirmed count
-- **path:** code-review/practice-review-certification-accepts-only-xsd-syntax-and-a-confirmed-count.md
-- **tags:** review-gate, certification, xmllint, xml-security
-- **relates_to:** practice-reviewer-prints-findings-and-the-orchestrator-alone-writes-them, practice-review-gate-reports-it-does-not-fix, practice-optional-by-absence-new-files-absent-means-feature-off
-
-## practice-review-diff-git-calls-are-argv-only-and-a-lost-path-fails-the-gate
-
-- **kind:** practice
-- **title:** Review diff Git calls are argv-only, and a lost path fails the gate
-- **path:** code-review/practice-review-diff-git-calls-are-argv-only-and-a-lost-path-fails-the-gate.md
-- **tags:** review-gate, git, diff-scope, shell-safety
-- **relates_to:** practice-review-gate-reports-it-does-not-fix, practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
 
 ## practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
 
@@ -697,45 +593,21 @@ Total nodes: 128
 - **relates_to:** map-model-optional-dispatch-reviewer-harness-omits-model, practice-optional-by-absence-new-files-absent-means-feature-off, practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
 - **derived_from:** .ai/strikethroo/plans/116--streamline-review-gate-contract-and-prompt/tasks/03--clean-review-gate-terminology.md
 
-## practice-review-gate-runs-only-on-explicit-boolean-opt-in
+## practice-review-gate-runs-only-on-explicit-opt-in
 
 - **kind:** practice
-- **title:** The review gate runs only when code_review.enabled is boolean true
-- **path:** code-review/practice-review-gate-runs-only-on-explicit-boolean-opt-in.md
-- **tags:** review-gate, opt-in, configuration, activation
-- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off, practice-review-gate-reports-it-does-not-fix, practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles
-
-## practice-reviewer-prints-findings-and-the-orchestrator-alone-writes-them
-
-- **kind:** practice
-- **title:** The reviewer prints findings; only the orchestrator writes review.xml
-- **path:** code-review/practice-reviewer-prints-findings-and-the-orchestrator-alone-writes-them.md
-- **tags:** review-gate, delivery, stdout, certification
-- **relates_to:** practice-review-gate-reports-it-does-not-fix, map-model-optional-dispatch-reviewer-harness-omits-model, practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore
+- **title:** Review gate runs only on explicit opt-in
+- **path:** code-review/practice-review-gate-runs-only-on-explicit-opt-in.md
+- **tags:** review-gate, config-yaml
+- **relates_to:** practice-review-gate-reports-it-does-not-fix
 
 ## practice-route-workspace-file-access-through-safe-fs
 
 - **kind:** practice
-- **title:** Route workspace file access through shared/safe-fs.ts
+- **title:** Route workspace file access through safe-fs
 - **path:** skills/practice-route-workspace-file-access-through-safe-fs.md
-- **tags:** safe-fs, security, symlink, filesystem, metadata, skill-scripts, serve
-- **relates_to:** practice-skill-scripts-build-boundary-keep-crossings-few, practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
-
-## practice-say-strikethroo-profile-or-execution-profile-never-bare-profile
-
-- **kind:** practice
-- **title:** Say strikethroo profile or execution profile, never bare profile
-- **path:** cli/practice-say-strikethroo-profile-or-execution-profile-never-bare-profile.md
-- **tags:** profiles, terminology, execution-routing, docs
-- **relates_to:** map-init-profile-resolves-validates-and-stages-a-strikethroo-profile, practice-strikethroo-profile-packages-tolerate-inert-package-root-extras
-
-## practice-security-check-audit-ci-exceptions-are-narrow
-
-- **kind:** practice
-- **title:** security:check exceptions name one advisory and one audit-ci path
-- **path:** tooling/practice-security-check-audit-ci-exceptions-are-narrow.md
-- **tags:** tooling, security, audit-ci, npm, ci, dependencies
-- **relates_to:** practice-release-workflow-splits-verify-from-publish
+- **tags:** safe-fs, security
+- **relates_to:** practice-serve-request-security-model
 
 ## practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
 
@@ -754,18 +626,10 @@ Total nodes: 128
 ## practice-serve-request-security-model
 
 - **kind:** practice
-- **title:** Serve guards every request before routing, and mutations need a session token
+- **title:** Serve guards every request; mutations need a session token
 - **path:** serve/practice-serve-request-security-model.md
-- **tags:** serve, security, dns-rebinding, capability, origin, http
-- **relates_to:** practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files, map-src-serve-self-review-ts-post-api-self-review-endpoint
-
-## practice-serve-self-review-and-sse-are-bounded-not-managed
-
-- **kind:** practice
-- **title:** Self-review launches and SSE streams are bounded, not managed
-- **path:** serve/practice-serve-self-review-and-sse-are-bounded-not-managed.md
-- **tags:** serve, self-review, sse, limits, backpressure
-- **relates_to:** map-src-serve-self-review-ts-post-api-self-review-endpoint, practice-serve-request-security-model
+- **tags:** serve, security
+- **relates_to:** practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files
 
 ## practice-set-suppresserrorrendering-true-in-mermaid-initialization
 
@@ -773,22 +637,6 @@ Total nodes: 128
 - **title:** Set suppressErrorRendering: true in mermaid initialization
 - **path:** web/rendering/practice-set-suppresserrorrendering-true-in-mermaid-initialization.md
 - **tags:** mermaid, spa, rendering, error-handling
-
-## practice-shared-disciplines-are-runtime-config-not-baked-prompts
-
-- **kind:** practice
-- **title:** Cross-skill disciplines ship as runtime config/shared files
-- **path:** skills/prompts/practice-shared-disciplines-are-runtime-config-not-baked-prompts.md
-- **tags:** skill-prompts, config-shared, schema-version, verification-gate, lifecycle
-- **relates_to:** practice-use-build-time-composition-to-eliminate-cross-skill-prompt-duplication, map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content, practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled, practice-review-gate-reports-it-does-not-fix
-
-## practice-skill-scripts-build-boundary-keep-crossings-few
-
-- **kind:** practice
-- **title:** The skill-scripts build boundary: tsconfig exclude is not an import fence
-- **path:** skills/practice-skill-scripts-build-boundary-keep-crossings-few.md
-- **tags:** skill-scripts, build, tsconfig, esbuild, boundary
-- **relates_to:** map-phase-derivation-is-implemented-twice-viewer-path-and-execution-path, practice-use-resolveworkspaceroot-not-findstrikethrooroot-outside-skill-bundles
 
 ## practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime
 
@@ -799,29 +647,13 @@ Total nodes: 128
 - **depends_on:** practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf
 - **derived_from:** 7f15ae61-53e1-4644-8689-567a37c4ff39:practice:0
 
-## practice-spa-csp-is-a-response-header
+## practice-spa-render-and-csp-boundaries
 
 - **kind:** practice
-- **title:** The SPA's CSP is a response header with script-src 'self' and no hash
-- **path:** web/rendering/practice-spa-csp-is-a-response-header.md
-- **tags:** web, serve, security, csp, theme
-- **relates_to:** practice-spa-markdown-and-mermaid-are-the-only-render-boundaries, practice-serve-request-security-model
-
-## practice-spa-data-layer-shared-plans-resource-and-revalidation
-
-- **kind:** practice
-- **title:** SPA data layer: one plans fetch, data kept on failed re-reads, safe routing
-- **path:** web/practice-spa-data-layer-shared-plans-resource-and-revalidation.md
-- **tags:** web, spa, data, revalidation, sse, router
-- **relates_to:** practice-web-routes-and-api-resolve-plans-by-composite-id-slug-directory-name-not-numeric, practice-serve-self-review-and-sse-are-bounded-not-managed
-
-## practice-spa-markdown-and-mermaid-are-the-only-render-boundaries
-
-- **kind:** practice
-- **title:** markdown.ts is the only sanitizer, and mermaid ignores document overrides
-- **path:** web/rendering/practice-spa-markdown-and-mermaid-are-the-only-render-boundaries.md
-- **tags:** web, rendering, security, sanitization, mermaid, dompurify
-- **relates_to:** practice-markdown-policy-needs-its-own-dompurify-instance, practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens, practice-set-suppresserrorrendering-true-in-mermaid-initialization
+- **title:** SPA renders through two modules under a header CSP
+- **path:** web/rendering/practice-spa-render-and-csp-boundaries.md
+- **tags:** sanitization, csp
+- **relates_to:** practice-markdown-policy-needs-its-own-dompurify-instance
 
 ## practice-spa-source-changes-require-npm-run-build-web-before-serve-reflects-them
 
@@ -871,37 +703,21 @@ Total nodes: 128
 - **tags:** gitignore, workspace, documentation, code-review, init
 - **relates_to:** practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore, practice-keep-ai-strikethroo-dogfood-workspace-explicitly-ignored-in-gitignore
 
-## practice-task-routing-classifies-at-generation-and-selects-at-dispatch
+## practice-task-routing-and-harness-dispatch
 
 - **kind:** practice
-- **title:** Task routing classifies at generation and selects a target at dispatch
-- **path:** skills/practice-task-routing-classifies-at-generation-and-selects-at-dispatch.md
-- **tags:** execution-routing, dispatch, skill-scripts, task-frontmatter, harness
-- **relates_to:** practice-harness-cli-args-are-exact-local-strings-and-executable-authority, map-model-optional-dispatch-reviewer-harness-omits-model, map-find-strikethroo-root-ts-skill-scripts-utility-that-locates-the-ai-strikethroo-workspace-root
+- **title:** Task routing: one profile writer, strict dispatch
+- **path:** skills/practice-task-routing-and-harness-dispatch.md
+- **tags:** execution-routing, dispatch
+- **relates_to:** practice-config-yaml-is-local-and-empty-means-unconfigured, map-model-optional-dispatch-reviewer-harness-omits-model
 
-## practice-task-status-lists-must-agree-and-only-the-router-writes-execution-profile
-
-- **kind:** practice
-- **title:** Task status lists must agree, and only the router writes execution_profile
-- **path:** cli/practice-task-status-lists-must-agree-and-only-the-router-writes-execution-profile.md
-- **tags:** tasks, frontmatter, validate, execution-routing, templates
-- **relates_to:** practice-validate-strict-pass-keeps-its-own-frontmatter-reader, map-validate-is-a-pure-read-only-consistency-check-over-plans, practice-task-routing-classifies-at-generation-and-selects-at-dispatch
-
-## practice-theme-guard-must-mirror-theme-ts
+## practice-uncertified-review-is-never-reported-clean
 
 - **kind:** practice
-- **title:** theme-guard.js duplicates theme.ts, so the two must change together
-- **path:** web/styling/practice-theme-guard-must-mirror-theme-ts.md
-- **tags:** web, theme, dark-mode, styling, coupling
-- **relates_to:** practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups, practice-spa-csp-is-a-response-header
-
-## practice-update-notice-only-from-parent-workflow-skills
-
-- **kind:** practice
-- **title:** Only parent workflow skills check for updates and emit the notice
-- **path:** skills/practice-update-notice-only-from-parent-workflow-skills.md
-- **tags:** update-check, skills, skill-prompts, notice, runtime
-- **relates_to:** map-installed-skills-in-claude-skills-are-decoupled-from-repo-builds, practice-optional-by-absence-new-files-absent-means-feature-off
+- **title:** An uncertified review is never reported clean
+- **path:** code-review/practice-uncertified-review-is-never-reported-clean.md
+- **tags:** review-gate, certification
+- **relates_to:** practice-review-gate-reports-it-does-not-fix
 
 ## practice-use-baseui-components-for-interactive-ui-elements-in-the-spa
 
@@ -972,21 +788,13 @@ Total nodes: 128
 - **path:** web/styling/practice-use-theme-token-utilities-everywhere-in-the-spa-never-arbitrary-value-brackets-f.md
 - **tags:** tailwind, tokens, css, dark-mode, spa
 
-## practice-validate-metadata-gate-reports-deleted-files-never-hash-drift
+## practice-validate-reports-deletions-not-hash-drift
 
 - **kind:** practice
-- **title:** validate's metadata gate reports deleted files, never hash drift
-- **path:** cli/practice-validate-metadata-gate-reports-deleted-files-never-hash-drift.md
-- **tags:** validate, metadata, optional-gates, hash-tracking
-- **relates_to:** map-validate-is-a-pure-read-only-consistency-check-over-plans, practice-optional-by-absence-new-files-absent-means-feature-off, practice-init-refresh-decides-each-config-path-against-its-recorded-baseline
-
-## practice-validate-strict-pass-keeps-its-own-frontmatter-reader
-
-- **kind:** practice
-- **title:** validate's strict pass keeps its own frontmatter reader
-- **path:** cli/practice-validate-strict-pass-keeps-its-own-frontmatter-reader.md
-- **tags:** validate, frontmatter, serve, gotcha
-- **relates_to:** map-validate-is-a-pure-read-only-consistency-check-over-plans, practice-task-status-lists-must-agree-and-only-the-router-writes-execution-profile
+- **title:** validate reports deleted files, never hash drift
+- **path:** cli/practice-validate-reports-deletions-not-hash-drift.md
+- **tags:** validate, frontmatter
+- **relates_to:** practice-optional-by-absence-new-files-absent-means-feature-off, practice-init-refresh-kept-file-keeps-its-old-baseline
 
 ## practice-vendoring-dalia-css-requires-the-foundational-dark-token-block-not-just-per-component-fixups
 

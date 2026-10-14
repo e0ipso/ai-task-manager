@@ -19,9 +19,9 @@ _None._
 ## By topic
 
 ### #web
+- Open [**Serve SPA has two sanctioned workspace mutations; self-review writes nothing**](../../serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md) — Archive moves done plans into archive/. Config writes overwrite one existing allowlisted file. Self-review spawns a process but writes no files.
 - Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
 - Open [**serve UI PRD and tickets live under .ai/strikethroo/scratch/ui/**](../../serve/map-serve-ui-prd-and-tickets-live-under-ai-strikethroo-scratch-ui.md) — The PRD and 13 dependency-ordered tickets for the serve SPA feature are in .ai/strikethroo/scratch/ui/, not in the formal plans/ flow.
-- Open [**Hot-reload dev loop requires three concurrent processes**](../../dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md) — Backend: ts-node via node --watch. Frontend: Vite at localhost:5173 with /api/* proxied to localhost:4317. No dist/ involvement.
 ### #ui
 - Open [**Archive UI control — confirmation-gated Archive button on done plans**](map-archive-ui-control-confirmation-gated-archive-button-on-done-plans.md) — Done plans get an Archive button wired to ArchivePlanModal; POST /api/plans/:id/archive triggers SSE-driven UI refresh.
 - Open [**Convey done/undone state with strikethrough, color, or emoji — never a non-interactive checkbox**](practice-convey-done-state-with-strikethrough-color-or-emoji-not-non-interactive-checkboxes.md) — In read-only UI, render Done/Undone with a passive visual cue (strikethrough, text color, emoji); a checkbox implies it is clickable
@@ -36,8 +36,8 @@ _None._
 ### #baseui
 - Open [**Use BaseUI components for interactive UI elements in the SPA**](practice-use-baseui-components-for-interactive-ui-elements-in-the-spa.md) — @base-ui-components/react is required for all new interactive UI elements; hand-rolled components are pre-mandate legacy.
 ### #components
-- Open [**Reuse shared SPA prose-rendering components across all markdown-rendering screens**](../rendering/practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens.md) — The project has a standing code-reuse mandate: all markdown-rendering screens must use the shared Section/ReaderProse renderer.
 - Open [**Use BaseUI components for interactive UI elements in the SPA**](practice-use-baseui-components-for-interactive-ui-elements-in-the-spa.md) — @base-ui-components/react is required for all new interactive UI elements; hand-rolled components are pre-mandate legacy.
+- Open [**Reuse shared SPA prose-rendering components across all markdown-rendering screens**](../rendering/practice-reuse-shared-spa-prose-rendering-components-across-all-markdown-rendering-screens.md) — The project has a standing code-reuse mandate: all markdown-rendering screens must use the shared Section/ReaderProse renderer.
 - Open [**MermaidError.tsx — shared mermaid render-error component**](../rendering/map-mermaiderror-tsx-shared-mermaid-render-error-component.md) — src/web/plans/detail/MermaidError.tsx renders a Lucide Frown icon with a collapsed Details disclosure for the verbatim parse error.
 ### #interactive
 - Open [**Use BaseUI components for interactive UI elements in the SPA**](practice-use-baseui-components-for-interactive-ui-elements-in-the-spa.md) — @base-ui-components/react is required for all new interactive UI elements; hand-rolled components are pre-mandate legacy.

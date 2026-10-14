@@ -1,7 +1,7 @@
 ---
 schema_version: 3
-nodes_hash: 'sha256:ab00e8af8d5caa6a53e9007dbbd6884d61fc1225983010f2b8552589868a4ff6'
-node_count: 128
+nodes_hash: 'sha256:f52ba01ed5e76035c9fc21768352ceb594aae60193d0e7eef68ddedc6a1b981a'
+node_count: 104
 ---
 # kenkeep
 
@@ -23,9 +23,9 @@ node_count: 128
 - Load [`web/`](nodes/web/index.md) for more information on the React + Vite + Tailwind SPA — data layer, screens, routing, and the branding, editor, rendering, styling, and ui subareas.
 
 ## Conventions (how we build)
-- Open [**Review gate artifacts are git-ignored by a workspace-root .gitignore**](nodes/practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore.md) to learn about: init ships .ai/strikethroo/.gitignore covering plans/*/review/ and archive/*/review/, keeping reviewer output out of git and its own diff. #code-review #gitignore #workspace #init #generated-artifacts
 - Open [**Never hand-commit generated skill artifacts in either tree**](nodes/practice-never-hand-commit-generated-skill-artifacts.md) to learn about: dist-test is gitignored build output; the root skills/ mirror is tracked but written only by the release sync. .gitattributes and the pre-commit guard cover both trees and the review gate skips them. #build #skills #git #gitattributes #review-gate #generated-artifacts
-- Open [**Strikethroo profile packages tolerate inert package-root extras**](nodes/practice-strikethroo-profile-packages-tolerate-inert-package-root-extras.md) to learn about: validateProfilePackage scopes to profile.yaml plus config/; entries at the package root are accepted and are never copied, hash-tracked, or executed. #profiles #init #validation #security
 - Open [**Workspace tracking is project-owned except local configuration and runtime output**](nodes/practice-takes-no-stance-on-committing-the-ai-strikethroo-workspace.md) to learn about: Projects choose whether to track plans and authored workspace files, while init ignores machine-local config.yaml, review artifacts, and runtime output. #gitignore #workspace #documentation #code-review #init
-- Open [**Design thesis: negotiable configuration is Markdown, guarantees are compiled**](nodes/practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled.md) to learn about: Three premises drive src/skill-prompts and src/skill-scripts. Put enforcement a user must not loosen in TypeScript, never in a hook. #design-thesis #architecture #skills #review-gate #enforcement
+- Open [**Review gate artifacts are git-ignored by a workspace-root .gitignore**](nodes/practice-review-gate-artifacts-are-git-ignored-by-a-workspace-root-gitignore.md) to learn about: init ships .ai/strikethroo/.gitignore covering plans/*/review/ and archive/*/review/, keeping reviewer output out of git and its own diff. #code-review #gitignore #workspace #init #generated-artifacts
+- Open [**Design thesis: configuration is Markdown, guarantees are compiled**](nodes/practice-design-thesis-markdown-is-negotiable-guarantees-are-compiled.md) to learn about: Hooks and templates are editable Markdown. Rules a user must not loosen live in TypeScript. #design-thesis #enforcement
 - Open [**Keep comment prose terse and single-sourced**](nodes/practice-keep-comment-prose-terse-and-single-sourced.md) to learn about: Do not write long doc comments or repeat the same rationale across call sites and file copies. State it once where it belongs. #comments #code-style #documentation #xsd #prose
+- Open [**Strikethroo profile packages tolerate inert package-root extras**](nodes/practice-strikethroo-profile-packages-tolerate-inert-package-root-extras.md) to learn about: validateProfilePackage scopes to profile.yaml plus config/; entries at the package root are accepted and are never copied, hash-tracked, or executed. #profiles #init #validation #security

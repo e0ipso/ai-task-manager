@@ -43,9 +43,9 @@ _None yet._
 ### #svg
 - Open [**Strikethroo brand favicon at src/web/public/favicon.svg**](practice-strikethroo-brand-favicon-svg.md) — Cream Outfit \`s\` on ink rounded-square with strike-through; embed real glyph paths and hex colors only.
 ### #web
+- Open [**Serve SPA has two sanctioned workspace mutations; self-review writes nothing**](../../serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md) — Archive moves done plans into archive/. Config writes overwrite one existing allowlisted file. Self-review spawns a process but writes no files.
 - Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
 - Open [**serve UI PRD and tickets live under .ai/strikethroo/scratch/ui/**](../../serve/map-serve-ui-prd-and-tickets-live-under-ai-strikethroo-scratch-ui.md) — The PRD and 13 dependency-ordered tickets for the serve SPA feature are in .ai/strikethroo/scratch/ui/, not in the formal plans/ flow.
-- Open [**Hot-reload dev loop requires three concurrent processes**](../../dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md) — Backend: ts-node via node --watch. Frontend: Vite at localhost:5173 with /api/* proxied to localhost:4317. No dist/ involvement.
 ### #wordmark
 - Open [**Use the throughline strikethroo wordmark**](practice-use-the-throughline-strikethroo-wordmark.md) — Use the Outfit throughline wordmark with an ink strike through the x-height; not the Dalia UI Wordmark or a dot.
 ### #workflow
