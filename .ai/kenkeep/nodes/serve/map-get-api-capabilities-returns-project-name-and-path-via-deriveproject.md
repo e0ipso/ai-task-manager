@@ -28,5 +28,5 @@ kk_confidence: high
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-src-serve-self-review-ts-post-api-self-review-endpoint](/serve/map-src-serve-self-review-ts-post-api-self-review-endpoint.md)
+- Related: [map-src-serve-self-review-ts-post-api-self-review-endpoint](map-src-serve-self-review-ts-post-api-self-review-endpoint.md)
 <!-- kk:related:end -->

@@ -39,5 +39,5 @@ Every one appears in `SKILL_ENTRYPOINTS` in `scripts/build-skills.cjs`. The regi
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content](/skills/prompts/map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content.md)
+- Related: [map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content](prompts/map-src-skill-prompts-is-the-authored-source-of-truth-for-skill-md-content.md)
 <!-- kk:related:end -->

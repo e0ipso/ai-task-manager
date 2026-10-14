@@ -31,5 +31,5 @@ When multiple agents operate on the same working tree, changes from a concurrent
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-do-not-use-no-verify-to-skip-git-commit-hooks](/git/practice-do-not-use-no-verify-to-skip-git-commit-hooks.md)
+- Related: [practice-do-not-use-no-verify-to-skip-git-commit-hooks](practice-do-not-use-no-verify-to-skip-git-commit-hooks.md)
 <!-- kk:related:end -->

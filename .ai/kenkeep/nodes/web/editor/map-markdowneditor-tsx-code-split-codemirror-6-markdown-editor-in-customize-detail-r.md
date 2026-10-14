@@ -28,5 +28,5 @@ The editor and all its dependencies are code-split via a single `React.lazy` + d
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily](/web/editor/practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily.md)
+- Related: [practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily](practice-all-codemirror-packages-must-stay-in-devdependencies-and-be-imported-lazily.md)
 <!-- kk:related:end -->

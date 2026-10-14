@@ -35,5 +35,5 @@ lint-staged config in package.json:
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-pre-commit-test-hook-prevents-per-phase-commits-during-multi-phase-plan-execution](/git/practice-pre-commit-test-hook-prevents-per-phase-commits-during-multi-phase-plan-execution.md)
+- Related: [practice-pre-commit-test-hook-prevents-per-phase-commits-during-multi-phase-plan-execution](practice-pre-commit-test-hook-prevents-per-phase-commits-during-multi-phase-plan-execution.md)
 <!-- kk:related:end -->

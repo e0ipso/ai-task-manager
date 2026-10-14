@@ -30,5 +30,5 @@ Rule of thumb: if clicking the control would not change anything, do not render 
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-use-baseui-components-for-interactive-ui-elements-in-the-spa](/web/ui/practice-use-baseui-components-for-interactive-ui-elements-in-the-spa.md)
+- Related: [practice-use-baseui-components-for-interactive-ui-elements-in-the-spa](practice-use-baseui-components-for-interactive-ui-elements-in-the-spa.md)
 <!-- kk:related:end -->

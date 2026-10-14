@@ -33,5 +33,5 @@ Then create the matching `v<version>` tag and push. Without the tag, CI's check 
 <!-- kk:related:start -->
 # Related
 
-- Depends on: [practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime](/release/practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime.md)
+- Depends on: [practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime](practice-spa-assets-are-prebuilt-and-force-added-into-release-commit-never-built-at-runtime.md)
 <!-- kk:related:end -->

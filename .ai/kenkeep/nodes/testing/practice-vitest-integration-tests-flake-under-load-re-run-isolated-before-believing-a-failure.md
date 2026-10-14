@@ -32,11 +32,11 @@ Do not change source to chase such a failure, and do not read it as caused by th
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-playwright-e2e-suites-flake-under-full-suite-parallelism-due-to-cpu-contention](/testing/practice-playwright-e2e-suites-flake-under-full-suite-parallelism-due-to-cpu-contention.md)
+- Related: [practice-playwright-e2e-suites-flake-under-full-suite-parallelism-due-to-cpu-contention](practice-playwright-e2e-suites-flake-under-full-suite-parallelism-due-to-cpu-contention.md)
 <!-- kk:related:end -->
 
 <!-- kk:citations:start -->
 # Citations
 
-[1] [cf892283-2514-437c-bea8-4b68a535813e:practice:0](cf892283-2514-437c-bea8-4b68a535813e:practice:0)
+[1] cf892283-2514-437c-bea8-4b68a535813e:practice:0
 <!-- kk:citations:end -->

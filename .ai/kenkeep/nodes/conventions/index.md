@@ -34,4 +34,5 @@ _None yet._
 ### #knowledge
 - Open [**Exclude host-specific knowledge from the repository knowledge base**](practice-exclude-host-specific-knowledge-from-the-repository-knowledge-base.md) — Keep host-specific tooling availability and credential conventions out of repository Kenkeep nodes.
 ### #terminology
+- Open [**Say strikethroo profile or execution profile, never bare profile**](../cli/practice-say-strikethroo-profile-or-execution-profile-never-bare-profile.md) — Setup packages imported by init and execution_routing.profiles share only a word; name which one in code, docs, prompts, and output.
 - Open [**Phase is reserved for execution blueprint task groups**](practice-phase-reserved-for-blueprint-task-groups.md) — "Phase" means parallel task batches in the blueprint. The three workflow stages are "steps", never "phases".

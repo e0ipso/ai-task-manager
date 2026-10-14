@@ -14,11 +14,29 @@
 - Load [`ui/`](ui/index.md) for more information on SPA interactive UI components and read-only affordance conventions.
 
 ## Conventions (how we build)
-_None yet._
+- Open [**SPA data layer: one plans fetch, data kept on failed re-reads, safe routing**](practice-spa-data-layer-shared-plans-resource-and-revalidation.md) to learn about: PlansProvider owns the one /api/plans fetch; useResource keeps last good data on a failed re-read; an SSE reconnect forces one pass. #web #spa #data #revalidation #sse #router
 
 ## Components (what exists)
 _None yet._
 
 ## By topic
 
-_No tags yet._
+### #data
+- Open [**SPA data layer: one plans fetch, data kept on failed re-reads, safe routing**](practice-spa-data-layer-shared-plans-resource-and-revalidation.md) — PlansProvider owns the one /api/plans fetch; useResource keeps last good data on a failed re-read; an SSE reconnect forces one pass.
+### #revalidation
+- Open [**Config editors keep draft, saved baseline, and disk as separate values**](editor/practice-config-editors-keep-draft-baseline-and-disk-apart.md) — draftState.ts stops a live revalidation from replacing typing. A disk change under unsaved edits shows DiskConflictBanner instead.
+- Open [**SPA data layer: one plans fetch, data kept on failed re-reads, safe routing**](practice-spa-data-layer-shared-plans-resource-and-revalidation.md) — PlansProvider owns the one /api/plans fetch; useResource keeps last good data on a failed re-read; an SSE reconnect forces one pass.
+### #router
+- Open [**SPA data layer: one plans fetch, data kept on failed re-reads, safe routing**](practice-spa-data-layer-shared-plans-resource-and-revalidation.md) — PlansProvider owns the one /api/plans fetch; useResource keeps last good data on a failed re-read; an SSE reconnect forces one pass.
+### #spa
+- Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
+- Open [**serve UI PRD and tickets live under .ai/strikethroo/scratch/ui/**](../serve/map-serve-ui-prd-and-tickets-live-under-ai-strikethroo-scratch-ui.md) — The PRD and 13 dependency-ordered tickets for the serve SPA feature are in .ai/strikethroo/scratch/ui/, not in the formal plans/ flow.
+- Open [**Serve SPA has two sanctioned workspace mutations; self-review writes nothing**](../serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md) — Archive moves done plans into archive/. Config writes overwrite one existing allowlisted file. Self-review spawns a process but writes no files.
+### #sse
+- Open [**window.__stRevalidationCount — Playwright observability hook for SSE-driven revalidation**](../testing/map-window-strevalidationcount-playwright-observability-hook-for-sse-driven-revalidation.md) — Deliberately-shipped window counter that Playwright e2e tests read to verify live-data revalidation fired after an SSE change event.
+- Open [**Use domcontentloaded not networkidle when Playwright-driving the SPA**](../capture/practice-use-domcontentloaded-not-networkidle-when-playwright-driving-the-spa.md) — The SPA holds an open SSE connection (/api/events) so networkidle never fires. Use domcontentloaded plus explicit waitForSelector calls instead.
+- Open [**SPA data layer: one plans fetch, data kept on failed re-reads, safe routing**](practice-spa-data-layer-shared-plans-resource-and-revalidation.md) — PlansProvider owns the one /api/plans fetch; useResource keeps last good data on a failed re-read; an SSE reconnect forces one pass.
+### #web
+- Open [**Plan Detail: blueprint markdown section is distinct from the tasks-frontmatter Tasks tab**](../serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md) — Four data sources feed the Plan Detail tabs; the blueprint prose and tasks-frontmatter rendering must not be conflated
+- Open [**serve UI PRD and tickets live under .ai/strikethroo/scratch/ui/**](../serve/map-serve-ui-prd-and-tickets-live-under-ai-strikethroo-scratch-ui.md) — The PRD and 13 dependency-ordered tickets for the serve SPA feature are in .ai/strikethroo/scratch/ui/, not in the formal plans/ flow.
+- Open [**Hot-reload dev loop requires three concurrent processes**](../dev/practice-hot-reload-dev-loop-requires-three-concurrent-processes.md) — Backend: ts-node via node --watch. Frontend: Vite at localhost:5173 with /api/* proxied to localhost:4317. No dist/ involvement.

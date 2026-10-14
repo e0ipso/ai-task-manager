@@ -23,5 +23,5 @@ Do not use the Dalia UI `<Wordmark>` component for Strikethroo assets. It is a d
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-strikethroo-brand-favicon-svg](/web/branding/practice-strikethroo-brand-favicon-svg.md)
+- Related: [practice-strikethroo-brand-favicon-svg](practice-strikethroo-brand-favicon-svg.md)
 <!-- kk:related:end -->

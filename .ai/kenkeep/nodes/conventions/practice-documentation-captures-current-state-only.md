@@ -22,5 +22,5 @@ If something is renamed or removed, update or delete the documentation. Do not a
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-phase-reserved-for-blueprint-task-groups](/conventions/practice-phase-reserved-for-blueprint-task-groups.md)
+- Related: [practice-phase-reserved-for-blueprint-task-groups](practice-phase-reserved-for-blueprint-task-groups.md)
 <!-- kk:related:end -->

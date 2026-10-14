@@ -33,5 +33,5 @@ Creating the instance at module load is safe because the module is browser-only:
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-review-gate-reports-it-does-not-fix](/code-review/practice-review-gate-reports-it-does-not-fix.md)
+- Related: [practice-review-gate-reports-it-does-not-fix](../../code-review/practice-review-gate-reports-it-does-not-fix.md)
 <!-- kk:related:end -->

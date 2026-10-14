@@ -24,5 +24,5 @@ Both mermaid consumers — `PlanDetailGraph.tsx` (Graph tab) and `ReaderProse.ts
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-set-suppresserrorrendering-true-in-mermaid-initialization](/web/rendering/practice-set-suppresserrorrendering-true-in-mermaid-initialization.md)
+- Related: [practice-set-suppresserrorrendering-true-in-mermaid-initialization](practice-set-suppresserrorrendering-true-in-mermaid-initialization.md)
 <!-- kk:related:end -->

@@ -30,5 +30,5 @@ Traversal hardening: the URL segment feeds plan lookup via enumerate-and-match (
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-src-serve-archive-ts-archiveplan-operation](/serve/map-src-serve-archive-ts-archiveplan-operation.md)
+- Related: [map-src-serve-archive-ts-archiveplan-operation](map-src-serve-archive-ts-archiveplan-operation.md)
 <!-- kk:related:end -->

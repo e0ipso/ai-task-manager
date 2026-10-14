@@ -28,5 +28,5 @@ The failure this prevents is a silent one: an inflated phase would disagree with
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](/serve/practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
+- Related: [practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter](practice-plan-detail-blueprint-markdown-vs-tasks-frontmatter.md)
 <!-- kk:related:end -->

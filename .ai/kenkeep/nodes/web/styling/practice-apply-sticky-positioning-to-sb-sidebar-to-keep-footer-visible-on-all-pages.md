@@ -28,5 +28,5 @@ This layout property is load-bearing — removing it would silently break the si
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-get-api-capabilities-returns-project-name-and-path-via-deriveproject](/serve/map-get-api-capabilities-returns-project-name-and-path-via-deriveproject.md)
+- Related: [map-get-api-capabilities-returns-project-name-and-path-via-deriveproject](../../serve/map-get-api-capabilities-returns-project-name-and-path-via-deriveproject.md)
 <!-- kk:related:end -->

@@ -25,5 +25,5 @@ kk_confidence: high
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes](/serve/practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes.md)
+- Related: [practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes](practice-serve-layer-uses-discriminated-union-result-types-not-custom-error-classes.md)
 <!-- kk:related:end -->

@@ -32,5 +32,5 @@ All component/screen CSS files (app-shell, plans, detail, board-graph, archive, 
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency](/web/styling/map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency.md)
+- Related: [map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency](map-dalia-ui-design-system-vendored-into-src-web-vendor-not-a-package-dependency.md)
 <!-- kk:related:end -->

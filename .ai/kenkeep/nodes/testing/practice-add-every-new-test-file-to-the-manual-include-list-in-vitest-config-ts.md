@@ -29,11 +29,11 @@ New test files also raise the coverage denominator, so verify the global thresho
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-vitest-test-suite-runs-in-node-environment-browser-apis-unavailable-in-tests](/testing/practice-vitest-test-suite-runs-in-node-environment-browser-apis-unavailable-in-tests.md)
+- Related: [practice-vitest-test-suite-runs-in-node-environment-browser-apis-unavailable-in-tests](practice-vitest-test-suite-runs-in-node-environment-browser-apis-unavailable-in-tests.md)
 <!-- kk:related:end -->
 
 <!-- kk:citations:start -->
 # Citations
 
-[1] [ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:1](ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:1)
+[1] ecba74ac-907e-4ecc-bb2b-60c89a695f4a:practice:1
 <!-- kk:citations:end -->

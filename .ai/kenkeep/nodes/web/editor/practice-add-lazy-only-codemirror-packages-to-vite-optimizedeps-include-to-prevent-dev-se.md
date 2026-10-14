@@ -36,5 +36,5 @@ This is a dev-server-only setting; `vite build` ignores it. After adding it, cle
 <!-- kk:related:start -->
 # Related
 
-- Depends on: [map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r](/web/editor/map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r.md)
+- Depends on: [map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r](map-markdowneditor-tsx-code-split-codemirror-6-markdown-editor-in-customize-detail-r.md)
 <!-- kk:related:end -->

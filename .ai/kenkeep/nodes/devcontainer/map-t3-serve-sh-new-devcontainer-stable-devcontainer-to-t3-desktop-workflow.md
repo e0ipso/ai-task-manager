@@ -29,11 +29,10 @@ Two complementary tools enable a stable per-repo t3 desktop connection:
 <!-- kk:citations:start -->
 # Citations
 
-[1] [05a1bddf-ef9e-4147-8e07-0b971366c7d7:map:0](05a1bddf-ef9e-4147-8e07-0b971366c7d7:map:0)
+[1] 05a1bddf-ef9e-4147-8e07-0b971366c7d7:map:0
 <!-- kk:citations:end -->
-
 <!-- kk:related:start -->
 # Related
 
-- Depends on: [practice-keep-host-0-0-0-0-in-t3-serve-docker-port-forwarding-needs-it](/devcontainer/practice-keep-host-0-0-0-0-in-t3-serve-docker-port-forwarding-needs-it.md)
+- Depends on: [practice-keep-host-0-0-0-0-in-t3-serve-docker-port-forwarding-needs-it](practice-keep-host-0-0-0-0-in-t3-serve-docker-port-forwarding-needs-it.md)
 <!-- kk:related:end -->

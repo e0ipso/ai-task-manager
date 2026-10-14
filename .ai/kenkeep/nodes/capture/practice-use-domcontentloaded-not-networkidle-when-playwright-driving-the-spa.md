@@ -25,5 +25,5 @@ Use `waitUntil: 'domcontentloaded'` combined with explicit `waitForSelector` or 
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-window-strevalidationcount-playwright-observability-hook-for-sse-driven-revalidation](/testing/map-window-strevalidationcount-playwright-observability-hook-for-sse-driven-revalidation.md)
+- Related: [map-window-strevalidationcount-playwright-observability-hook-for-sse-driven-revalidation](../testing/map-window-strevalidationcount-playwright-observability-hook-for-sse-driven-revalidation.md)
 <!-- kk:related:end -->

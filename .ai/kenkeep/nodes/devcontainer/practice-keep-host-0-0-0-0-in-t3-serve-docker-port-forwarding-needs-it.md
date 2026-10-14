@@ -26,11 +26,10 @@ The working invocation: `t3 serve --host 0.0.0.0 --mode web --no-browser`.
 <!-- kk:citations:start -->
 # Citations
 
-[1] [05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:0](05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:0)
+[1] 05a1bddf-ef9e-4147-8e07-0b971366c7d7:practice:0
 <!-- kk:citations:end -->
-
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge](/devcontainer/practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge.md)
+- Related: [practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge](practice-keep-t3-pairing-auth-sibling-devcontainers-can-reach-the-docker-bridge.md)
 <!-- kk:related:end -->

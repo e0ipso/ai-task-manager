@@ -28,5 +28,5 @@ Adding jsdom to the Vitest config is not the solution — the project deliberate
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks](/testing/practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md)
+- Related: [practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks](practice-eslint-test-block-must-include-browser-globals-for-page-evaluate-callbacks.md)
 <!-- kk:related:end -->

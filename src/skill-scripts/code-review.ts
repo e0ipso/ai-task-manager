@@ -24,7 +24,7 @@ import {
  * The code review gate: scope the plan's cumulative diff, dispatch a second
  * harness to review it, certify the findings, and emit one JSON line. It
  * reports; it never fixes, commits, or judges findings. Rationale for each
- * decision below is in AGENTS.md, "Code Review Gate".
+ * decision below is in `.ai/kenkeep/nodes/code-review/`.
  */
 
 const HOOK_RELATIVE_PATH = path.join('config', 'hooks', 'CODE_REVIEW.md');
@@ -440,7 +440,7 @@ const untrackedDiff = (workspace: string, file: string): string | null =>
 /**
  * Scope: two-dot `git diff <base>` against the working tree, plus an add-diff
  * per untracked unignored path, minus paths `.gitattributes` marks generated
- * or vendored. Why each: AGENTS.md, "Code Review Gate".
+ * or vendored. Why each: `.ai/kenkeep/nodes/code-review/`.
  *
  * Every Git step is argv-based: paths from the repository are data, never part
  * of a command string. Any step failing — the listings, the attribute check,

@@ -21,7 +21,7 @@ import { Finding } from './types';
 const METADATA_FILENAME = '.init-metadata.json';
 
 /**
- * Tracked paths AGENTS.md documents as optional by absence: deleting one is the
+ * Tracked paths that are optional by absence: deleting one is the
  * supported way to turn its feature off — the review gate skips cleanly, XSD
  * certification reports `validator-absent`, and the update notice falls back to
  * the bundled default. Absence is a valid state, so none of them is a deletion.

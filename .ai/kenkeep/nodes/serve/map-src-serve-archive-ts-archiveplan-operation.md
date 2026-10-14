@@ -24,5 +24,5 @@ The route `POST /api/plans/:key/archive` in `src/serve/server.ts` accepts only t
 <!-- kk:related:start -->
 # Related
 
-- Related: [practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files](/serve/practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md)
+- Related: [practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files](practice-serve-layer-mutation-invariant-archive-endpoint-is-the-only-route-that-writes-workspace-files.md)
 <!-- kk:related:end -->

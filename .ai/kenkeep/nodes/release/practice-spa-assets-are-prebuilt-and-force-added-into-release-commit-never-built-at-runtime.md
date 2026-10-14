@@ -50,11 +50,10 @@ Each artifact lives where its consumer reads it. The SPA's only consumer is the 
 <!-- kk:citations:start -->
 # Citations
 
-[1] [7f15ae61-53e1-4644-8689-567a37c4ff39:practice:0](7f15ae61-53e1-4644-8689-567a37c4ff39:practice:0)
+[1] 7f15ae61-53e1-4644-8689-567a37c4ff39:practice:0
 <!-- kk:citations:end -->
-
 <!-- kk:related:start -->
 # Related
 
-- Depends on: [practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf](/release/practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf.md)
+- Depends on: [practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf](practice-use-git-rm-r-for-tracked-skill-output-dirs-not-rm-rf.md)
 <!-- kk:related:end -->

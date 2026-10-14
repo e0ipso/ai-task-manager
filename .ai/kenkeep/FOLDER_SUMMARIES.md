@@ -4,6 +4,9 @@ summaries:
   capture: >-
     the documentation-visual capture harness — its committed fixture workspace
     and Playwright SPA-driving technique
+  cli: >-
+    the strikethroo CLI commands: init and update refresh contract, setup
+    profiles, workspace validation, and the workspace schema version
   code-review: >-
     the report-only code review gate — reviewer discovery and dispatch, the
     stdout delivery channel, XSD certification, and cumulative-diff scoping
@@ -59,6 +62,7 @@ summaries:
 # kenkeep Folder Summaries
 
 - `capture`: the documentation-visual capture harness — its committed fixture workspace and Playwright SPA-driving technique
+- `cli`: the strikethroo CLI commands: init and update refresh contract, setup profiles, workspace validation, and the workspace schema version
 - `code-review`: the report-only code review gate — reviewer discovery and dispatch, the stdout delivery channel, XSD certification, and cumulative-diff scoping
 - `conventions`: documentation and terminology conventions — current-state-only docs and the reserved meaning of phase
 - `dev`: the local development loop — dev:serve hot reload, the three concurrent processes, and rebuilding the SPA for serve

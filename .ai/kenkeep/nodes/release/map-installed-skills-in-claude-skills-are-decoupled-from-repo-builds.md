@@ -22,5 +22,5 @@ The skills installed under `~/.claude/skills/` (or `/workspace/.claude/skills/`)
 <!-- kk:related:start -->
 # Related
 
-- Related: [map-vercel-labs-skills-installer-scans-standard-dirs-before-plugin-json](/release/map-vercel-labs-skills-installer-scans-standard-dirs-before-plugin-json.md)
+- Related: [map-vercel-labs-skills-installer-scans-standard-dirs-before-plugin-json](map-vercel-labs-skills-installer-scans-standard-dirs-before-plugin-json.md)
 <!-- kk:related:end -->
