@@ -5,7 +5,7 @@
  */
 
 import { SUPPORTED_HARNESSES } from '../types';
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -143,6 +143,64 @@ describe('code review gate — explicit opt-in', () => {
       expect(dispatch).not.toHaveBeenCalled();
     } finally {
       ws.cleanup();
+    }
+  });
+
+  it.skipIf(process.platform === 'win32').each([
+    ['symlink', (configFile: string, outside: string) => fs.symlinkSync(outside, configFile)],
+    ['FIFO', (configFile: string) => execFileSync('mkfifo', [configFile])],
+  ])('rejects a %s configuration without following or blocking on it', async (_label, plant) => {
+    const ws = makeReviewGateWorkspace();
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strikethroo-outside-'));
+    const outside = path.join(outsideDir, 'config.yaml');
+    fs.writeFileSync(outside, 'code_review:\n  enabled: true\n');
+    const dispatch = vi.fn(stubDeps().dispatch);
+    try {
+      fs.rmSync(ws.configFile);
+      plant(ws.configFile, outside);
+      const result = await runReview(
+        { plan: '1', currentHarness: 'claude', startPath: ws.root },
+        stubDeps({ dispatch })
+      );
+      expect(result).toMatchObject({ kind: 'infrastructure-failure', action: 'halt' });
+      expect(result.detail).toContain('could not be read');
+      expect(dispatch).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+      ws.cleanup();
+    }
+  });
+
+  it.each([
+    ['skips a disabled target from an enabled workspace', 'true', 'false'],
+    ['reviews an enabled target from a disabled workspace', 'false', 'true'],
+  ])('%s', async (_label, startEnabled, targetEnabled) => {
+    const start = makeReviewGateWorkspace({ config: `code_review:\n  enabled: ${startEnabled}\n` });
+    const target = makeReviewGateWorkspace({
+      config: `code_review:\n  enabled: ${targetEnabled}\n`,
+      baseCommit: FAKE_SHA,
+    });
+    const discover = vi.fn(async () => ({ outcomes: [], reviewerCandidates: [] }));
+    try {
+      const result = await runReview(
+        { plan: target.planFile, currentHarness: 'claude', startPath: start.root },
+        stubDeps({ discover })
+      );
+      if (targetEnabled === 'true') {
+        expect(result).toMatchObject({ kind: 'skipped', reason: 'no-reviewer-candidate' });
+        expect(discover).toHaveBeenCalledWith(
+          expect.objectContaining({
+            strikethrooRoot: target.strikethrooRoot,
+            workspace: target.root,
+          })
+        );
+      } else {
+        expect(result).toMatchObject({ kind: 'skipped', reason: 'review-disabled' });
+        expect(discover).not.toHaveBeenCalled();
+      }
+    } finally {
+      start.cleanup();
+      target.cleanup();
     }
   });
 

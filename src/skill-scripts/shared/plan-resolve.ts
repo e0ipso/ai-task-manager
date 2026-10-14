@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { checkWorkspaceSchema, findStrikethrooRoot } from './root';
+import { checkWorkspaceSchema, discoverStrikethrooRoot, findStrikethrooRoot } from './root';
 import { getAllPlans } from './plan-scan';
 import { extractPlanId } from './frontmatter';
 
@@ -67,15 +67,17 @@ const checkStandardRootShortcut = (filePath: string): string | null => {
   return isValidRootDir(possibleRoot) ? possibleRoot : null;
 };
 
+const discoverRootForPlanFile = (planFile: string): string | null =>
+  checkStandardRootShortcut(planFile) ?? discoverStrikethrooRoot(path.dirname(planFile));
+
 /**
  * The layout shortcut only locates a root, so it is routed through the same
  * schema gate `findStrikethrooRoot` applies. One gate, both routes.
  */
 const locateRootForPlanFile = (planFile: string): string | null => {
-  const shortcut = checkStandardRootShortcut(planFile);
-  if (!shortcut) return findStrikethrooRoot(path.dirname(planFile));
-  checkWorkspaceSchema(shortcut);
-  return shortcut;
+  const root = discoverRootForPlanFile(planFile);
+  if (root) checkWorkspaceSchema(root);
+  return root;
 };
 
 const resolveByPath = (absolutePath: string): ResolvedPlan | null => {
@@ -116,6 +118,20 @@ const resolveById = (planId: number, startPath: string): ResolvedPlan | null => 
     strikethrooRoot: tmRoot,
     planId,
   };
+};
+
+/**
+ * Discovery only: the workspace `resolvePlan` would address, without the schema
+ * gate or reading the plan. Inputs that are not a path route like ids.
+ */
+export const discoverPlanWorkspace = (
+  input: string | number,
+  startPath: string = process.cwd()
+): string | null => {
+  const classified = _classifyPlanInput(input);
+  return classified.kind === 'path'
+    ? discoverRootForPlanFile(classified.planFile)
+    : discoverStrikethrooRoot(startPath);
 };
 
 export const resolvePlan = (

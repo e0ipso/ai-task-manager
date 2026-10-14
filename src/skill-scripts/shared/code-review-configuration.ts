@@ -1,8 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import * as yaml from 'js-yaml';
 
 import { WORKSPACE_CONFIG_RELPATH } from './execution-routing';
+import { readContainedFile } from './safe-fs';
 import { hasYamlContent } from './task-frontmatter';
 
 export type CodeReviewConfiguration =
@@ -17,16 +16,12 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
 
 /** Only an explicit boolean true authorizes review. Other sections have their own readers. */
 export const loadCodeReviewConfiguration = (strikethrooRoot: string): CodeReviewConfiguration => {
-  let contents: string;
-  try {
-    contents = fs.readFileSync(path.join(strikethrooRoot, WORKSPACE_CONFIG_RELPATH), 'utf8');
-  } catch (error) {
-    if ((error as { code?: unknown }).code === 'ENOENT') return { kind: 'config', enabled: false };
-    return {
-      kind: 'invalid',
-      detail: `config.yaml could not be read: ${error instanceof Error ? error.message : String(error)}`,
-    };
+  const read = readContainedFile(strikethrooRoot, WORKSPACE_CONFIG_RELPATH);
+  if ('error' in read) {
+    if (read.error === 'not-found') return { kind: 'config', enabled: false };
+    return { kind: 'invalid', detail: `config.yaml could not be read: ${read.message}` };
   }
+  const contents = read.content;
 
   if (!hasYamlContent(contents)) return { kind: 'config', enabled: false };
 

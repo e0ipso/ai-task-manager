@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SUPPORTED_HARNESSES, type Harness } from '../types';
 import { execGit, execGitDiffAllowingChanges, splitNulDelimited } from './shared/git-utils';
-import { checkWorkspaceSchema, discoverStrikethrooRoot } from './shared/root';
+import { checkWorkspaceSchema } from './shared/root';
 import { loadCodeReviewConfiguration } from './shared/code-review-configuration';
-import { resolvePlan } from './shared/plan-resolve';
+import { discoverPlanWorkspace, resolvePlan } from './shared/plan-resolve';
 import { discoverHarnesses } from './shared/harness-discovery';
 import { executableResolves } from './shared/executable-resolution';
 import { dispatchReview } from './shared/external-dispatch';
@@ -609,18 +609,23 @@ interface ReviewContext {
   xsdFile: string;
 }
 
-/** The workspace shape the gate needs, or the skip or failure that ends the run. */
+/**
+ * The shape of the workspace the plan addresses, or the skip or failure that
+ * ends the run. An absolute plan path can address a workspace other than the
+ * one around `startPath`, and its own preference decides.
+ */
 const resolveReviewContext = (
+  plan: string | number,
   startPath: string,
   validatorAvailable: () => boolean = () => executableResolves('xmllint')
 ): { kind: 'resolved'; context: ReviewContext } | { kind: 'ended'; result: ReviewResult } => {
-  const strikethrooRoot = discoverStrikethrooRoot(startPath);
+  const strikethrooRoot = discoverPlanWorkspace(plan, startPath);
   if (!strikethrooRoot) {
     return {
       kind: 'ended',
       result: decide({
         kind: 'infrastructure-failure',
-        detail: `No Strikethroo workspace was found from ${startPath}.`,
+        detail: `No Strikethroo workspace was found for plan "${plan}" from ${startPath}.`,
       }),
     };
   }
@@ -713,7 +718,7 @@ export const runReview = async (
   const dependencies = { ...defaultDependencies, ...overrides };
   const startPath = request.startPath ?? process.cwd();
 
-  const resolution = resolveReviewContext(startPath, dependencies.validatorAvailable);
+  const resolution = resolveReviewContext(request.plan, startPath, dependencies.validatorAvailable);
   if (resolution.kind === 'ended') return resolution.result;
   const { strikethrooRoot, workspace, hookFile, hookContent, xsdFile } = resolution.context;
 
@@ -722,6 +727,12 @@ export const runReview = async (
     return decide({
       kind: 'infrastructure-failure',
       detail: `Plan "${request.plan}" was not found or is invalid.`,
+    });
+  }
+  if (resolved.strikethrooRoot !== strikethrooRoot) {
+    return decide({
+      kind: 'infrastructure-failure',
+      detail: `Plan "${request.plan}" resolved outside the workspace whose review preference was checked.`,
     });
   }
   const { planDir, planFile, planId } = resolved;
