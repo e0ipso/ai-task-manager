@@ -14,9 +14,9 @@
  *   - platform-aware browser auto-open on startup.
  *
  * The server binds loopback unless the caller passes another IP address in
- * `host`, and every request — static, API, and the `apiHandlers` extension
- * point — passes through {@link guardRequest} (Host authority, request-target
- * parsing) and a single
+ * `host`; `publicUrls` names extra origins a reverse proxy serves it on. Every
+ * request — static, API, and the `apiHandlers` extension point — passes through
+ * {@link guardRequest} (Host authority, request-target parsing) and a single
  * exception boundary before any route runs. Routes are matched by path first
  * and method second, so a wrong method answers `405` and a mutation path never
  * reaches a read handler. Body-bearing mutations require `application/json`.
@@ -81,6 +81,12 @@ export interface ServeOptions {
    * every peer that can reach it; see {@link ServeHandle.exposed}.
    */
   host?: string;
+  /**
+   * Origins a reverse proxy serves the viewer on (see {@link parsePublicUrls}).
+   * Each adds its authority to the allowed `Host` set and itself to the allowed
+   * `Origin` set. Bind address and port are unaffected.
+   */
+  publicUrls?: string[];
   /**
    * Seams for the self-review launcher (availability probe and spawn).
    * Test-only: lets a suite prove a rejected request launched nothing.
@@ -204,6 +210,8 @@ const sendError = (res: http.ServerResponse, status: number, body: unknown): voi
 export interface GuardContext {
   /** Lower-case `host[:port]` authorities this server answers for. */
   allowedHosts: ReadonlySet<string>;
+  /** Lower-case `scheme://host[:port]` origins the same-origin guard accepts. */
+  allowedOrigins: ReadonlySet<string>;
   /** The per-start mutation capability (see the module comment). */
   capability: string;
 }
@@ -227,12 +235,12 @@ const MISDIRECTED = reject(421, 'Misdirected request.');
 const FORBIDDEN = reject(403, 'Forbidden.');
 
 /**
- * Runs before routing, for every request. Refuses any `Host` that is not one
- * of the server's own loopback authorities (DNS-rebinding defense), then parses
- * the request target: origin-form (`/path`) or absolute-form naming an allowed
- * authority; anything else, including a target whose path does not
- * percent-decode, is a `400`. The returned `pathname` is the only thing routing
- * consumes.
+ * Runs before routing, for every request. Refuses any `Host` that is not one of
+ * the server's own IP authorities, `localhost`, or a configured public URL
+ * (DNS-rebinding defense), then parses the request target: origin-form
+ * (`/path`) or absolute-form naming an allowed authority; anything else,
+ * including a target whose path does not percent-decode, is a `400`. The
+ * returned `pathname` is the only thing routing consumes.
  */
 export const guardRequest = (req: http.IncomingMessage, ctx: GuardContext): GuardResult => {
   const host = (req.headers.host ?? '').toLowerCase();
@@ -260,23 +268,20 @@ export const guardRequest = (req: http.IncomingMessage, ctx: GuardContext): Guar
 
 /**
  * Same-origin policy for the session bootstrap and every mutation. The request
- * must carry no cross-site fetch metadata (`Sec-Fetch-Site` absent, `same-origin`
- * or `none` — a page we served, or a direct navigation) and any `Origin` present
- * must be `http://<allowed authority>`. `same-site`, `cross-site`, `null`, and a
- * foreign or https Origin are all refused. Both headers are forbidden request
- * headers in browsers, so a page cannot forge them; non-browser callers are
- * what the capability is for.
+ * must carry no cross-site fetch metadata (`Sec-Fetch-Site` absent,
+ * `same-origin` or `none` — a page we served, or a direct navigation) and any
+ * `Origin` present must be `http://<allowed IP or localhost authority>` or
+ * exactly a configured public URL. `same-site`, `cross-site`, `null`, and any
+ * other Origin are all refused. Both headers are forbidden request headers in
+ * browsers, so a page cannot forge them; non-browser callers are what the
+ * capability is for.
  */
 const guardSameOrigin = (req: http.IncomingMessage, ctx: GuardContext): GuardResult | null => {
   const site = req.headers['sec-fetch-site'];
   if (site !== undefined && site !== 'same-origin' && site !== 'none') return FORBIDDEN;
   const origin = req.headers.origin;
   if (origin === undefined) return null;
-  const lower = origin.toLowerCase();
-  for (const host of ctx.allowedHosts) {
-    if (lower === `http://${host}`) return null;
-  }
-  return FORBIDDEN;
+  return ctx.allowedOrigins.has(origin.toLowerCase()) ? null : FORBIDDEN;
 };
 
 /** Constant-time check that {@link CAPABILITY_HEADER} carries this instance's token. */
@@ -850,11 +855,47 @@ export const hostAddressesFor = (
   return [...addresses];
 };
 
+/** Outcome of {@link parsePublicUrls}: normalised origins, or the first refusal. */
+export type PublicUrlsResult = { ok: true; origins: string[] } | { ok: false; error: string };
+
+/**
+ * Validates `--public-url` values: an absolute `http`/`https` URL with no
+ * credentials, no path beyond `/`, and no query or fragment. Each yields its
+ * origin as a browser sends it in `Origin` (lower-cased host, default port
+ * dropped, IDN as punycode), deduplicated.
+ */
+export const parsePublicUrls = (values: readonly string[]): PublicUrlsResult => {
+  const origins = new Set<string>();
+  for (const raw of values) {
+    const value = raw.trim();
+    const refuse = (reason: string): PublicUrlsResult => ({
+      ok: false,
+      error: `Invalid --public-url "${raw}": ${reason}`,
+    });
+    // The prefix check stops the URL parser's lenient `https:host` reading.
+    if (!/^https?:\/\//i.test(value)) return refuse('use an absolute http:// or https:// URL.');
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      return refuse('not a valid URL.');
+    }
+    if (url.username || url.password) return refuse('credentials are not allowed.');
+    if (url.pathname !== '/' || /[?#]/.test(value)) {
+      return refuse('give only the scheme and authority, with no path, query, or fragment.');
+    }
+    origins.add(url.origin.toLowerCase());
+  }
+  return { ok: true, origins: [...origins] };
+};
+
 /**
  * Creates and starts the HTTP server, resolving with the bound URL once it is
- * listening. Rejects only on a genuine listen/bind error.
+ * listening. Rejects on invalid `publicUrls` or a genuine listen/bind error.
  */
 export const startServer = async (opts: ServeOptions): Promise<ServeHandle> => {
+  const publicUrls = parsePublicUrls(opts.publicUrls ?? []);
+  if (!publicUrls.ok) throw new Error(publicUrls.error);
   const extraHandlers = opts.apiHandlers ?? [];
   const events = new EventsHub(opts.root, opts.debounceMs);
 
@@ -865,7 +906,11 @@ export const startServer = async (opts: ServeOptions): Promise<ServeHandle> => {
   // `allowedHosts` is filled in once `listen` resolves (port 0 is ephemeral);
   // empty until then, which refuses everything — no request can arrive before
   // that anyway.
-  const guardContext: GuardContext = { allowedHosts: new Set(), capability };
+  const guardContext: GuardContext = {
+    allowedHosts: new Set(),
+    allowedOrigins: new Set(),
+    capability,
+  };
 
   // One launch registry per instance, so self-review admission is bounded for
   // this server's lifetime; a test-supplied registry still wins.
@@ -953,11 +998,19 @@ export const startServer = async (opts: ServeOptions): Promise<ServeHandle> => {
   const authorities = hostAddressesFor(address.address).map(a => authorityOf(a, boundPort));
   // `127.0.0.1` and `localhost` are always allowed; IPv6 and non-loopback
   // authorities only where the server listens. Lower-cased to match the guard.
-  guardContext.allowedHosts = new Set(
-    [...authorities, `${DEFAULT_HOST}:${boundPort}`, `localhost:${boundPort}`].map(a =>
-      a.toLowerCase()
-    )
+  const ownHosts = [...authorities, `${DEFAULT_HOST}:${boundPort}`, `localhost:${boundPort}`].map(
+    a => a.toLowerCase()
   );
+  // Own authorities are reached over plain http; a public URL is trusted only
+  // under its exact scheme.
+  guardContext.allowedHosts = new Set([
+    ...ownHosts,
+    ...publicUrls.origins.map(origin => new URL(origin).host),
+  ]);
+  guardContext.allowedOrigins = new Set([
+    ...ownHosts.map(host => `http://${host}`),
+    ...publicUrls.origins,
+  ]);
 
   // A wildcard bind is opened locally through IPv4 loopback.
   const url = WILDCARD_ADDRESSES.has(address.address)
